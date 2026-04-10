@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<StackPane fx:id="root" minHeight="620.0" minWidth="980.0" prefHeight="620.0" prefWidth="980.0" styleClass="signup-root" stylesheets="@../css/signup.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.SignUpController">
+   <children>
+      <GridPane maxHeight="560.0" maxWidth="860.0" prefHeight="560.0" prefWidth="860.0" styleClass="signup-card">
+         <columnConstraints>
+            <ColumnConstraints percentWidth="48.0" />
+            <ColumnConstraints percentWidth="52.0" />
+         </columnConstraints>
+         <children>
+            <StackPane styleClass="signup-left-pane" GridPane.columnIndex="0">
+               <children>
+                  <VBox alignment="TOP_LEFT" maxHeight="Infinity" maxWidth="Infinity" spacing="26.0">
+                     <children>
+                        <Button fx:id="homeButton" mnemonicParsing="false" onAction="#onGoHome" styleClass="btn-home-back" text="Home" />
+                        <VBox alignment="CENTER" spacing="16.0" VBox.vgrow="ALWAYS">
+                           <children>
+                              <ImageView fx:id="heroImageView" fitHeight="200.0" fitWidth="320.0" preserveRatio="true" smooth="true" styleClass="signup-hero-image" />
+                              <Label styleClass="left-title" text="Start Your Journey to" />
+                              <Label styleClass="left-title" text="Excellence" />
+                              <Label alignment="CENTER" maxWidth="300.0" styleClass="left-subtitle" text="Join our community and unlock your full athletic potential" textAlignment="CENTER" wrapText="true" />
+                              <VBox alignment="CENTER_LEFT" spacing="8.0">
+                                 <children>
+                                    <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                       <children>
+                                          <Label styleClass="check-icon" text="✓" />
+                                          <Label styleClass="benefit-text" text="Smart nutrition plans" />
+                                       </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                       <children>
+                                          <Label styleClass="check-icon" text="✓" />
+                                          <Label styleClass="benefit-text" text="Workout management" />
+                                       </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                       <children>
+                                          <Label styleClass="check-icon" text="✓" />
+                                          <Label styleClass="benefit-text" text="AI mental wellness" />
+                                       </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                       <children>
+                                          <Label styleClass="check-icon" text="✓" />
+                                          <Label styleClass="benefit-text" text="Progress tracking" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </VBox>
+                        <Region VBox.vgrow="ALWAYS" />
+                     </children>
+                     <padding>
+                        <Insets bottom="24.0" left="24.0" right="24.0" top="24.0" />
+                     </padding>
+                  </VBox>
+               </children>
+            </StackPane>
+            <StackPane styleClass="signup-right-pane" GridPane.columnIndex="1">
+               <children>
+                  <VBox alignment="TOP_LEFT" maxWidth="380.0" spacing="8.0">
+                     <children>
+                        <Label styleClass="create-title" text="Create Account" />
+                        <Label styleClass="create-subtitle" text="Sign up and start your fitness journey today." />
+                        <Region prefHeight="10.0" />
+                        <Label styleClass="field-label" text="FIRST NAME" />
+                        <TextField fx:id="firstNameField" promptText="First Name" styleClass="input-field" />
+                        <Label styleClass="field-label" text="LAST NAME" />
+                        <TextField fx:id="lastNameField" promptText="Last Name" styleClass="input-field" />
+                        <Label styleClass="field-label" text="EMAIL" />
+                        <TextField fx:id="emailField" promptText="Email" styleClass="input-field" />
+                        <Label styleClass="field-label" text="PASSWORD" />
+                        <PasswordField fx:id="passwordField" promptText="Password" styleClass="input-field" />
+                        <Region prefHeight="8.0" />
+                        <Button fx:id="signUpButton" mnemonicParsing="false" onAction="#onSignUp" styleClass="btn-signup-main" text="SIGN UP" />
+                        <HBox alignment="CENTER" spacing="6.0">
+                           <children>
+                              <Label styleClass="footer-text" text="Already have an account?" />
+                              <Button fx:id="signInButton" mnemonicParsing="false" onAction="#onSignIn" styleClass="btn-signin-inline" text="Sign In" />
+                           </children>
+                        </HBox>
+                     </children>
+                     <padding>
+                        <Insets bottom="26.0" left="30.0" right="30.0" top="34.0" />
+                     </padding>
+                  </VBox>
+               </children>
+            </StackPane>
+         </children>
+      </GridPane>
+   </children>
+</StackPane>

@@ -1,0 +1,93 @@
+.dash-root {
+    -fx-background-color: #070b16;
+    -fx-font-family: "Segoe UI", "Montserrat", "Roboto", sans-serif;
+}
+
+.dash-sidebar {
+    -fx-background-color: #141a2b;
+}
+
+.sidebar-user {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 15px;
+    -fx-font-weight: 700;
+}
+
+.sidebar-brand {
+    -fx-text-fill: #9f7cff;
+    -fx-font-size: 34px;
+    -fx-font-weight: 800;
+    -fx-padding: 0 0 8 0;
+}
+
+.side-item,
+.side-item-active {
+    -fx-background-color: transparent;
+    -fx-text-fill: #c8cedd;
+    -fx-font-size: 14px;
+    -fx-alignment: center-left;
+    -fx-padding: 10 12;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand;
+}
+
+.side-item-active {
+    -fx-background-color: rgba(159, 124, 255, 0.22);
+    -fx-text-fill: #ffffff;
+}
+
+.side-item:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+}
+
+.logout-btn {
+    -fx-background-color: #2f3750;
+    -fx-text-fill: white;
+    -fx-font-weight: 700;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand;
+}
+
+.dash-content {
+    -fx-background-color: transparent;
+}
+
+.dash-page-title {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 42px;
+    -fx-font-weight: 800;
+}
+
+.hero-card {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 0%, #20183f, #111a2f);
+    -fx-background-radius: 14px;
+}
+
+.hero-title {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 36px;
+    -fx-font-weight: 800;
+}
+
+.hero-subtitle {
+    -fx-text-fill: #adb4c9;
+    -fx-font-size: 16px;
+}
+
+.hero-primary-btn {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 0%, #4a82ff, #9f7cff);
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: 800;
+    -fx-background-radius: 10px;
+    -fx-padding: 10 16;
+}
+
+.hero-secondary-btn {
+    -fx-background-color: #202b46;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+    -fx-background-radius: 10px;
+    -fx-padding: 10 16;
+}

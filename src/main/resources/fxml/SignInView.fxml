@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<StackPane fx:id="root" minHeight="620.0" minWidth="980.0" prefHeight="620.0" prefWidth="980.0" styleClass="signin-root" stylesheets="@../css/signin.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.SignInController">
+   <children>
+      <GridPane maxHeight="560.0" maxWidth="860.0" prefHeight="560.0" prefWidth="860.0" styleClass="signin-card">
+         <columnConstraints>
+            <ColumnConstraints percentWidth="48.0" />
+            <ColumnConstraints percentWidth="52.0" />
+         </columnConstraints>
+         <children>
+            <StackPane styleClass="signin-left-pane" GridPane.columnIndex="0">
+               <children>
+                  <VBox alignment="TOP_LEFT" maxHeight="Infinity" maxWidth="Infinity" spacing="28.0">
+                     <children>
+                        <Button fx:id="homeButton" mnemonicParsing="false" onAction="#onGoHome" styleClass="btn-home-back" text="←  Home" />
+                        <VBox alignment="CENTER" spacing="18.0" VBox.vgrow="ALWAYS">
+                           <children>
+                              <ImageView fx:id="heroImageView" fitHeight="200.0" fitWidth="320.0" preserveRatio="true" smooth="true" styleClass="signin-hero-image" />
+                              <Label styleClass="left-title" text="Push your limits" />
+                              <Label alignment="CENTER" maxWidth="290.0" styleClass="left-subtitle" text="Feel the energy. Train smarter. Stay consistent." textAlignment="CENTER" wrapText="true" />
+                           </children>
+                        </VBox>
+                        <Region VBox.vgrow="ALWAYS" />
+                     </children>
+                     <padding>
+                        <Insets bottom="28.0" left="24.0" right="24.0" top="24.0" />
+                     </padding>
+                  </VBox>
+               </children>
+            </StackPane>
+            <StackPane styleClass="signin-right-pane" GridPane.columnIndex="1">
+               <children>
+                  <VBox alignment="TOP_LEFT" maxWidth="380.0" spacing="10.0">
+                     <children>
+                        <Label styleClass="welcome-title" text="Welcome Back" />
+                        <Label styleClass="welcome-subtitle" text="Sign in to continue your fitness journey" />
+                        <Region prefHeight="16.0" />
+                        <Label styleClass="field-label" text="EMAIL" />
+                        <TextField fx:id="emailField" promptText="Email" styleClass="input-field" />
+                        <Region prefHeight="8.0" />
+                        <Label styleClass="field-label" text="PASSWORD" />
+                        <PasswordField fx:id="passwordField" promptText="Password" styleClass="input-field" />
+                        <Region prefHeight="12.0" />
+                        <Label styleClass="separator-text" text="or sign in with email" />
+                        <Button fx:id="signInWithPasswordButton" mnemonicParsing="false" onAction="#onSignInWithPassword" styleClass="btn-signin-password" text="SIGN IN WITH PASSWORD" />
+                        <HBox alignment="CENTER" spacing="6.0">
+                           <children>
+                              <Label styleClass="footer-text" text="You don't have an account?" />
+                              <Button fx:id="signUpButton" mnemonicParsing="false" onAction="#onSignUp" styleClass="btn-signup-inline" text="Sign Up" />
+                           </children>
+                        </HBox>
+                     </children>
+                     <padding>
+                        <Insets bottom="30.0" left="30.0" right="30.0" top="48.0" />
+                     </padding>
+                  </VBox>
+               </children>
+            </StackPane>
+         </children>
+      </GridPane>
+   </children>
+</StackPane>

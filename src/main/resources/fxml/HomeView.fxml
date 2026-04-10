@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.media.MediaView?>
+
+<StackPane fx:id="root" minHeight="540.0" minWidth="840.0" prefHeight="620.0" prefWidth="980.0" styleClass="root-home" stylesheets="@../css/home.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.HomeController">
+   <children>
+      <!-- Background video from Symfony public/ (URL via WebAssets); sized in controller -->
+      <StackPane maxHeight="Infinity" maxWidth="Infinity" styleClass="hero-video-layer">
+         <children>
+            <MediaView fx:id="backgroundMediaView" preserveRatio="false" smooth="true" />
+         </children>
+      </StackPane>
+      <Region styleClass="hero-dark-overlay" maxWidth="Infinity" maxHeight="Infinity" />
+      <BorderPane maxWidth="Infinity" maxHeight="Infinity">
+         <top>
+            <HBox alignment="CENTER_RIGHT" spacing="12.0" styleClass="home-top-bar" BorderPane.alignment="CENTER">
+               <padding>
+                  <Insets bottom="8.0" left="32.0" right="32.0" top="24.0" />
+               </padding>
+               <children>
+                  <Button fx:id="signUpButton" mnemonicParsing="false" onAction="#onSignUp" styleClass="btn-sign-up" text="SIGN UP" />
+                  <Button fx:id="signInButton" mnemonicParsing="false" onAction="#onSignIn" styleClass="btn-sign-in" text="SIGN IN" />
+               </children>
+            </HBox>
+         </top>
+         <center>
+            <VBox alignment="CENTER" spacing="20.0" BorderPane.alignment="CENTER">
+               <children>
+                  <!-- Logo: assign Image in Scene Builder (user graphic) or leave as decorative placeholder -->
+                  <ImageView fx:id="logoImageView" fitHeight="96.0" fitWidth="96.0" pickOnBounds="true" preserveRatio="true" styleClass="logo-image" />
+                  <Label styleClass="brand-title" text="FITSENSE" />
+                  <HBox alignment="CENTER" spacing="6.0">
+                     <children>
+                        <Label styleClass="hero-line-white" text="REDEFINE YOUR" />
+                        <Label styleClass="hero-line-accent" text="LIMITS" />
+                     </children>
+                  </HBox>
+                  <!-- HBox keeps the CTA from stretching to the full VBox width -->
+                  <HBox alignment="CENTER">
+                     <children>
+                        <Button fx:id="startJourneyButton" mnemonicParsing="false" onAction="#onStartJourney" styleClass="btn-cta-home" text="START YOUR JOURNEY" />
+                     </children>
+                  </HBox>
+               </children>
+               <padding>
+                  <Insets bottom="48.0" left="32.0" right="32.0" top="0.0" />
+               </padding>
+            </VBox>
+         </center>
+      </BorderPane>
+   </children>
+</StackPane>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<StackPane fx:id="root" prefHeight="620.0" prefWidth="980.0" styleClass="onb-root" stylesheets="@../css/onboarding.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ObjectiveController">
+   <children>
+      <VBox alignment="CENTER" maxWidth="500.0" spacing="18.0" styleClass="onb-card">
+         <children>
+            <Label styleClass="onb-title" text="Your Fitness Strategy" />
+            <GridPane hgap="14.0" vgap="14.0">
+               <children>
+                  <Button fx:id="objectiveBtn1" mnemonicParsing="false" onAction="#onObjectiveClick" prefHeight="95.0" prefWidth="190.0" styleClass="choice-card" text="Weight Loss" />
+                  <Button fx:id="objectiveBtn2" mnemonicParsing="false" onAction="#onObjectiveClick" prefHeight="95.0" prefWidth="190.0" styleClass="choice-card" text="Muscle Gain" GridPane.columnIndex="1" />
+                  <Button fx:id="objectiveBtn3" mnemonicParsing="false" onAction="#onObjectiveClick" prefHeight="95.0" prefWidth="190.0" styleClass="choice-card" text="Endurance" GridPane.rowIndex="1" />
+                  <Button fx:id="objectiveBtn4" mnemonicParsing="false" onAction="#onObjectiveClick" prefHeight="95.0" prefWidth="190.0" styleClass="choice-card" text="Well-being" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+               </children>
+            </GridPane>
+            <Button mnemonicParsing="false" onAction="#onContinue" styleClass="btn-continue" text="Continue →" />
+         </children>
+         <padding>
+            <Insets bottom="22.0" left="26.0" right="26.0" top="24.0" />
+         </padding>
+      </VBox>
+   </children>
+</StackPane>

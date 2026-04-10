@@ -1,0 +1,128 @@
+.signup-root {
+    -fx-background-color: #08080e;
+    -fx-font-family: "Segoe UI", "Montserrat", "Roboto", sans-serif;
+}
+
+.signup-card {
+    -fx-background-color: #0c0c13;
+    -fx-background-radius: 14px;
+    -fx-border-radius: 14px;
+    -fx-border-color: rgba(255, 255, 255, 0.06);
+}
+
+.signup-left-pane {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #231a46, #121529);
+    -fx-background-radius: 14px 0 0 14px;
+}
+
+.signup-right-pane {
+    -fx-background-color: #09090f;
+    -fx-background-radius: 0 14px 14px 0;
+}
+
+.btn-home-back {
+    -fx-background-insets: 0;
+    -fx-background-color: rgba(255, 255, 255, 0.12);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-padding: 7px 14px;
+    -fx-background-radius: 16px;
+    -fx-cursor: hand;
+}
+
+.btn-home-back:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+}
+
+.left-title {
+    -fx-text-fill: #9f7cff;
+    -fx-font-size: 24px;
+    -fx-font-weight: 800;
+}
+
+.left-subtitle {
+    -fx-text-fill: #c9cbda;
+    -fx-font-size: 14px;
+}
+
+.check-icon {
+    -fx-text-fill: #d9c8ff;
+    -fx-font-size: 13px;
+    -fx-font-weight: 800;
+    -fx-background-color: rgba(159, 124, 255, 0.24);
+    -fx-background-radius: 50%;
+    -fx-padding: 2px 7px;
+}
+
+.benefit-text {
+    -fx-text-fill: #e8e9f3;
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+}
+
+.create-title {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 40px;
+    -fx-font-weight: 800;
+}
+
+.create-subtitle {
+    -fx-text-fill: #a6a8b6;
+    -fx-font-size: 16px;
+}
+
+.field-label {
+    -fx-text-fill: #9f7cff;
+    -fx-font-size: 12px;
+    -fx-font-weight: 800;
+}
+
+.input-field {
+    -fx-background-insets: 0;
+    -fx-background-color: #13131b;
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: #6f7285;
+    -fx-font-size: 14px;
+    -fx-padding: 12px 14px;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-border-color: rgba(255, 255, 255, 0.07);
+}
+
+.input-field:focused {
+    -fx-border-color: #9f7cff;
+}
+
+.btn-signup-main {
+    -fx-background-insets: 0;
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 0%, #8b5cf6, #c4b5fd);
+    -fx-text-fill: white;
+    -fx-font-size: 17px;
+    -fx-font-weight: 800;
+    -fx-padding: 14px 18px;
+    -fx-background-radius: 12px;
+    -fx-cursor: hand;
+}
+
+.btn-signup-main:hover {
+    -fx-opacity: 0.95;
+}
+
+.footer-text {
+    -fx-text-fill: #a6a8b6;
+    -fx-font-size: 15px;
+}
+
+.btn-signin-inline {
+    -fx-background-color: transparent;
+    -fx-text-fill: #9f7cff;
+    -fx-font-size: 15px;
+    -fx-font-weight: 800;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+}
+
+.btn-signin-inline:hover {
+    -fx-text-fill: #bea8ff;
+}

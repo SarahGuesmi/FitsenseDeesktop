@@ -41,7 +41,9 @@ public class CoachDashboardController {
     @FXML
     private VBox feedbackPane;
     @FXML
-    private VBox mentalWellnessPane;
+    private VBox mentalTestsPane;
+    @FXML
+    private VBox mentalAssessmentsPane;
     @FXML
     private VBox nutritionPane;
     @FXML
@@ -58,7 +60,9 @@ public class CoachDashboardController {
     @FXML
     private Button feedbackBtn;
     @FXML
-    private Button mentalWellnessBtn;
+    private Button mentalTestsBtn;
+    @FXML
+    private Button mentalAssessmentsBtn;
     @FXML
     private Button nutritionBtn;
     @FXML
@@ -97,6 +101,10 @@ public class CoachDashboardController {
 
     @FXML
     private ProfileFragmentController coachProfileController;
+    @FXML
+    private CoachMentalTestsFragmentController coachMentalTestsController;
+    @FXML
+    private CoachMentalAssessmentsFragmentController coachMentalAssessmentsController;
 
     private final UserService userService = new UserService();
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy");
@@ -116,8 +124,8 @@ public class CoachDashboardController {
         hideAllContent();
         coachDashboardPane.setManaged(true);
         coachDashboardPane.setVisible(true);
-        setNavbarText("Coach dashboard", "Train and support your athletes");
-        setActiveSidebar(coachHomeBtn);
+        setNavbarText("Coach Panel", "Manage your athletes");
+        setActiveSidebar(coachHomeBtn, null);
         refreshStats();
     }
 
@@ -127,7 +135,7 @@ public class CoachDashboardController {
         athletesPane.setManaged(true);
         athletesPane.setVisible(true);
         setNavbarText("Athletes", "Directory of users (read-only)");
-        setActiveSidebar(athletesBtn);
+        setActiveSidebar(athletesBtn, null);
         refreshAthletesTable();
     }
 
@@ -137,7 +145,7 @@ public class CoachDashboardController {
         chatroomPane.setManaged(true);
         chatroomPane.setVisible(true);
         setNavbarText("Chatroom", "Team messaging");
-        setActiveSidebar(chatroomBtn);
+        setActiveSidebar(chatroomBtn, null);
     }
 
     @FXML
@@ -146,7 +154,7 @@ public class CoachDashboardController {
         workoutCatalogPane.setManaged(true);
         workoutCatalogPane.setVisible(true);
         setNavbarText("Workout catalog", "Programs and exercises");
-        setActiveSidebar(workoutCatalogBtn);
+        setActiveSidebar(workoutCatalogBtn, null);
     }
 
     @FXML
@@ -155,16 +163,31 @@ public class CoachDashboardController {
         feedbackPane.setManaged(true);
         feedbackPane.setVisible(true);
         setNavbarText("Feedback management", "Athlete feedback");
-        setActiveSidebar(feedbackBtn);
+        setActiveSidebar(feedbackBtn, null);
     }
 
     @FXML
-    private void onShowMentalWellness() {
+    private void onShowMentalTests() {
         hideAllContent();
-        mentalWellnessPane.setManaged(true);
-        mentalWellnessPane.setVisible(true);
-        setNavbarText("Mental wellness", "Well-being resources");
-        setActiveSidebar(mentalWellnessBtn);
+        mentalTestsPane.setManaged(true);
+        mentalTestsPane.setVisible(true);
+        setNavbarText("Mental wellness", "Create tests: title + questions (1–5 scoring, total = sum)");
+        setActiveSidebar(null, mentalTestsBtn);
+        if (coachMentalTestsController != null) {
+            coachMentalTestsController.showListView();
+        }
+    }
+
+    @FXML
+    private void onShowMentalAssessments() {
+        hideAllContent();
+        mentalAssessmentsPane.setManaged(true);
+        mentalAssessmentsPane.setVisible(true);
+        setNavbarText("Latest assessments", "Member mental check-ins (stress, sleep, mood, motivation)");
+        setActiveSidebar(null, mentalAssessmentsBtn);
+        if (coachMentalAssessmentsController != null) {
+            coachMentalAssessmentsController.refreshOnShow();
+        }
     }
 
     @FXML
@@ -173,7 +196,7 @@ public class CoachDashboardController {
         nutritionPane.setManaged(true);
         nutritionPane.setVisible(true);
         setNavbarText("Nutrition plan", "Meals and macros");
-        setActiveSidebar(nutritionBtn);
+        setActiveSidebar(nutritionBtn, null);
     }
 
     @FXML
@@ -182,7 +205,7 @@ public class CoachDashboardController {
         profilePane.setManaged(true);
         profilePane.setVisible(true);
         setNavbarText("Profile", "Your account and physique");
-        setActiveSidebar(profileBtn);
+        setActiveSidebar(profileBtn, null);
         if (coachProfileController != null) {
             coachProfileController.reloadFromSession();
         }
@@ -197,7 +220,7 @@ public class CoachDashboardController {
 
     private void hideAllContent() {
         for (VBox p : List.of(coachDashboardPane, athletesPane, chatroomPane, workoutCatalogPane,
-                feedbackPane, mentalWellnessPane, nutritionPane, profilePane)) {
+                feedbackPane, mentalTestsPane, mentalAssessmentsPane, nutritionPane, profilePane)) {
             if (p != null) {
                 p.setManaged(false);
                 p.setVisible(false);
@@ -254,15 +277,28 @@ public class CoachDashboardController {
         return "CH";
     }
 
-    private void setActiveSidebar(Button selected) {
+    /**
+     * Highlights a main nav item, or a mental-wellness sub-item (mutually exclusive).
+     */
+    private void setActiveSidebar(Button mainNav, Button mentalSubNav) {
         for (Button b : List.of(coachHomeBtn, athletesBtn, chatroomBtn, workoutCatalogBtn,
-                feedbackBtn, mentalWellnessBtn, nutritionBtn, profileBtn)) {
+                feedbackBtn, nutritionBtn, profileBtn)) {
             if (b != null) {
                 b.getStyleClass().remove("side-link-active");
             }
         }
-        if (selected != null && !selected.getStyleClass().contains("side-link-active")) {
-            selected.getStyleClass().add("side-link-active");
+        if (mentalTestsBtn != null) {
+            mentalTestsBtn.getStyleClass().remove("side-sub-link-active");
+        }
+        if (mentalAssessmentsBtn != null) {
+            mentalAssessmentsBtn.getStyleClass().remove("side-sub-link-active");
+        }
+        if (mentalSubNav != null) {
+            if (!mentalSubNav.getStyleClass().contains("side-sub-link-active")) {
+                mentalSubNav.getStyleClass().add("side-sub-link-active");
+            }
+        } else if (mainNav != null && !mainNav.getStyleClass().contains("side-link-active")) {
+            mainNav.getStyleClass().add("side-link-active");
         }
     }
 

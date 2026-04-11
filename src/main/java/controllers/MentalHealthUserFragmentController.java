@@ -26,8 +26,10 @@ import models.CoachMentalTest;
 import models.CoachMentalTestQuestion;
 import models.MentalHealthEvaluation;
 import services.CoachMentalTestService;
+import services.MentalHealthEvaluationRepository;
 import services.MentalHealthSubmissionService;
 
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -60,6 +62,7 @@ public class MentalHealthUserFragmentController {
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     private final CoachMentalTestService coachTestService = CoachMentalTestService.getInstance();
+    private final MentalHealthEvaluationRepository evaluationRepository = new MentalHealthEvaluationRepository();
     private final ObservableList<MentalHealthEvaluation> evaluations = FXCollections.observableArrayList();
     private final List<ComboBox<String>> answerCombos = new ArrayList<>();
     private final List<String> currentPromptStrings = new ArrayList<>();
@@ -155,7 +158,21 @@ public class MentalHealthUserFragmentController {
 
         setupRecommendationsTable();
 
+        loadEvaluationsFromDatabase();
+
         showListView();
+    }
+
+    private void loadEvaluationsFromDatabase() {
+        User u = AppSession.getCurrentUser();
+        if (u == null || u.getId() == null) {
+            return;
+        }
+        try {
+            evaluations.setAll(evaluationRepository.findByUserId(u.getId()));
+        } catch (SQLException e) {
+            System.err.println("loadEvaluationsFromDatabase failed: " + e.getMessage());
+        }
     }
 
     private void setupRecommendationsTable() {
@@ -337,6 +354,10 @@ public class MentalHealthUserFragmentController {
             saved = ev;
         }
         if (saved != null) {
+            User member = AppSession.getCurrentUser();
+            if (member != null && member.getId() != null) {
+                saved.setUserId(member.getId());
+            }
             MentalHealthSubmissionService.getInstance().recordMemberSubmission(AppSession.getCurrentUser(), saved);
         }
 
@@ -399,7 +420,13 @@ public class MentalHealthUserFragmentController {
         confirm.setContentText("Remove this evaluation from " + DATE_FMT.format(row.getTestedAt()) + "?");
         Optional<ButtonType> ans = confirm.showAndWait();
         if (ans.isPresent() && ans.get() == ButtonType.OK) {
+            try {
+                evaluationRepository.delete(row.getId());
+            } catch (SQLException e) {
+                System.err.println("delete evaluation failed: " + e.getMessage());
+            }
             evaluations.remove(row);
+            MentalHealthSubmissionService.getInstance().reloadFromDatabase();
         }
     }
 

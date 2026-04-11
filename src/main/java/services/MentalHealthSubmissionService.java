@@ -6,23 +6,36 @@ import models.MentalHealthAssessmentSubmission;
 import models.MentalHealthEvaluation;
 import models.User;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
 /**
- * Feed of member mental check-ins for the coach dashboard (in-memory).
+ * Feed of member mental check-ins for the coach dashboard (backed by MySQL).
  */
 public final class MentalHealthSubmissionService {
 
     private static final MentalHealthSubmissionService INSTANCE = new MentalHealthSubmissionService();
 
     private final ObservableList<MentalHealthAssessmentSubmission> submissions = FXCollections.observableArrayList();
+    private final MentalHealthSubmissionRepository submissionRepository = new MentalHealthSubmissionRepository();
+    private final MentalHealthEvaluationRepository evaluationRepository = new MentalHealthEvaluationRepository();
 
     private MentalHealthSubmissionService() {
+        reloadFromDatabase();
     }
 
     public static MentalHealthSubmissionService getInstance() {
         return INSTANCE;
+    }
+
+    public void reloadFromDatabase() {
+        try {
+            List<MentalHealthAssessmentSubmission> rows = submissionRepository.loadAllWithExercises();
+            submissions.setAll(rows);
+        } catch (SQLException e) {
+            System.err.println("MentalHealthSubmissionService load failed: " + e.getMessage());
+        }
     }
 
     public ObservableList<MentalHealthAssessmentSubmission> getSubmissions() {
@@ -30,7 +43,7 @@ public final class MentalHealthSubmissionService {
     }
 
     /**
-     * Member removes coach recommendation from their own assessment row (in-memory).
+     * Member removes coach recommendation from their own assessment row.
      */
     public boolean clearRecommendationForUser(UUID submissionId, UUID userId) {
         if (submissionId == null || userId == null) {
@@ -39,10 +52,46 @@ public final class MentalHealthSubmissionService {
         for (MentalHealthAssessmentSubmission s : submissions) {
             if (submissionId.equals(s.getId()) && userId.equals(s.getUserId())) {
                 s.clearRecommendationContent();
+                try {
+                    submissionRepository.clearCoachRecommendationFields(submissionId);
+                } catch (SQLException e) {
+                    System.err.println("clearRecommendationForUser persist failed: " + e.getMessage());
+                }
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * Coach removes a recommendation (manage dialog).
+     */
+    public void clearRecommendationByCoach(UUID submissionId) {
+        if (submissionId == null) {
+            return;
+        }
+        for (MentalHealthAssessmentSubmission s : submissions) {
+            if (submissionId.equals(s.getId())) {
+                s.clearRecommendationContent();
+                try {
+                    submissionRepository.clearCoachRecommendationFields(submissionId);
+                } catch (SQLException e) {
+                    System.err.println("clearRecommendationByCoach persist failed: " + e.getMessage());
+                }
+                return;
+            }
+        }
+    }
+
+    public void persistCoachRecommendation(MentalHealthAssessmentSubmission s) {
+        if (s == null) {
+            return;
+        }
+        try {
+            submissionRepository.persistCoachRecommendation(s);
+        } catch (SQLException e) {
+            System.err.println("persistCoachRecommendation failed: " + e.getMessage());
+        }
     }
 
     /**
@@ -52,7 +101,54 @@ public final class MentalHealthSubmissionService {
         if (user == null || user.getId() == null || ev == null) {
             return;
         }
-        MentalHealthAssessmentSubmission s = new MentalHealthAssessmentSubmission(UUID.randomUUID());
+        try {
+            evaluationRepository.upsert(ev, user.getId());
+        } catch (SQLException e) {
+            System.err.println("recordMemberSubmission evaluation upsert failed: " + e.getMessage());
+            return;
+        }
+
+        MentalHealthAssessmentSubmission existing = findByEvaluationId(ev.getId());
+        MentalHealthAssessmentSubmission s;
+        if (existing != null) {
+            s = existing;
+        } else {
+            UUID dbId = null;
+            try {
+                dbId = submissionRepository.findSubmissionIdByEvaluationId(ev.getId());
+            } catch (SQLException e) {
+                System.err.println("findSubmissionIdByEvaluationId failed: " + e.getMessage());
+            }
+            if (dbId != null) {
+                s = new MentalHealthAssessmentSubmission(dbId);
+                submissions.add(0, s);
+            } else {
+                s = new MentalHealthAssessmentSubmission(UUID.randomUUID());
+                submissions.add(0, s);
+            }
+        }
+        fillSnapshot(s, user, ev);
+        s.setEvaluationId(ev.getId());
+        try {
+            submissionRepository.upsertMemberSnapshot(user, s);
+        } catch (SQLException e) {
+            System.err.println("recordMemberSubmission submission upsert failed: " + e.getMessage());
+        }
+    }
+
+    private MentalHealthAssessmentSubmission findByEvaluationId(UUID evaluationId) {
+        if (evaluationId == null) {
+            return null;
+        }
+        for (MentalHealthAssessmentSubmission s : submissions) {
+            if (evaluationId.equals(s.getEvaluationId())) {
+                return s;
+            }
+        }
+        return null;
+    }
+
+    private static void fillSnapshot(MentalHealthAssessmentSubmission s, User user, MentalHealthEvaluation ev) {
         s.setUserId(user.getId());
         s.setUserFullName(buildFullName(user));
         s.setUserEmail(safe(user.getEmail()));
@@ -75,7 +171,6 @@ public final class MentalHealthSubmissionService {
             s.setMotivation(ev.getMotivation());
             s.setMentalTired(ev.getMentalTired());
         }
-        submissions.add(0, s);
     }
 
     private static String buildFullName(User u) {

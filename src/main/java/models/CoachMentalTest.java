@@ -13,6 +13,8 @@ import java.util.UUID;
 public class CoachMentalTest {
 
     private final UUID id;
+    /** Owning coach (app_user.id). */
+    private UUID coachUserId;
     private String title;
     private final List<CoachMentalTestQuestion> questions;
     private LocalDateTime createdAt;
@@ -25,6 +27,14 @@ public class CoachMentalTest {
 
     public UUID getId() {
         return id;
+    }
+
+    public UUID getCoachUserId() {
+        return coachUserId;
+    }
+
+    public void setCoachUserId(UUID coachUserId) {
+        this.coachUserId = coachUserId;
     }
 
     public String getTitle() {

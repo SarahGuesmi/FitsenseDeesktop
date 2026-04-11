@@ -7,11 +7,13 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * One mental health self-assessment row (in-memory until persisted to DB).
+ * One mental health self-assessment row (persisted in {@code mental_health_evaluation}).
  */
 public class MentalHealthEvaluation {
 
     private final UUID id;
+    /** Owning member (app_user.id); set when persisting or loading from DB. */
+    private UUID userId;
     private UUID coachTestId;
     private String coachTestTitle;
     /** Ordered answers (1–5) for each question; empty for legacy rows. */
@@ -34,6 +36,14 @@ public class MentalHealthEvaluation {
 
     public UUID getId() {
         return id;
+    }
+
+    public UUID getUserId() {
+        return userId;
+    }
+
+    public void setUserId(UUID userId) {
+        this.userId = userId;
     }
 
     public UUID getCoachTestId() {

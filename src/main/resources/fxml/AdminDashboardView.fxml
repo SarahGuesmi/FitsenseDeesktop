@@ -27,6 +27,7 @@
                   <Label styleClass="admin-side-sub" text="ADMIN PANEL" />
                   <Button fx:id="adminDashboardBtn" mnemonicParsing="false" onAction="#onShowAdminDashboard" styleClass="side-link" text="◈  Admin Dashboard" />
                   <Button fx:id="userManagementBtn" mnemonicParsing="false" onAction="#onShowUserManagement" styleClass="side-link" text="◉  User Management" />
+                  <Button fx:id="profileBtn" mnemonicParsing="false" onAction="#onShowProfile" styleClass="side-link" text="☺  Profile" />
                   <Button mnemonicParsing="false" onAction="#onLogout" styleClass="side-link" text="⏻  Sign Out" />
                </children>
                <padding>
@@ -107,6 +108,14 @@
                               </VBox>
                            </children>
                         </GridPane>
+                     </children>
+                     <padding>
+                        <Insets bottom="18.0" left="18.0" right="18.0" top="18.0" />
+                     </padding>
+                  </VBox>
+                  <VBox fx:id="profilePane" managed="false" spacing="0.0" styleClass="admin-content" visible="false" VBox.vgrow="ALWAYS">
+                     <children>
+                        <fx:include fx:id="adminProfile" source="ProfileFragment.fxml" VBox.vgrow="ALWAYS" />
                      </children>
                      <padding>
                         <Insets bottom="18.0" left="18.0" right="18.0" top="18.0" />

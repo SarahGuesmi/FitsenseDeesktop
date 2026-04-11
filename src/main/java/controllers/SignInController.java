@@ -100,8 +100,13 @@ public class SignInController {
 
             AppSession.setCurrentUser(user);
 
-            if (ADMIN_EMAIL.equalsIgnoreCase(user.getEmail())) {
+            String rolesJson = user.getRolesJson() == null ? "" : user.getRolesJson();
+            if (ADMIN_EMAIL.equalsIgnoreCase(user.getEmail()) || rolesJson.contains("ROLE_ADMIN")) {
                 switchScene("/fxml/AdminDashboardView.fxml", "/css/admin.css");
+                return;
+            }
+            if (rolesJson.contains("ROLE_COACH")) {
+                switchScene("/fxml/CoachDashboardView.fxml", "/css/admin.css");
                 return;
             }
 
@@ -128,8 +133,11 @@ public class SignInController {
             Scene scene = root.getScene();
             scene.setRoot(newRoot);
             scene.getStylesheets().setAll(Objects.requireNonNull(getClass().getResource(cssPath)).toExternalForm());
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to switch scene to " + fxmlPath, e);
+        } catch (Exception e) {
+            Throwable cause = e.getCause() != null ? e.getCause() : e;
+            cause.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Navigation Error",
+                    "Could not load view: " + fxmlPath + "\n\n" + cause.getClass().getSimpleName() + ": " + cause.getMessage());
         }
     }
 

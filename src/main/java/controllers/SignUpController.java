@@ -111,7 +111,7 @@ public class SignUpController {
             user.setAccountStatus("active");
             user.setPhoneNumber(null);
             user.setPhoto(null);
-            user.setUsername(null);
+            user.setUsername(uniqueUsernameFromEmail(email));
             user.setGoogleAuthenticatorSecret(null);
 
             userService.createPrepared(user);
@@ -127,6 +127,29 @@ public class SignUpController {
     @FXML
     private void onSignIn() {
         switchScene("/fxml/SignInView.fxml", "/css/signin.css");
+    }
+
+    private String uniqueUsernameFromEmail(String email) {
+        int at = email.indexOf('@');
+        String base = (at > 0 ? email.substring(0, at) : email).replaceAll("[^a-zA-Z0-9._-]", "");
+        if (base.isBlank()) {
+            base = "user";
+        }
+        if (base.length() > 48) {
+            base = base.substring(0, 48);
+        }
+        String candidate = base;
+        int suffix = 0;
+        try {
+            while (userService.findByUsername(candidate) != null) {
+                suffix++;
+                String tail = "_" + suffix;
+                candidate = base.substring(0, Math.max(1, Math.min(base.length(), 48 - tail.length()))) + tail;
+            }
+        } catch (SQLException ignored) {
+            return base + "_" + System.currentTimeMillis();
+        }
+        return candidate;
     }
 
     private void switchScene(String fxmlPath, String cssPath) {

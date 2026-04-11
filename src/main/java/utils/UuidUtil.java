@@ -2,6 +2,7 @@ package utils;
 
 import java.nio.ByteBuffer;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.UUID;
 
@@ -18,6 +19,36 @@ public final class UuidUtil {
         if (o == null || rs.wasNull()) {
             return null;
         }
+        return fromJdbcObject(o, column);
+    }
+
+    /**
+     * First column in the row whose label matches one of {@code candidates} (case-insensitive).
+     */
+    public static UUID fromResultSetFirst(ResultSet rs, String... candidates) throws SQLException {
+        if (candidates == null || candidates.length == 0) {
+            return null;
+        }
+        ResultSetMetaData md = rs.getMetaData();
+        for (int i = 1; i <= md.getColumnCount(); i++) {
+            String label = md.getColumnLabel(i);
+            for (String c : candidates) {
+                if (c != null && c.equalsIgnoreCase(label)) {
+                    Object o = rs.getObject(i);
+                    if (o == null || rs.wasNull()) {
+                        return null;
+                    }
+                    return fromJdbcObject(o, label);
+                }
+            }
+        }
+        return null;
+    }
+
+    private static UUID fromJdbcObject(Object o, String columnHint) throws SQLException {
+        if (o instanceof UUID u) {
+            return u;
+        }
         if (o instanceof byte[] bytes) {
             if (bytes.length == 16) {
                 return fromBytes16(bytes);
@@ -29,7 +60,7 @@ public final class UuidUtil {
         if (o instanceof String s && !s.isBlank()) {
             return UUID.fromString(s.trim());
         }
-        throw new SQLException("Unsupported UUID storage for column " + column + ": " + o.getClass().getName());
+        throw new SQLException("Unsupported UUID storage for column " + columnHint + ": " + o.getClass().getName());
     }
 
     public static byte[] toBytes16(UUID uuid) {

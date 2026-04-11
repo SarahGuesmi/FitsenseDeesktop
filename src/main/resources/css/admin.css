@@ -420,3 +420,49 @@
     -fx-border-color: #ff6578;
     -fx-border-width: 2px;
 }
+
+/* ComboBox dropdown popup — dark theme (popup uses scene stylesheets, not nested ScrollPane sheets) */
+.combo-box-popup > .list-view {
+    -fx-background-color: #151b2e;
+    -fx-background-insets: 0;
+    -fx-border-color: rgba(176, 196, 246, 0.45);
+    -fx-border-width: 1px;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-padding: 4 0;
+}
+
+.combo-box-popup > .list-view .list-cell {
+    -fx-background-color: #151b2e;
+    -fx-text-fill: #eff4ff;
+    -fx-font-size: 16px;
+    -fx-padding: 12px 18px;
+}
+
+.combo-box-popup > .list-view .list-cell:hover {
+    -fx-background-color: rgba(74, 130, 255, 0.28);
+}
+
+.combo-box-popup > .list-view .list-cell:filled:selected,
+.combo-box-popup > .list-view .list-cell:filled:selected:hover {
+    -fx-background-color: rgba(111, 77, 255, 0.38);
+    -fx-text-fill: #ffffff;
+}
+
+.combo-box-popup > .list-view .list-cell:empty {
+    -fx-background-color: transparent;
+}
+
+.combo-box-popup > .list-view > .virtual-flow > .corner {
+    -fx-background-color: #151b2e;
+}
+
+.combo-box-popup > .list-view .scroll-bar:vertical,
+.combo-box-popup > .list-view .scroll-bar:horizontal {
+    -fx-background-color: #0f1424;
+}
+
+.combo-box-popup > .list-view .scroll-bar .thumb {
+    -fx-background-color: rgba(176, 196, 246, 0.35);
+    -fx-background-radius: 6px;
+}

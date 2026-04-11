@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="profile-scroll" stylesheets="@../css/profile.css" vbarPolicy="AS_NEEDED" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ProfileFragmentController">
+   <content>
+      <HBox alignment="CENTER" maxWidth="Infinity" styleClass="profile-outer">
+         <children>
+            <VBox alignment="TOP_CENTER" maxWidth="720.0" minWidth="280.0" spacing="20.0" styleClass="profile-root" HBox.hgrow="NEVER">
+         <children>
+            <VBox alignment="CENTER" spacing="10.0" styleClass="profile-hero">
+               <children>
+                  <Label fx:id="profileAvatar" alignment="CENTER" styleClass="profile-avatar" text="👤" />
+                  <Label fx:id="profileDisplayName" styleClass="profile-name" text=" " />
+                  <Label styleClass="profile-tagline" text="Manage your personal info and photo." wrapText="true" />
+               </children>
+            </VBox>
+            <HBox alignment="CENTER" spacing="0.0" styleClass="profile-section-row">
+               <children>
+                  <Label styleClass="profile-section-icon" text="◎" />
+                  <Label styleClass="profile-section-title" text="Personal info" />
+               </children>
+            </HBox>
+            <GridPane hgap="16.0" vgap="16.0">
+               <columnConstraints>
+                  <ColumnConstraints hgrow="ALWAYS" minWidth="160.0" prefWidth="280.0" />
+                  <ColumnConstraints hgrow="ALWAYS" minWidth="160.0" prefWidth="280.0" />
+               </columnConstraints>
+               <children>
+                  <VBox spacing="6.0">
+                     <children>
+                        <Label styleClass="profile-field-label" text="First name" />
+                        <TextField fx:id="firstnameField" maxWidth="Infinity" styleClass="profile-field" />
+                     </children>
+                  </VBox>
+                  <VBox spacing="6.0" GridPane.columnIndex="1">
+                     <children>
+                        <Label styleClass="profile-field-label" text="Last name" />
+                        <TextField fx:id="lastnameField" maxWidth="Infinity" styleClass="profile-field" />
+                     </children>
+                  </VBox>
+                  <HBox alignment="CENTER" GridPane.columnSpan="2" GridPane.rowIndex="1" styleClass="profile-email-row">
+                     <children>
+                        <VBox alignment="CENTER" maxWidth="560.0" spacing="6.0" HBox.hgrow="NEVER">
+                           <children>
+                              <Label styleClass="profile-field-label" text="Phone number" />
+                              <TextField fx:id="phoneField" maxWidth="560.0" prefWidth="520.0" styleClass="profile-field" />
+                           </children>
+                        </VBox>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" GridPane.columnSpan="2" GridPane.rowIndex="2" styleClass="profile-email-row">
+                     <children>
+                        <VBox alignment="CENTER" maxWidth="560.0" spacing="6.0" HBox.hgrow="NEVER">
+                           <children>
+                              <Label styleClass="profile-field-label" text="Email" />
+                              <TextField fx:id="emailField" maxWidth="560.0" prefWidth="520.0" styleClass="profile-field" />
+                           </children>
+                        </VBox>
+                     </children>
+                  </HBox>
+                  <VBox spacing="6.0" GridPane.columnSpan="2" GridPane.rowIndex="3">
+                     <children>
+                        <Label styleClass="profile-field-label" text="Objective" />
+                        <ComboBox fx:id="objectiveCombo" editable="false" maxWidth="Infinity" minHeight="52.0" prefHeight="52.0" promptText="Choose objective" styleClass="profile-combo" />
+                     </children>
+                  </VBox>
+                  <VBox spacing="6.0" GridPane.rowIndex="4">
+                     <children>
+                        <Label styleClass="profile-field-label" text="Height (cm)" />
+                        <TextField fx:id="heightField" maxWidth="Infinity" promptText="175" styleClass="profile-field" />
+                     </children>
+                  </VBox>
+                  <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                     <children>
+                        <Label styleClass="profile-field-label" text="Weight (kg)" />
+                        <TextField fx:id="weightField" maxWidth="Infinity" promptText="70" styleClass="profile-field" />
+                     </children>
+                  </VBox>
+                  <VBox maxWidth="400.0" spacing="6.0" GridPane.columnSpan="2" GridPane.rowIndex="5">
+                     <children>
+                        <Label styleClass="profile-field-label" text="Gender" />
+                        <ComboBox fx:id="genderCombo" maxWidth="Infinity" minHeight="52.0" prefHeight="52.0" promptText="Select" styleClass="profile-combo" />
+                     </children>
+                  </VBox>
+               </children>
+            </GridPane>
+            <Label fx:id="profileStatusLabel" managed="false" styleClass="profile-status" text="" visible="false" />
+            <HBox alignment="CENTER_RIGHT" spacing="12.0">
+               <children>
+                  <Button mnemonicParsing="false" onAction="#onSaveProfile" styleClass="profile-save-btn" text="Save changes" />
+               </children>
+            </HBox>
+         </children>
+         <padding>
+            <Insets bottom="24.0" left="8.0" right="8.0" top="8.0" />
+         </padding>
+            </VBox>
+         </children>
+      </HBox>
+   </content>
+</ScrollPane>

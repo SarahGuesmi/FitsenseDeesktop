@@ -18,6 +18,7 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import models.MentalHealthAssessmentSubmission;
 import models.RecommendedExercise;
+import services.MentalHealthSubmissionService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -136,6 +137,7 @@ public final class RecommendationEditorDialog {
             if (!validateAndApply(submission, rows, generalNote.getText())) {
                 return;
             }
+            MentalHealthSubmissionService.getInstance().persistCoachRecommendation(submission);
             saved[0] = true;
             stage.close();
         });

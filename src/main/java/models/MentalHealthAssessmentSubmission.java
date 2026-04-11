@@ -6,11 +6,13 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Snapshot of a member mental check-in visible to coaches (in-memory feed until DB).
+ * Snapshot of a member mental check-in visible to coaches (persisted in {@code mental_health_submission}).
  */
 public class MentalHealthAssessmentSubmission {
 
     private final UUID id;
+    /** Links to {@code mental_health_evaluation.id} (one submission row per check-in). */
+    private UUID evaluationId;
     private UUID userId;
     private String userFullName;
     private String userEmail;
@@ -37,6 +39,14 @@ public class MentalHealthAssessmentSubmission {
 
     public UUID getId() {
         return id;
+    }
+
+    public UUID getEvaluationId() {
+        return evaluationId;
+    }
+
+    public void setEvaluationId(UUID evaluationId) {
+        this.evaluationId = evaluationId;
     }
 
     public UUID getUserId() {

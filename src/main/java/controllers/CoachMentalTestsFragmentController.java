@@ -1,5 +1,6 @@
 package controllers;
 
+import app.AppSession;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -17,6 +18,7 @@ import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import models.CoachMentalTest;
 import models.CoachMentalTestQuestion;
+import models.User;
 import services.CoachMentalTestService;
 
 import java.time.LocalDateTime;
@@ -103,6 +105,11 @@ public class CoachMentalTestsFragmentController {
 
     @FXML
     private void onSaveTest() {
+        User coach = AppSession.getCurrentUser();
+        if (coach == null || coach.getId() == null) {
+            warn("Sign in required", "Sign in as a coach to save mental health tests.");
+            return;
+        }
         String title = titleField.getText() == null ? "" : titleField.getText().trim();
         if (title.isEmpty()) {
             warn("Missing title", "Please enter a test title.");
@@ -117,6 +124,7 @@ public class CoachMentalTestsFragmentController {
         LocalDateTime now = LocalDateTime.now();
         UUID id = editingTestId != null ? editingTestId : UUID.randomUUID();
         CoachMentalTest test = new CoachMentalTest(id);
+        test.setCoachUserId(coach.getId());
         test.setTitle(title);
         int order = 0;
         for (String p : prompts) {

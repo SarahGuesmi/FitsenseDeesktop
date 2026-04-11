@@ -99,7 +99,7 @@ public final class CoachRecommendationsManageDialog {
                     c.setContentText("Remove this recommendation for " + safe(row.getUserFullName()) + "?");
                     Optional<ButtonType> ans = c.showAndWait();
                     if (ans.isPresent() && ans.get() == ButtonType.OK) {
-                        row.clearRecommendationContent();
+                        MentalHealthSubmissionService.getInstance().clearRecommendationByCoach(row.getId());
                         table.refresh();
                         if (afterChange != null) {
                             afterChange.run();

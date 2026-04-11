@@ -42,3 +42,93 @@ CREATE TABLE IF NOT EXISTS `objectif_sportif` (
   CONSTRAINT `fk_objectif_profile_physique`
     FOREIGN KEY (`profile_physique_id`) REFERENCES `profile_physique` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Coach-authored mental tests (was file-backed; now MySQL)
+CREATE TABLE IF NOT EXISTS `coach_mental_test` (
+  `id` BINARY(16) NOT NULL,
+  `coach_user_id` BINARY(16) NOT NULL,
+  `title` VARCHAR(512) NOT NULL,
+  `created_at` DATETIME(6) DEFAULT NULL,
+  `updated_at` DATETIME(6) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_coach_mental_test_coach` (`coach_user_id`),
+  CONSTRAINT `fk_coach_mental_test_user`
+    FOREIGN KEY (`coach_user_id`) REFERENCES `app_user` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `coach_mental_test_question` (
+  `id` BINARY(16) NOT NULL,
+  `test_id` BINARY(16) NOT NULL,
+  `order_index` INT NOT NULL,
+  `prompt` TEXT NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_coach_q_test` (`test_id`),
+  CONSTRAINT `fk_coach_q_test`
+    FOREIGN KEY (`test_id`) REFERENCES `coach_mental_test` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Member mental evaluations (check-ins)
+CREATE TABLE IF NOT EXISTS `mental_health_evaluation` (
+  `id` BINARY(16) NOT NULL,
+  `user_id` BINARY(16) NOT NULL,
+  `coach_test_id` BINARY(16) DEFAULT NULL,
+  `coach_test_title` VARCHAR(512) DEFAULT NULL,
+  `tested_at` DATETIME(6) DEFAULT NULL,
+  `mood` INT NOT NULL DEFAULT 0,
+  `stress` INT NOT NULL DEFAULT 0,
+  `sleep` INT NOT NULL DEFAULT 0,
+  `motivation` INT NOT NULL DEFAULT 0,
+  `mental_tired` INT NOT NULL DEFAULT 0,
+  `score` INT NOT NULL,
+  `status` VARCHAR(64) DEFAULT NULL,
+  `member_notes` TEXT,
+  `question_scores_json` TEXT,
+  `question_prompts_json` TEXT,
+  PRIMARY KEY (`id`),
+  KEY `idx_mh_eval_user` (`user_id`),
+  KEY `idx_mh_eval_tested` (`tested_at`),
+  CONSTRAINT `fk_mh_eval_user`
+    FOREIGN KEY (`user_id`) REFERENCES `app_user` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Coach dashboard feed / member recommendations (one row per evaluation check-in)
+CREATE TABLE IF NOT EXISTS `mental_health_submission` (
+  `id` BINARY(16) NOT NULL,
+  `evaluation_id` BINARY(16) NOT NULL,
+  `user_id` BINARY(16) NOT NULL,
+  `user_full_name` VARCHAR(512) DEFAULT NULL,
+  `user_email` VARCHAR(255) DEFAULT NULL,
+  `tested_at` DATETIME(6) DEFAULT NULL,
+  `stress` INT NOT NULL DEFAULT 0,
+  `sleep` INT NOT NULL DEFAULT 0,
+  `mood` INT NOT NULL DEFAULT 0,
+  `motivation` INT NOT NULL DEFAULT 0,
+  `mental_tired` INT NOT NULL DEFAULT 0,
+  `score` INT NOT NULL,
+  `status` VARCHAR(64) DEFAULT NULL,
+  `member_notes` TEXT,
+  `coach_test_title` VARCHAR(512) DEFAULT NULL,
+  `coach_recommendation` TEXT,
+  `recommendation_general_note` TEXT,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_mh_submission_eval` (`evaluation_id`),
+  KEY `idx_mh_sub_user` (`user_id`),
+  KEY `idx_mh_sub_tested` (`tested_at`),
+  CONSTRAINT `fk_mh_sub_user`
+    FOREIGN KEY (`user_id`) REFERENCES `app_user` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_mh_sub_eval`
+    FOREIGN KEY (`evaluation_id`) REFERENCES `mental_health_evaluation` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `mental_health_recommended_exercise` (
+  `id` BINARY(16) NOT NULL,
+  `submission_id` BINARY(16) NOT NULL,
+  `sort_order` INT NOT NULL,
+  `name` VARCHAR(512) NOT NULL,
+  `duration_minutes` VARCHAR(64) DEFAULT NULL,
+  `description` TEXT,
+  PRIMARY KEY (`id`),
+  KEY `idx_mh_ex_sub` (`submission_id`),
+  CONSTRAINT `fk_mh_ex_submission`
+    FOREIGN KEY (`submission_id`) REFERENCES `mental_health_submission` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

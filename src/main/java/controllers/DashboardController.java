@@ -13,6 +13,7 @@ import models.User;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 public class DashboardController {
     @FXML
@@ -36,9 +37,13 @@ public class DashboardController {
     @FXML
     private VBox dashProfilePane;
     @FXML
+    private VBox dashMentalHealthPane;
+    @FXML
     private Button dashHomeBtn;
     @FXML
     private Button dashProfileBtn;
+    @FXML
+    private Button dashMentalHealthBtn;
     @FXML
     private ProfileFragmentController dashProfileController;
 
@@ -70,6 +75,15 @@ public class DashboardController {
         }
         if (navbarPageSubtitle != null) {
             navbarPageSubtitle.setText("Manage your personal information");
+        }
+    }
+
+    private void setMentalHealthNavbarTitles() {
+        if (navbarPageTitle != null) {
+            navbarPageTitle.setText("Dashboard");
+        }
+        if (navbarPageSubtitle != null) {
+            navbarPageSubtitle.setText("Welcome back to FitSense.");
         }
     }
 
@@ -144,6 +158,10 @@ public class DashboardController {
             dashHomePane.setManaged(false);
             dashHomePane.setVisible(false);
         }
+        if (dashMentalHealthPane != null) {
+            dashMentalHealthPane.setManaged(false);
+            dashMentalHealthPane.setVisible(false);
+        }
         if (dashProfilePane != null) {
             dashProfilePane.setManaged(true);
             dashProfilePane.setVisible(true);
@@ -152,6 +170,24 @@ public class DashboardController {
         if (dashProfileController != null) {
             dashProfileController.reloadFromSession();
         }
+    }
+
+    @FXML
+    private void onShowMentalHealth() {
+        setMentalHealthNavbarTitles();
+        if (dashHomePane != null) {
+            dashHomePane.setManaged(false);
+            dashHomePane.setVisible(false);
+        }
+        if (dashProfilePane != null) {
+            dashProfilePane.setManaged(false);
+            dashProfilePane.setVisible(false);
+        }
+        if (dashMentalHealthPane != null) {
+            dashMentalHealthPane.setManaged(true);
+            dashMentalHealthPane.setVisible(true);
+        }
+        setDashNavActive(dashMentalHealthBtn);
     }
 
     private void showDashboardHome() {
@@ -163,22 +199,22 @@ public class DashboardController {
             dashProfilePane.setManaged(false);
             dashProfilePane.setVisible(false);
         }
+        if (dashMentalHealthPane != null) {
+            dashMentalHealthPane.setManaged(false);
+            dashMentalHealthPane.setVisible(false);
+        }
         setDashNavActive(dashHomeBtn);
     }
 
     private void setDashNavActive(Button selected) {
-        if (dashHomeBtn != null) {
-            dashHomeBtn.getStyleClass().setAll("dash-side-link");
-            if (selected == dashHomeBtn) {
-                dashHomeBtn.getStyleClass().add("dash-side-link-active");
-            }
-        }
-        if (dashProfileBtn != null) {
-            dashProfileBtn.getStyleClass().setAll("dash-side-link");
-            if (selected == dashProfileBtn) {
-                dashProfileBtn.getStyleClass().add("dash-side-link-active");
-            }
-        }
+        Stream.of(dashHomeBtn, dashProfileBtn, dashMentalHealthBtn)
+                .filter(Objects::nonNull)
+                .forEach(b -> {
+                    b.getStyleClass().setAll("dash-side-link");
+                    if (b == selected) {
+                        b.getStyleClass().add("dash-side-link-active");
+                    }
+                });
     }
 
     @FXML

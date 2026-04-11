@@ -6,6 +6,7 @@ module org.example.fitsense {
     requires mysql.connector.j;
     requires spring.security.crypto;
     requires commons.logging;
+    requires com.google.gson;
 
     opens app to javafx.graphics;
     opens controllers to javafx.fxml;

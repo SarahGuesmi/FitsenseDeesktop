@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox prefWidth="600.0" spacing="16.0" styleClass="admin-content"
+      stylesheets="@../css/admin.css"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controllers.FeedbackFormController">
+   <padding>
+      <Insets bottom="28.0" left="28.0" right="28.0" top="24.0" />
+   </padding>
+   <children>
+      <!-- Header -->
+      <HBox alignment="CENTER_LEFT">
+         <children>
+            <VBox HBox.hgrow="ALWAYS" spacing="4.0">
+               <children>
+                  <Label styleClass="page-title" text="Create Feedback" />
+                  <Label styleClass="users-subtitle" text="Fill in the questionnaire details for your athletes." />
+               </children>
+            </VBox>
+            <Button mnemonicParsing="false" onAction="#onCancel" styleClass="side-link" text="✕  Cancel" />
+         </children>
+      </HBox>
+
+      <Separator />
+
+      <!-- Titre -->
+      <VBox spacing="6.0">
+         <children>
+            <Label styleClass="field-label" text="TITLE *" />
+            <TextField fx:id="titreField" promptText="e.g. Post-session feedback" styleClass="input-field" />
+         </children>
+      </VBox>
+
+      <!-- Type -->
+      <VBox spacing="6.0">
+         <children>
+            <Label styleClass="field-label" text="TYPE" />
+            <ComboBox fx:id="typeCombo" prefWidth="200.0" />
+         </children>
+      </VBox>
+
+      <!-- Note globale -->
+      <VBox spacing="6.0">
+         <children>
+            <Label styleClass="field-label" text="GLOBAL RATING (1-10)" />
+            <TextField fx:id="noteGlobaleField" promptText="e.g. 8" styleClass="input-field" />
+         </children>
+      </VBox>
+
+      <!-- Satisfaction -->
+      <VBox spacing="6.0">
+         <children>
+            <Label styleClass="field-label" text="SATISFACTION (1-10)" />
+            <TextField fx:id="satisfactionField" promptText="e.g. 7" styleClass="input-field" />
+         </children>
+      </VBox>
+
+      <!-- Intensite -->
+      <VBox spacing="6.0">
+         <children>
+            <Label styleClass="field-label" text="INTENSITY" />
+            <ComboBox fx:id="intensiteCombo" prefWidth="200.0" />
+         </children>
+      </VBox>
+
+      <!-- Duree -->
+      <VBox spacing="6.0">
+         <children>
+            <Label styleClass="field-label" text="DURATION" />
+            <ComboBox fx:id="dureeCombo" prefWidth="200.0" />
+         </children>
+      </VBox>
+
+      <!-- Commentaire -->
+      <VBox spacing="6.0">
+         <children>
+            <Label styleClass="field-label" text="COMMENT" />
+            <TextArea fx:id="commentaireArea" prefHeight="80.0" promptText="Additional comments..." styleClass="input-field" wrapText="true" />
+         </children>
+      </VBox>
+
+      <!-- Actions -->
+      <HBox alignment="CENTER_RIGHT" spacing="12.0">
+         <children>
+            <Button mnemonicParsing="false" onAction="#onCancel" styleClass="side-link" text="Cancel" />
+            <Button mnemonicParsing="false" onAction="#onSave" styleClass="btn-add-primary" text="💾  Save Feedback" />
+         </children>
+      </HBox>
+   </children>
+</VBox>

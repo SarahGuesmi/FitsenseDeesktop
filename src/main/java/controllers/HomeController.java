@@ -95,10 +95,14 @@ public class HomeController {
             scene.getStylesheets().setAll(Objects.requireNonNull(getClass().getResource(cssPath)).toExternalForm());
         } catch (Exception e) {
             e.printStackTrace();
+            // Unwrap to find the root cause
+            Throwable root = e;
+            while (root.getCause() != null) root = root.getCause();
             javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
             alert.setTitle("Navigation Error");
-            alert.setHeaderText(null);
-            alert.setContentText(e.getMessage());
+            alert.setHeaderText(e.getClass().getSimpleName() + ": " + e.getMessage());
+            alert.setContentText("Root cause: " + root.getClass().getSimpleName() + "\n" + root.getMessage());
+            alert.getDialogPane().setMinWidth(600);
             alert.showAndWait();
         }
     }

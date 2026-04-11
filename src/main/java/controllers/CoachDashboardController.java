@@ -7,18 +7,20 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import models.Questionnaire;
 import models.User;
+import models.Workout;
 import services.UserService;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -95,6 +97,31 @@ public class CoachDashboardController {
     @FXML
     private TableColumn<User, String> dateCol;
 
+    // Feedback management fields
+    @FXML
+    private javafx.scene.control.TextField feedbackSearchField;
+    @FXML
+    private TableView<models.Questionnaire> feedbackTable;
+    @FXML
+    private TableColumn<models.Questionnaire, String> feedbackTitleCol;
+    @FXML
+    private TableColumn<models.Questionnaire, String> feedbackWorkoutsCol;
+    @FXML
+    private TableColumn<models.Questionnaire, String> feedbackOptionsCol;
+    @FXML
+    private TableColumn<models.Questionnaire, String> feedbackActionsCol;
+
+    // Modal overlay fields
+    @FXML private StackPane feedbackModalOverlay;
+    @FXML private StackPane deleteConfirmOverlay;
+    @FXML private TextField modalTitreField;
+    @FXML private VBox workoutsCheckboxList;
+    @FXML private VBox optionsList;
+    @FXML private Label modalTitreErrorLabel;
+    @FXML private Label workoutsErrorLabel;
+
+    private Questionnaire pendingDeleteQuestionnaire;
+
     @FXML
     private ProfileFragmentController coachProfileController;
 
@@ -154,8 +181,336 @@ public class CoachDashboardController {
         hideAllContent();
         feedbackPane.setManaged(true);
         feedbackPane.setVisible(true);
-        setNavbarText("Feedback management", "Athlete feedback");
+        setNavbarText("Feedback Management", "Create and manage feedback questionnaires for your athletes.");
         setActiveSidebar(feedbackBtn);
+        setupFeedbackTable();
+        refreshFeedbackTable();
+    }
+
+    @FXML
+    private void onAddFeedback() {
+        clearFeedbackValidation();
+        workoutsCheckboxList.getChildren().clear();
+        optionsList.getChildren().clear();
+        modalTitreField.clear();
+        // Load workouts from DB
+        try {
+            List<Workout> workouts = new services.WorkoutService().read();
+            for (Workout w : workouts) {
+                CheckBox cb = new CheckBox(w.getNom());
+                cb.setUserData(w);
+                cb.setStyle("-fx-text-fill: #eff4ff; -fx-font-size: 14px;");
+                workoutsCheckboxList.getChildren().add(cb);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        // Default options
+        addOptionRow("1 Very poor");
+        addOptionRow("2 Poor");
+        addOptionRow("3 Average");
+        addOptionRow("4 Good");
+        addOptionRow("5 Excellent");
+        feedbackModalOverlay.setManaged(true);
+        feedbackModalOverlay.setVisible(true);
+    }
+
+    @FXML
+    private void onCancelDelete() {
+        pendingDeleteQuestionnaire = null;
+        deleteConfirmOverlay.setManaged(false);
+        deleteConfirmOverlay.setVisible(false);
+    }
+
+    @FXML
+    private void onConfirmDelete() {
+        if (pendingDeleteQuestionnaire == null) return;
+        try {
+            new services.FeedbackService(utils.DbConnection.getInstance().getCnx()).delete(pendingDeleteQuestionnaire);
+            pendingDeleteQuestionnaire = null;
+            deleteConfirmOverlay.setManaged(false);
+            deleteConfirmOverlay.setVisible(false);
+            refreshFeedbackTable();
+        } catch (SQLException e) {
+            new Alert(Alert.AlertType.ERROR, "Could not delete: " + e.getMessage()).showAndWait();
+        }
+    }
+
+    @FXML
+    private void onCloseFeedbackModal() {
+        feedbackModalOverlay.setManaged(false);
+        feedbackModalOverlay.setVisible(false);
+        clearFeedbackValidation();
+    }
+
+    private void clearFeedbackValidation() {
+        if (modalTitreErrorLabel != null) {
+            modalTitreErrorLabel.setVisible(false);
+        }
+        if (workoutsErrorLabel != null) {
+            workoutsErrorLabel.setVisible(false);
+        }
+        if (modalTitreField != null) {
+            modalTitreField.getStyleClass().remove("modal-field-error");
+        }
+        if (workoutsCheckboxList != null) {
+            workoutsCheckboxList.getStyleClass().remove("modal-field-error");
+        }
+    }
+
+    @FXML
+    private void onAddOption() {
+        addOptionRow("");
+    }
+
+    private void addOptionRow(String value) {
+        HBox row = new HBox(8);
+        row.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        TextField tf = new TextField(value);
+        tf.setPromptText("Option text...");
+        tf.getStyleClass().add("modal-field");
+        HBox.setHgrow(tf, javafx.scene.layout.Priority.ALWAYS);
+        Button removeBtn = new Button("✕");
+        removeBtn.getStyleClass().add("modal-close-btn");
+        removeBtn.setOnAction(e -> optionsList.getChildren().remove(row));
+        row.getChildren().addAll(tf, removeBtn);
+        optionsList.getChildren().add(row);
+    }
+
+    @FXML
+    private void onSaveFeedbackModal() {
+        clearFeedbackValidation();
+        String titre = modalTitreField.getText() == null ? "" : modalTitreField.getText().trim();
+        // Collect selected workouts
+        List<Workout> selectedWorkouts = new ArrayList<>();
+        for (javafx.scene.Node node : workoutsCheckboxList.getChildren()) {
+            if (node instanceof CheckBox cb && cb.isSelected()) {
+                selectedWorkouts.add((Workout) cb.getUserData());
+            }
+        }
+        boolean hasValidationError = false;
+        if (titre.isEmpty()) {
+            if (modalTitreErrorLabel != null) modalTitreErrorLabel.setVisible(true);
+            if (modalTitreField != null && !modalTitreField.getStyleClass().contains("modal-field-error")) {
+                modalTitreField.getStyleClass().add("modal-field-error");
+            }
+            hasValidationError = true;
+        }
+        if (selectedWorkouts.isEmpty()) {
+            if (workoutsErrorLabel != null) workoutsErrorLabel.setVisible(true);
+            if (workoutsCheckboxList != null && !workoutsCheckboxList.getStyleClass().contains("modal-field-error")) {
+                workoutsCheckboxList.getStyleClass().add("modal-field-error");
+            }
+            hasValidationError = true;
+        }
+        if (hasValidationError) {
+            return;
+        }
+        // Collect options as valid JSON array
+        List<String> options = new ArrayList<>();
+        for (javafx.scene.Node node : optionsList.getChildren()) {
+            if (node instanceof HBox row) {
+                row.getChildren().stream()
+                        .filter(n -> n instanceof TextField)
+                        .map(n -> ((TextField) n).getText().trim())
+                        .filter(s -> !s.isEmpty())
+                        .forEach(options::add);
+            }
+        }
+        // Build valid JSON array string
+        StringBuilder jsonOptions = new StringBuilder("[");
+        for (int i = 0; i < options.size(); i++) {
+            jsonOptions.append("\"").append(options.get(i).replace("\"", "\\\"")).append("\"");
+            if (i < options.size() - 1) jsonOptions.append(",");
+        }
+        jsonOptions.append("]");
+        Questionnaire q = new Questionnaire();
+        // Check if editing existing
+        Object userData = modalTitreField.getUserData();
+        if (userData instanceof Integer existingId) {
+            q.setId(existingId);
+        }
+        q.setTitre(titre);
+        q.setType("template");
+        q.setOptions(jsonOptions.toString());
+        q.setDateSoumission(Instant.now());
+        selectedWorkouts.forEach(q::addWorkout);
+        String selectedWorkoutTitles = selectedWorkouts.stream()
+                .map(Workout::getNom)
+                .filter(title -> title != null && !title.isBlank())
+                .collect(Collectors.joining(", "));
+        q.setExercicesCompris(selectedWorkoutTitles);
+        if (AppSession.getCurrentUser() != null) q.setCoach(AppSession.getCurrentUser());
+        try {
+            services.FeedbackService fs = new services.FeedbackService(utils.DbConnection.getInstance().getCnx());
+            if (q.getId() != null) {
+                fs.update(q);
+            } else {
+                fs.createPrepared(q);
+            }
+            modalTitreField.setUserData(null);
+            onCloseFeedbackModal();
+            refreshFeedbackTable();
+        } catch (SQLException e) {
+            new Alert(Alert.AlertType.ERROR, "Could not save: " + e.getMessage()).showAndWait();
+        }
+    }
+
+    private void setupFeedbackTable() {
+        if (feedbackTitleCol == null) return;
+
+        // TITLE col — bold white text
+        feedbackTitleCol.setCellValueFactory(data ->
+                new SimpleStringProperty(data.getValue().getTitre()));
+        feedbackTitleCol.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) { setGraphic(null); setText(null); return; }
+                Label lbl = new Label(item);
+                lbl.setStyle("-fx-text-fill: #f4f8ff; -fx-font-weight: 700; -fx-font-size: 14px;");
+                setGraphic(lbl);
+                setText(null);
+            }
+        });
+
+        // LINKED WORKOUTS col — badge per workout
+        feedbackWorkoutsCol.setCellValueFactory(data -> {
+            String workoutNames = data.getValue().getWorkouts().stream()
+                    .map(Workout::getNom)
+                    .filter(name -> name != null && !name.isBlank())
+                    .collect(Collectors.joining(", "));
+            if (workoutNames.isBlank()) {
+                workoutNames = data.getValue().getExercicesCompris() != null ? data.getValue().getExercicesCompris() : "";
+            }
+            return new SimpleStringProperty(workoutNames);
+        });
+        feedbackWorkoutsCol.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null || item.isBlank()) { setGraphic(null); setText(null); return; }
+                HBox box = new HBox(6);
+                box.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+                for (String w : item.split(",")) {
+                    if (w.isBlank()) continue;
+                    Label badge = new Label("↔ " + w.trim());
+                    badge.setStyle("-fx-background-color: rgba(58,141,255,0.15); -fx-text-fill: #5ab4ff;" +
+                            "-fx-background-radius: 20px; -fx-border-color: rgba(90,180,255,0.5);" +
+                            "-fx-border-radius: 20px; -fx-padding: 4 10; -fx-font-size: 12px; -fx-font-weight: 700;");
+                    box.getChildren().add(badge);
+                }
+                setGraphic(box);
+                setText(null);
+            }
+        });
+
+        // OPTIONS col — "X options" badge
+        feedbackOptionsCol.setCellValueFactory(data ->
+                new SimpleStringProperty(data.getValue().getOptions()));
+        feedbackOptionsCol.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) { setGraphic(null); setText(null); return; }
+                int count = 0;
+                if (item != null && !item.isBlank()) {
+                    count = item.split(",").length;
+                }
+                Label badge = new Label(count + " options");
+                badge.setStyle("-fx-background-color: rgba(30,40,65,0.9); -fx-text-fill: #c8d8ff;" +
+                        "-fx-background-radius: 20px; -fx-border-color: rgba(140,170,255,0.35);" +
+                        "-fx-border-radius: 20px; -fx-padding: 4 12; -fx-font-size: 12px; -fx-font-weight: 700;");
+                setGraphic(badge);
+                setText(null);
+            }
+        });
+
+        // ACTIONS col — edit + delete buttons
+        feedbackActionsCol.setCellFactory(col -> new TableCell<>() {
+            private final Button editBtn = new Button("✎");
+            private final Button deleteBtn = new Button("🗑");
+            {
+                editBtn.getStyleClass().addAll("table-icon-btn", "icon-edit");
+                deleteBtn.getStyleClass().addAll("table-icon-btn", "icon-delete");
+                editBtn.setOnAction(e -> {
+                    Questionnaire q = getTableView().getItems().get(getIndex());
+                    openEditModal(q);
+                });
+                deleteBtn.setOnAction(e -> {
+                    Questionnaire q = getTableView().getItems().get(getIndex());
+                    pendingDeleteQuestionnaire = q;
+                    deleteConfirmOverlay.setManaged(true);
+                    deleteConfirmOverlay.setVisible(true);
+                });
+            }
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) { setGraphic(null); return; }
+                HBox box = new HBox(8, editBtn, deleteBtn);
+                box.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+                setGraphic(box);
+            }
+        });
+
+        if (feedbackSearchField != null) {
+            feedbackSearchField.textProperty().addListener((obs, oldVal, newVal) -> refreshFeedbackTable());
+        }
+    }
+
+    private void openEditModal(Questionnaire q) {
+        workoutsCheckboxList.getChildren().clear();
+        optionsList.getChildren().clear();
+        modalTitreField.setText(q.getTitre());
+        // Load workouts
+        try {
+            List<Workout> workouts = new services.WorkoutService().read();
+            java.util.Set<String> linkedWorkoutNames = q.getWorkouts().stream()
+                    .map(Workout::getNom)
+                    .filter(name -> name != null && !name.isBlank())
+                    .collect(Collectors.toSet());
+            if (linkedWorkoutNames.isEmpty() && q.getExercicesCompris() != null) {
+                for (String title : q.getExercicesCompris().split(",")) {
+                    if (!title.isBlank()) linkedWorkoutNames.add(title.trim());
+                }
+            }
+            for (Workout w : workouts) {
+                CheckBox cb = new CheckBox(w.getNom());
+                cb.setUserData(w);
+                cb.setStyle("-fx-text-fill: #eff4ff; -fx-font-size: 14px;");
+                boolean linked = w.getNom() != null && linkedWorkoutNames.contains(w.getNom());
+                cb.setSelected(linked);
+                workoutsCheckboxList.getChildren().add(cb);
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        // Load options
+        if (q.getOptions() != null && !q.getOptions().isBlank()) {
+            String raw = q.getOptions().replaceAll("[\\[\\]\"]", "");
+            for (String opt : raw.split(",")) {
+                if (!opt.isBlank()) addOptionRow(opt.trim());
+            }
+        }
+        // Store id for update
+        modalTitreField.setUserData(q.getId());
+        clearFeedbackValidation();
+        feedbackModalOverlay.setManaged(true);
+        feedbackModalOverlay.setVisible(true);
+    }
+
+    private void refreshFeedbackTable() {
+        if (feedbackTable == null) return;
+        try {
+            services.FeedbackService qs = new services.FeedbackService(utils.DbConnection.getInstance().getCnx());
+            java.util.List<models.Questionnaire> all = qs.read();
+            String search = feedbackSearchField != null ? feedbackSearchField.getText().toLowerCase() : "";
+            java.util.List<models.Questionnaire> filtered = all.stream()
+                    .filter(q -> search.isEmpty() || (q.getTitre() != null && q.getTitre().toLowerCase().contains(search)))
+                    .collect(java.util.stream.Collectors.toList());
+            feedbackTable.setItems(javafx.collections.FXCollections.observableArrayList(filtered));
+        } catch (java.sql.SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML

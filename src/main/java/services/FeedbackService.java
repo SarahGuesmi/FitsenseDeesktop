@@ -6,11 +6,11 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class QuestionnaireService implements CRUD<Questionnaire> {
+public class FeedbackService implements CRUD<Questionnaire> {
 
     private final Connection connection;
 
-    public QuestionnaireService(Connection connection) {
+    public FeedbackService(Connection connection) {
         this.connection = connection;
     }
 
@@ -32,8 +32,15 @@ public class QuestionnaireService implements CRUD<Questionnaire> {
                 "rapproche_objectifs, commentaire, options, user_name, date_soumission) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setObject(1, q.getUser() != null ? q.getUser().getId() : null);
-            ps.setObject(2, q.getCoach() != null ? q.getCoach().getId() : null);
+            // user_id and coach_id are int in DB
+            if (q.getUser() != null)
+                ps.setInt(1, (int) q.getUser().getId().getLeastSignificantBits());
+            else
+                ps.setNull(1, Types.INTEGER);
+            if (q.getCoach() != null)
+                ps.setInt(2, (int) q.getCoach().getId().getLeastSignificantBits());
+            else
+                ps.setNull(2, Types.INTEGER);
             ps.setString(3, q.getTitre());
             ps.setString(4, q.getType());
             ps.setObject(5, q.getNoteGlobale());
@@ -62,6 +69,7 @@ public class QuestionnaireService implements CRUD<Questionnaire> {
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 Questionnaire q = new Questionnaire();
+                q.setId(rs.getObject("id", Integer.class));
                 q.setTitre(rs.getString("titre"));
                 q.setType(rs.getString("type"));
                 q.setNoteGlobale(rs.getObject("note_globale", Integer.class));
@@ -87,27 +95,14 @@ public class QuestionnaireService implements CRUD<Questionnaire> {
 
     @Override
     public void update(Questionnaire q) throws SQLException {
-        String sql = "UPDATE questionnaire SET titre=?, type=?, note_globale=?, satisfaction=?, intensite=?, " +
-                "exercices_compris=?, duree=?, ressenti_physique=?, stress=?, motivation=?, progression=?, " +
-                "rapproche_objectifs=?, commentaire=?, options=?, user_name=?, date_soumission=? WHERE id=?";
+        String sql = "UPDATE questionnaire SET titre=?, type=?, options=?, exercices_compris=?, date_soumission=? WHERE id=?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, q.getTitre());
-            ps.setString(2, q.getType());
-            ps.setObject(3, q.getNoteGlobale());
-            ps.setObject(4, q.getSatisfaction());
-            ps.setString(5, q.getIntensite());
-            ps.setString(6, q.getExercicesCompris());
-            ps.setString(7, q.getDuree());
-            ps.setString(8, q.getRessentiPhysique());
-            ps.setString(9, q.getStress());
-            ps.setString(10, q.getMotivation());
-            ps.setString(11, q.getProgression());
-            ps.setObject(12, q.getRapprocheObjectifs());
-            ps.setString(13, q.getCommentaire());
-            ps.setString(14, q.getOptions());
-            ps.setString(15, q.getUserName());
-            ps.setObject(16, q.getDateSoumission() != null ? Timestamp.from(q.getDateSoumission()) : null);
-            ps.setInt(17, q.getId());
+            ps.setString(2, q.getType() != null ? q.getType() : "template");
+            ps.setString(3, q.getOptions());
+            ps.setString(4, q.getExercicesCompris());
+            ps.setObject(5, q.getDateSoumission() != null ? Timestamp.from(q.getDateSoumission()) : null);
+            ps.setInt(6, q.getId());
             ps.executeUpdate();
         }
     }

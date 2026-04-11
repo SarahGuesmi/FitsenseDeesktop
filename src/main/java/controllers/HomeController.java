@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
@@ -12,7 +13,6 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import utils.WebAssets;
 
-import java.io.IOException;
 import java.util.Objects;
 
 /**
@@ -93,8 +93,19 @@ public class HomeController {
             Scene scene = root.getScene();
             scene.setRoot(newRoot);
             scene.getStylesheets().setAll(Objects.requireNonNull(getClass().getResource(cssPath)).toExternalForm());
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to switch scene to " + fxmlPath, e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Could not open screen");
+            alert.setHeaderText("Failed to load " + fxmlPath);
+            Throwable c = e;
+            while (c.getCause() != null) {
+                c = c.getCause();
+            }
+            alert.setContentText(c.getClass().getSimpleName() + ": " + c.getMessage()
+                    + "\n\nCheck the Run console for the full stack trace. "
+                    + "If you see ClassNotFoundException, use Maven Reload in the IDE.");
+            alert.showAndWait();
         }
     }
 

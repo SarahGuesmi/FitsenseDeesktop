@@ -45,12 +45,21 @@ public class SignInController {
     @FXML
     private ImageView heroImageView;
 
-    private final UserService userService = new UserService();
-    private final ProfilePhysiqueService profilePhysiqueService = new ProfilePhysiqueService();
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private UserService userService;
+    private ProfilePhysiqueService profilePhysiqueService;
+    private BCryptPasswordEncoder passwordEncoder;
+    private Throwable servicesInitError;
 
     @FXML
     private void initialize() {
+        try {
+            passwordEncoder = new BCryptPasswordEncoder();
+            userService = new UserService();
+            profilePhysiqueService = new ProfilePhysiqueService();
+        } catch (Throwable t) {
+            servicesInitError = t;
+            t.printStackTrace();
+        }
         WebAssets.loadPublicAsset(heroImageView, WebAssets.HERO_SPORT_IMAGE);
     }
 
@@ -61,6 +70,19 @@ public class SignInController {
 
     @FXML
     private void onSignInWithPassword() {
+        if (servicesInitError != null) {
+            showAlert(Alert.AlertType.ERROR, "Sign-in unavailable",
+                    "Services did not start correctly:\n" + servicesInitError.getMessage()
+                            + "\n\nReload Maven dependencies (commons-logging + spring-security-crypto) and run again.");
+            return;
+        }
+        if (userService == null || userService.cnx == null) {
+            showAlert(Alert.AlertType.ERROR, "Database",
+                    "No database connection. Ensure MySQL is running and the URL matches your server (default port 3308). "
+                            + "Override with -Dfitsense.db.url=... if needed.");
+            return;
+        }
+
         String email = emailField.getText() == null ? "" : emailField.getText().trim();
         String password = passwordField.getText() == null ? "" : passwordField.getText();
 

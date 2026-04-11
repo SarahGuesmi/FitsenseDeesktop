@@ -24,7 +24,9 @@
                   <Button fx:id="chatroomBtn" mnemonicParsing="false" onAction="#onShowChatroom" styleClass="side-link" text="💬  Chatroom" />
                   <Button fx:id="workoutCatalogBtn" mnemonicParsing="false" onAction="#onShowWorkoutCatalog" styleClass="side-link" text="🏋  Workout catalog" />
                   <Button fx:id="feedbackBtn" mnemonicParsing="false" onAction="#onShowFeedback" styleClass="side-link" text="✉  Feedback management" />
-                  <Button fx:id="mentalWellnessBtn" mnemonicParsing="false" onAction="#onShowMentalWellness" styleClass="side-link" text="🧠  Mental wellness" />
+                  <Label styleClass="coach-side-section" text="MENTAL WELLNESS" />
+                  <Button fx:id="mentalTestsBtn" mnemonicParsing="false" onAction="#onShowMentalTests" styleClass="side-sub-link" text="◇  Tests &amp; questionnaires" />
+                  <Button fx:id="mentalAssessmentsBtn" mnemonicParsing="false" onAction="#onShowMentalAssessments" styleClass="side-sub-link" text="◇  Latest assessments" />
                   <Button fx:id="nutritionBtn" mnemonicParsing="false" onAction="#onShowNutrition" styleClass="side-link" text="🥗  Nutrition plan" />
                   <Button fx:id="profileBtn" mnemonicParsing="false" onAction="#onShowProfile" styleClass="side-link" text="☺  Profile" />
                   <Button mnemonicParsing="false" onAction="#onLogout" styleClass="side-link" text="⏻  Sign Out" />
@@ -158,10 +160,17 @@
                               <Insets bottom="18.0" left="18.0" right="18.0" top="18.0" />
                            </padding>
                         </VBox>
-                        <VBox fx:id="mentalWellnessPane" managed="false" spacing="12.0" styleClass="admin-content" visible="false">
+                        <VBox fx:id="mentalTestsPane" managed="false" spacing="0.0" styleClass="admin-content" visible="false" VBox.vgrow="ALWAYS">
                            <children>
-                              <Label styleClass="page-title" text="Mental wellness" />
-                              <Label styleClass="users-subtitle" text="Resources and check-ins for mental health." wrapText="true" />
+                              <fx:include fx:id="coachMentalTests" source="CoachMentalTestsFragment.fxml" VBox.vgrow="ALWAYS" />
+                           </children>
+                           <padding>
+                              <Insets bottom="18.0" left="18.0" right="18.0" top="18.0" />
+                           </padding>
+                        </VBox>
+                        <VBox fx:id="mentalAssessmentsPane" managed="false" spacing="0.0" styleClass="admin-content" visible="false" VBox.vgrow="ALWAYS">
+                           <children>
+                              <fx:include fx:id="coachMentalAssessments" source="CoachMentalAssessmentsFragment.fxml" VBox.vgrow="ALWAYS" />
                            </children>
                            <padding>
                               <Insets bottom="18.0" left="18.0" right="18.0" top="18.0" />

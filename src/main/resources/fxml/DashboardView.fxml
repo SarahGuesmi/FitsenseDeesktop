@@ -20,7 +20,7 @@
                   <Button fx:id="dashHomeBtn" mnemonicParsing="false" onAction="#onShowDashboard" styleClass="dash-side-link" text="◈  Dashboard" />
                   <Button fx:id="dashProfileBtn" mnemonicParsing="false" onAction="#onShowProfile" styleClass="dash-side-link" text="☺  Profile" />
                   <Button mnemonicParsing="false" styleClass="dash-side-link" text="▣  My Workouts" />
-                  <Button mnemonicParsing="false" styleClass="dash-side-link" text="◉  Mental Health" />
+                  <Button fx:id="dashMentalHealthBtn" mnemonicParsing="false" onAction="#onShowMentalHealth" styleClass="dash-side-link" text="◉  Mental Health" />
                   <Button mnemonicParsing="false" styleClass="dash-side-link" text="◇  Nutrition" />
                   <Button mnemonicParsing="false" styleClass="dash-side-link" text="💬  Chatroom" />
                   <Region VBox.vgrow="ALWAYS" />
@@ -70,7 +70,7 @@
                                     <HBox spacing="10.0">
                                        <children>
                                           <Button mnemonicParsing="false" styleClass="hero-primary-btn" text="Start Training" />
-                                          <Button mnemonicParsing="false" styleClass="hero-secondary-btn" text="Mental Check" />
+                                          <Button mnemonicParsing="false" onAction="#onShowMentalHealth" styleClass="hero-secondary-btn" text="Mental Check" />
                                        </children>
                                     </HBox>
                                  </children>
@@ -86,6 +86,14 @@
                         <VBox fx:id="dashProfilePane" alignment="TOP_CENTER" managed="false" styleClass="dash-content" visible="false" StackPane.alignment="TOP_CENTER">
                            <children>
                               <fx:include fx:id="dashProfile" source="ProfileFragment.fxml" />
+                           </children>
+                           <padding>
+                              <Insets bottom="22.0" left="22.0" right="22.0" top="22.0" />
+                           </padding>
+                        </VBox>
+                        <VBox fx:id="dashMentalHealthPane" alignment="TOP_CENTER" managed="false" styleClass="dash-content" visible="false" StackPane.alignment="TOP_CENTER">
+                           <children>
+                              <fx:include fx:id="mentalHealthUser" source="MentalHealthUserFragment.fxml" />
                            </children>
                            <padding>
                               <Insets bottom="22.0" left="22.0" right="22.0" top="22.0" />

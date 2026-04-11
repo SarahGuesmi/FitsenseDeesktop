@@ -22,6 +22,14 @@
     -fx-font-weight: 600;
 }
 
+.coach-side-section {
+    -fx-text-fill: #7a8bb8;
+    -fx-font-size: 11px;
+    -fx-font-weight: 700;
+    -fx-letter-spacing: 0.08em;
+    -fx-padding: 18 4 6 4;
+}
+
 .side-link,
 .side-link-active {
     -fx-background-color: transparent;
@@ -42,6 +50,29 @@
 
 .side-link:hover {
     -fx-background-color: rgba(255, 255, 255, 0.08);
+}
+
+.side-sub-link {
+    -fx-background-color: transparent;
+    -fx-text-fill: #a0b3df;
+    -fx-font-size: 15px;
+    -fx-font-weight: 600;
+    -fx-alignment: center-left;
+    -fx-padding: 8 16;
+    -fx-background-radius: 10px;
+    -fx-cursor: hand;
+}
+
+.side-sub-link:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-text-fill: #ffffff;
+}
+
+.side-sub-link-active {
+    -fx-background-color: rgba(74, 130, 255, 0.15);
+    -fx-text-fill: #8eb3ff;
+    -fx-border-color: transparent transparent transparent #4a82ff;
+    -fx-border-width: 0 0 0 3;
 }
 
 .admin-main-area {

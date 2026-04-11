@@ -93,8 +93,13 @@ public class HomeController {
             Scene scene = root.getScene();
             scene.setRoot(newRoot);
             scene.getStylesheets().setAll(Objects.requireNonNull(getClass().getResource(cssPath)).toExternalForm());
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to switch scene to " + fxmlPath, e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
+            alert.setTitle("Navigation Error");
+            alert.setHeaderText(null);
+            alert.setContentText(e.getMessage());
+            alert.showAndWait();
         }
     }
 

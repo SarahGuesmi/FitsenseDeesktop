@@ -90,15 +90,6 @@
                               </VBox>
                               <VBox styleClass="stat-card" GridPane.columnIndex="2">
                                  <children>
-                                    <Label styleClass="stat-title" text="NOTIFICATIONS" />
-                                    <Label fx:id="notificationsLabel" styleClass="stat-value" text="0" />
-                                 </children>
-                                 <padding>
-                                    <Insets bottom="12.0" left="14.0" right="14.0" top="12.0" />
-                                 </padding>
-                              </VBox>
-                              <VBox styleClass="stat-card" GridPane.columnIndex="3">
-                                 <children>
                                     <Label styleClass="stat-title" text="2FA PROTECTED" />
                                     <Label fx:id="twoFaLabel" styleClass="stat-value" text="0" />
                                  </children>
@@ -135,6 +126,32 @@
                            </children>
                            <padding>
                               <Insets bottom="8.0" left="2.0" right="2.0" top="2.0" />
+                           </padding>
+                        </HBox>
+                        <HBox alignment="BOTTOM_LEFT" spacing="16.0" styleClass="user-filters-bar">
+                           <children>
+                              <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label styleClass="filter-field-label" text="Search Users" />
+                                    <TextField fx:id="userSearchField" promptText="Search by name or email..." styleClass="filter-search-field" />
+                                 </children>
+                              </VBox>
+                              <VBox spacing="6.0">
+                                 <children>
+                                    <Label styleClass="filter-field-label" text="Status" />
+                                    <ComboBox fx:id="userStatusFilterCombo" prefWidth="150.0" styleClass="filter-combo" />
+                                 </children>
+                              </VBox>
+                              <VBox spacing="6.0">
+                                 <children>
+                                    <Label styleClass="filter-field-label" text="Role" />
+                                    <ComboBox fx:id="userRoleFilterCombo" prefWidth="150.0" styleClass="filter-combo" />
+                                 </children>
+                              </VBox>
+                              <Button mnemonicParsing="false" onAction="#onClearUserFilters" styleClass="filter-clear-btn" text="Clear" />
+                           </children>
+                           <padding>
+                              <Insets bottom="14.0" left="16.0" right="16.0" top="14.0" />
                            </padding>
                         </HBox>
                         <TableView fx:id="usersTable" prefHeight="520.0" styleClass="users-table">

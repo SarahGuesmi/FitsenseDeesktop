@@ -48,10 +48,17 @@ public class SignUpController {
     @FXML
     private ImageView heroImageView;
 
-    private final UserService userService = new UserService();
+    private UserService userService;
+    private Throwable userServiceInitError;
 
     @FXML
     private void initialize() {
+        try {
+            userService = new UserService();
+        } catch (Throwable t) {
+            userServiceInitError = t;
+            t.printStackTrace();
+        }
         WebAssets.loadPublicAsset(heroImageView, WebAssets.HERO_SPORT_IMAGE);
     }
 
@@ -77,6 +84,15 @@ public class SignUpController {
         }
         if (password.length() < 6) {
             showWarning("Weak Password", "Password must contain at least 6 characters.");
+            return;
+        }
+
+        if (userServiceInitError != null) {
+            showError("Sign-up unavailable", "Services did not start correctly:\n" + userServiceInitError.getMessage());
+            return;
+        }
+        if (userService == null || userService.cnx == null) {
+            showError("Database", "No database connection. Check MySQL (default port 3308) or -Dfitsense.db.url=...");
             return;
         }
 

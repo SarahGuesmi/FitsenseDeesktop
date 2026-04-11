@@ -466,3 +466,59 @@
     -fx-background-color: rgba(176, 196, 246, 0.35);
     -fx-background-radius: 6px;
 }
+
+/* —— User management filters —— */
+.user-filters-bar {
+    -fx-background-color: linear-gradient(to right, rgba(17, 30, 56, 0.95), rgba(20, 28, 52, 0.95));
+    -fx-background-radius: 14px;
+    -fx-border-color: rgba(160, 181, 255, 0.32);
+    -fx-border-radius: 14px;
+    -fx-border-width: 1px;
+}
+
+.filter-field-label {
+    -fx-text-fill: #f4f7ff;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+}
+
+.filter-search-field {
+    -fx-background-color: rgba(12, 18, 32, 0.95);
+    -fx-text-fill: #eff4ff;
+    -fx-prompt-text-fill: #657aa8;
+    -fx-background-radius: 10px;
+    -fx-border-color: rgba(176, 196, 246, 0.45);
+    -fx-border-radius: 10px;
+    -fx-font-size: 14px;
+    -fx-padding: 10 12;
+}
+
+.filter-combo {
+    -fx-background-color: rgba(12, 18, 32, 0.95);
+    -fx-border-color: rgba(176, 196, 246, 0.45);
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-font-size: 14px;
+    -fx-pref-height: 40px;
+}
+
+.filter-combo .list-cell {
+    -fx-text-fill: #eff4ff;
+}
+
+.filter-clear-btn {
+    -fx-background-color: rgba(12, 18, 32, 0.95);
+    -fx-text-fill: #eff4ff;
+    -fx-border-color: rgba(176, 196, 246, 0.45);
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-padding: 10 20;
+    -fx-min-height: 40px;
+    -fx-cursor: hand;
+}
+
+.filter-clear-btn:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.06);
+}

@@ -14,12 +14,12 @@
 <StackPane fx:id="root" minHeight="540.0" minWidth="840.0" prefHeight="620.0" prefWidth="980.0" styleClass="root-home" stylesheets="@../css/home.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.HomeController">
    <children>
       <!-- Background video from Symfony public/ (URL via WebAssets); sized in controller -->
-      <StackPane maxHeight="Infinity" maxWidth="Infinity" styleClass="hero-video-layer">
+      <StackPane maxHeight="Infinity" maxWidth="Infinity" mouseTransparent="true" styleClass="hero-video-layer">
          <children>
-            <MediaView fx:id="backgroundMediaView" preserveRatio="false" smooth="true" />
+            <MediaView fx:id="backgroundMediaView" mouseTransparent="true" preserveRatio="false" smooth="true" />
          </children>
       </StackPane>
-      <Region styleClass="hero-dark-overlay" maxWidth="Infinity" maxHeight="Infinity" />
+      <Region maxHeight="Infinity" maxWidth="Infinity" mouseTransparent="true" styleClass="hero-dark-overlay" />
       <BorderPane maxWidth="Infinity" maxHeight="Infinity">
          <top>
             <HBox alignment="CENTER_RIGHT" spacing="12.0" styleClass="home-top-bar" BorderPane.alignment="CENTER">

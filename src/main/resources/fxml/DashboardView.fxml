@@ -5,6 +5,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
@@ -12,45 +13,87 @@
    <children>
       <BorderPane>
          <left>
-            <VBox prefWidth="210.0" spacing="14.0" styleClass="dash-sidebar">
+            <VBox prefWidth="250.0" spacing="14.0" styleClass="dash-sidebar">
                <children>
-                  <Label fx:id="userNameLabel" styleClass="sidebar-user" text="User" />
-                  <Label styleClass="sidebar-brand" text="FITSENSE" />
-                  <Button mnemonicParsing="false" styleClass="side-item-active" text="Dashboard" />
-                  <Button mnemonicParsing="false" styleClass="side-item" text="My Workouts" />
-                  <Button mnemonicParsing="false" styleClass="side-item" text="Mental Health" />
-                  <Button mnemonicParsing="false" styleClass="side-item" text="Nutrition" />
-                  <Button mnemonicParsing="false" styleClass="side-item" text="Chatroom" />
-                  <Button mnemonicParsing="false" onAction="#onLogout" styleClass="logout-btn" text="Logout" />
+                  <Label styleClass="dash-brand" text="FITSENSE" />
+                  <Label styleClass="dash-side-sub" text="YOUR SPACE" />
+                  <Button fx:id="dashHomeBtn" mnemonicParsing="false" onAction="#onShowDashboard" styleClass="dash-side-link" text="◈  Dashboard" />
+                  <Button fx:id="dashProfileBtn" mnemonicParsing="false" onAction="#onShowProfile" styleClass="dash-side-link" text="☺  Profile" />
+                  <Button mnemonicParsing="false" styleClass="dash-side-link" text="▣  My Workouts" />
+                  <Button mnemonicParsing="false" styleClass="dash-side-link" text="◉  Mental Health" />
+                  <Button mnemonicParsing="false" styleClass="dash-side-link" text="◇  Nutrition" />
+                  <Button mnemonicParsing="false" styleClass="dash-side-link" text="💬  Chatroom" />
+                  <Region VBox.vgrow="ALWAYS" />
+                  <Button mnemonicParsing="false" onAction="#onLogout" styleClass="dash-side-link" text="⏻  Sign Out" />
                </children>
                <padding>
-                  <Insets bottom="20.0" left="14.0" right="14.0" top="20.0" />
+                  <Insets bottom="22.0" left="18.0" right="18.0" top="22.0" />
                </padding>
             </VBox>
          </left>
          <center>
-            <VBox spacing="18.0" styleClass="dash-content">
+            <VBox styleClass="dash-main-area" BorderPane.alignment="CENTER" VBox.vgrow="ALWAYS">
                <children>
-                  <Label styleClass="dash-page-title" text="My Dashboard" />
-                  <VBox spacing="10.0" styleClass="hero-card">
+                  <HBox alignment="CENTER_LEFT" styleClass="dash-navbar" VBox.vgrow="NEVER">
                      <children>
-                        <Label fx:id="welcomeLabel" styleClass="hero-title" text="Welcome back!" />
-                        <Label styleClass="hero-subtitle" text="Ready to crush your goals today? Your plan is waiting for you." wrapText="true" />
-                        <HBox spacing="10.0">
+                        <VBox HBox.hgrow="ALWAYS" spacing="4.0">
                            <children>
-                              <Button mnemonicParsing="false" styleClass="hero-primary-btn" text="Start Training" />
-                              <Button mnemonicParsing="false" styleClass="hero-secondary-btn" text="Mental Check" />
+                              <Label fx:id="navbarPageTitle" styleClass="dash-navbar-title" text="Dashboard" />
+                              <Label fx:id="navbarPageSubtitle" styleClass="dash-navbar-subtitle" text="Your fitness overview" />
+                           </children>
+                        </VBox>
+                        <Button fx:id="navbarBellBtn" focusTraversable="false" mnemonicParsing="false" styleClass="dash-navbar-bell" text="" />
+                        <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="dash-navbar-profile">
+                           <children>
+                              <VBox alignment="CENTER_LEFT" spacing="2.0">
+                                 <children>
+                                    <Label fx:id="navbarUserName" styleClass="dash-navbar-user-name" text="—" />
+                                    <Label fx:id="navbarUserRole" styleClass="dash-navbar-user-role" text="User" />
+                                 </children>
+                              </VBox>
+                              <Label fx:id="navbarAvatar" alignment="CENTER" styleClass="dash-navbar-avatar" text="?" />
                            </children>
                         </HBox>
                      </children>
                      <padding>
-                        <Insets bottom="18.0" left="20.0" right="20.0" top="18.0" />
+                        <Insets bottom="16.0" left="24.0" right="24.0" top="16.0" />
                      </padding>
-                  </VBox>
+                  </HBox>
+                  <StackPane styleClass="dash-center-stack" VBox.vgrow="ALWAYS">
+                     <children>
+                        <VBox fx:id="dashHomePane" spacing="18.0" styleClass="dash-content">
+                           <children>
+                              <VBox spacing="10.0" styleClass="hero-card">
+                                 <children>
+                                    <Label fx:id="welcomeLabel" styleClass="hero-title" text="Welcome back!" />
+                                    <Label styleClass="hero-subtitle" text="Ready to crush your goals today? Your plan is waiting for you." wrapText="true" />
+                                    <HBox spacing="10.0">
+                                       <children>
+                                          <Button mnemonicParsing="false" styleClass="hero-primary-btn" text="Start Training" />
+                                          <Button mnemonicParsing="false" styleClass="hero-secondary-btn" text="Mental Check" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="18.0" left="20.0" right="20.0" top="18.0" />
+                                 </padding>
+                              </VBox>
+                           </children>
+                           <padding>
+                              <Insets bottom="22.0" left="22.0" right="22.0" top="22.0" />
+                           </padding>
+                        </VBox>
+                        <VBox fx:id="dashProfilePane" alignment="TOP_CENTER" managed="false" styleClass="dash-content" visible="false" StackPane.alignment="TOP_CENTER">
+                           <children>
+                              <fx:include fx:id="dashProfile" source="ProfileFragment.fxml" />
+                           </children>
+                           <padding>
+                              <Insets bottom="22.0" left="22.0" right="22.0" top="22.0" />
+                           </padding>
+                        </VBox>
+                     </children>
+                  </StackPane>
                </children>
-               <padding>
-                  <Insets bottom="22.0" left="22.0" right="22.0" top="22.0" />
-               </padding>
             </VBox>
          </center>
       </BorderPane>

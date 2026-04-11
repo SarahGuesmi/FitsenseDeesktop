@@ -3,6 +3,7 @@ package services;
 import models.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import utils.DbConnection;
+import utils.ResultSetColumns;
 import utils.UuidUtil;
 
 import java.sql.*;
@@ -25,7 +26,7 @@ public class UserService implements CRUD<User> {
         Timestamp ts = rs.getTimestamp("date_creation");
         LocalDateTime dateCreation =
                 ts != null ? ts.toInstant().atZone(ZoneOffset.UTC).toLocalDateTime() : null;
-        return new User(
+        User user = new User(
                 UuidUtil.fromResultSet(rs, "id"),
                 rs.getString("email_email"),
                 rs.getString("password"),
@@ -38,6 +39,13 @@ public class UserService implements CRUD<User> {
                 rs.getString("phone_number"),
                 rs.getString("photo"),
                 rs.getString("username"));
+        String obj = ResultSetColumns.coalesceNonBlank(
+                ResultSetColumns.getFirstString(rs, "objective"),
+                ResultSetColumns.getFirstString(rs, "objectif"));
+        user.setAccountObjective(obj);
+        Object genderObj = ResultSetColumns.getFirstObject(rs, "gender", "genre", "sexe");
+        user.setAccountGender(ResultSetColumns.normalizeGenderDbValue(genderObj));
+        return user;
     }
 
     private String hashPasswordIfPlain(String password) {
@@ -57,6 +65,22 @@ public class UserService implements CRUD<User> {
         String sql = "SELECT * FROM `app_user` WHERE `email_email` = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
             stmt.setString(1, email);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapRow(rs);
+                }
+            }
+        }
+        return null;
+    }
+
+    public User findByUsername(String username) throws SQLException {
+        if (username == null || username.isBlank()) {
+            return null;
+        }
+        String sql = "SELECT * FROM `app_user` WHERE `username` = ?";
+        try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
+            stmt.setString(1, username.trim());
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     return mapRow(rs);

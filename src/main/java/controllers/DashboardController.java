@@ -5,8 +5,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import models.User;
 
 import java.io.IOException;
@@ -18,18 +20,164 @@ public class DashboardController {
     @FXML
     private Label welcomeLabel;
     @FXML
-    private Label userNameLabel;
+    private Label navbarPageTitle;
+    @FXML
+    private Label navbarPageSubtitle;
+    @FXML
+    private Button navbarBellBtn;
+    @FXML
+    private Label navbarUserName;
+    @FXML
+    private Label navbarUserRole;
+    @FXML
+    private Label navbarAvatar;
+    @FXML
+    private VBox dashHomePane;
+    @FXML
+    private VBox dashProfilePane;
+    @FXML
+    private Button dashHomeBtn;
+    @FXML
+    private Button dashProfileBtn;
+    @FXML
+    private ProfileFragmentController dashProfileController;
 
     @FXML
     private void initialize() {
-        User currentUser = AppSession.getCurrentUser();
-        if (currentUser != null) {
-            String name = (currentUser.getFirstname() == null ? "" : currentUser.getFirstname()).trim();
-            if (name.isEmpty()) {
-                name = currentUser.getEmail();
+        if (navbarBellBtn != null) {
+            navbarBellBtn.setText("\uD83D\uDD14");
+        }
+        if (dashProfileController != null) {
+            dashProfileController.setAfterSaveCallback(this::refreshNavbar);
+        }
+        refreshNavbar();
+        setDashboardNavbarTitles();
+        showDashboardHome();
+    }
+
+    private void setDashboardNavbarTitles() {
+        if (navbarPageTitle != null) {
+            navbarPageTitle.setText("Dashboard");
+        }
+        if (navbarPageSubtitle != null) {
+            navbarPageSubtitle.setText("Your fitness overview");
+        }
+    }
+
+    private void setProfileNavbarTitles() {
+        if (navbarPageTitle != null) {
+            navbarPageTitle.setText("Profile");
+        }
+        if (navbarPageSubtitle != null) {
+            navbarPageSubtitle.setText("Manage your personal information");
+        }
+    }
+
+    private void refreshNavbar() {
+        User session = AppSession.getCurrentUser();
+        if (session == null) {
+            return;
+        }
+        String initials = userInitials(session);
+        String roleLabel = roleDisplayName(session.getRolesJson());
+        if (navbarUserName != null) {
+            navbarUserName.setText(initials);
+        }
+        if (navbarAvatar != null) {
+            navbarAvatar.setText(initials);
+        }
+        if (navbarUserRole != null) {
+            navbarUserRole.setText(roleLabel);
+        }
+        String first = session.getFirstname() == null ? "" : session.getFirstname().trim();
+        if (welcomeLabel != null) {
+            String greet = first.isEmpty() ? safe(session.getEmail()) : first;
+            welcomeLabel.setText("Welcome back, " + greet + "!");
+        }
+    }
+
+    private static String userInitials(User u) {
+        String f = safe(u.getFirstname()).trim();
+        String l = safe(u.getLastname()).trim();
+        StringBuilder sb = new StringBuilder();
+        if (!f.isEmpty()) {
+            sb.append(Character.toUpperCase(f.charAt(0)));
+        }
+        if (!l.isEmpty()) {
+            sb.append(Character.toUpperCase(l.charAt(0)));
+        }
+        if (sb.length() > 0) {
+            return sb.toString();
+        }
+        String email = safe(u.getEmail());
+        if (!email.isEmpty()) {
+            return email.substring(0, Math.min(2, email.length())).toUpperCase();
+        }
+        return "U";
+    }
+
+    private static String roleDisplayName(String rolesJson) {
+        String s = safe(rolesJson);
+        if (s.contains("ROLE_ADMIN")) {
+            return "Administrator";
+        }
+        if (s.contains("ROLE_COACH")) {
+            return "Coach";
+        }
+        return "User";
+    }
+
+    private static String safe(String v) {
+        return v == null ? "" : v;
+    }
+
+    @FXML
+    private void onShowDashboard() {
+        setDashboardNavbarTitles();
+        showDashboardHome();
+    }
+
+    @FXML
+    private void onShowProfile() {
+        setProfileNavbarTitles();
+        if (dashHomePane != null) {
+            dashHomePane.setManaged(false);
+            dashHomePane.setVisible(false);
+        }
+        if (dashProfilePane != null) {
+            dashProfilePane.setManaged(true);
+            dashProfilePane.setVisible(true);
+        }
+        setDashNavActive(dashProfileBtn);
+        if (dashProfileController != null) {
+            dashProfileController.reloadFromSession();
+        }
+    }
+
+    private void showDashboardHome() {
+        if (dashHomePane != null) {
+            dashHomePane.setManaged(true);
+            dashHomePane.setVisible(true);
+        }
+        if (dashProfilePane != null) {
+            dashProfilePane.setManaged(false);
+            dashProfilePane.setVisible(false);
+        }
+        setDashNavActive(dashHomeBtn);
+    }
+
+    private void setDashNavActive(Button selected) {
+        if (dashHomeBtn != null) {
+            dashHomeBtn.getStyleClass().setAll("dash-side-link");
+            if (selected == dashHomeBtn) {
+                dashHomeBtn.getStyleClass().add("dash-side-link-active");
             }
-            userNameLabel.setText(name);
-            welcomeLabel.setText("Welcome back, " + name + "!");
+        }
+        if (dashProfileBtn != null) {
+            dashProfileBtn.getStyleClass().setAll("dash-side-link");
+            if (selected == dashProfileBtn) {
+                dashProfileBtn.getStyleClass().add("dash-side-link-active");
+            }
         }
     }
 

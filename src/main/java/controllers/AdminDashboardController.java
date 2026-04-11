@@ -44,6 +44,12 @@ public class AdminDashboardController {
     @FXML
     private Button userManagementBtn;
     @FXML
+    private Button profileBtn;
+    @FXML
+    private VBox profilePane;
+    @FXML
+    private ProfileFragmentController adminProfileController;
+    @FXML
     private Button navbarBellBtn;
     @FXML
     private Label navbarUserName;
@@ -113,6 +119,9 @@ public class AdminDashboardController {
     private void initialize() {
         setupTable();
         initializeModalControls();
+        if (adminProfileController != null) {
+            adminProfileController.setAfterSaveCallback(this::refreshNavbar);
+        }
         refreshNavbar();
         showAdminDashboard();
     }
@@ -189,6 +198,11 @@ public class AdminDashboardController {
     }
 
     @FXML
+    private void onShowProfile() {
+        showProfile();
+    }
+
+    @FXML
     private void onLogout() {
         AppSession.setCurrentUser(null);
         AppSession.resetOnboarding();
@@ -247,6 +261,7 @@ public class AdminDashboardController {
             user.setPassword(password);
             user.setRolesJson("[\"ROLE_COACH\"]");
             user.setAccountStatus(status.toLowerCase());
+            user.setUsername(uniqueUsernameFromEmail(email));
             userService.createPrepared(user);
             closeModal();
             showUserManagement();
@@ -484,6 +499,10 @@ public class AdminDashboardController {
         adminDashboardPane.setVisible(true);
         userManagementPane.setManaged(false);
         userManagementPane.setVisible(false);
+        if (profilePane != null) {
+            profilePane.setManaged(false);
+            profilePane.setVisible(false);
+        }
         setActiveSidebar(adminDashboardBtn);
         refreshData();
     }
@@ -493,8 +512,27 @@ public class AdminDashboardController {
         adminDashboardPane.setVisible(false);
         userManagementPane.setManaged(true);
         userManagementPane.setVisible(true);
+        if (profilePane != null) {
+            profilePane.setManaged(false);
+            profilePane.setVisible(false);
+        }
         setActiveSidebar(userManagementBtn);
         refreshData();
+    }
+
+    private void showProfile() {
+        adminDashboardPane.setManaged(false);
+        adminDashboardPane.setVisible(false);
+        userManagementPane.setManaged(false);
+        userManagementPane.setVisible(false);
+        if (profilePane != null) {
+            profilePane.setManaged(true);
+            profilePane.setVisible(true);
+        }
+        setActiveSidebar(profileBtn);
+        if (adminProfileController != null) {
+            adminProfileController.reloadFromSession();
+        }
     }
 
     private void setActiveSidebar(Button selectedButton) {
@@ -503,6 +541,9 @@ public class AdminDashboardController {
         }
         if (userManagementBtn != null) {
             userManagementBtn.getStyleClass().remove("side-link-active");
+        }
+        if (profileBtn != null) {
+            profileBtn.getStyleClass().remove("side-link-active");
         }
         if (selectedButton != null && !selectedButton.getStyleClass().contains("side-link-active")) {
             selectedButton.getStyleClass().add("side-link-active");
@@ -597,6 +638,29 @@ public class AdminDashboardController {
 
     private static String normalizeStatusForUi(String status) {
         return "inactive".equalsIgnoreCase(status) ? "inactive" : "active";
+    }
+
+    private String uniqueUsernameFromEmail(String email) {
+        int at = email.indexOf('@');
+        String base = (at > 0 ? email.substring(0, at) : safe(email)).replaceAll("[^a-zA-Z0-9._-]", "");
+        if (base.isBlank()) {
+            base = "coach";
+        }
+        if (base.length() > 48) {
+            base = base.substring(0, 48);
+        }
+        String candidate = base;
+        int suffix = 0;
+        try {
+            while (userService.findByUsername(candidate) != null) {
+                suffix++;
+                String tail = "_" + suffix;
+                candidate = base.substring(0, Math.max(1, Math.min(base.length(), 48 - tail.length()))) + tail;
+            }
+        } catch (SQLException ignored) {
+            return base + "_" + System.currentTimeMillis();
+        }
+        return candidate;
     }
 
     private static String safe(String value) {

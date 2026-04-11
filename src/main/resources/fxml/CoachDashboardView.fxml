@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<StackPane prefHeight="700.0" prefWidth="1100.0" styleClass="admin-root" stylesheets="@../css/admin.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.CoachDashboardController">
+   <children>
+      <BorderPane>
+         <left>
+            <VBox prefWidth="250.0" spacing="10.0" styleClass="admin-sidebar">
+               <children>
+                  <Label styleClass="admin-brand" text="FITSENSE" />
+                  <Label styleClass="admin-side-sub" text="COACH PANEL" />
+                  <Button fx:id="coachHomeBtn" mnemonicParsing="false" onAction="#onShowDashboard" styleClass="side-link" text="◈  Dashboard" />
+                  <Button fx:id="athletesBtn" mnemonicParsing="false" onAction="#onShowAthletes" styleClass="side-link" text="◎  Athletes" />
+                  <Button fx:id="chatroomBtn" mnemonicParsing="false" onAction="#onShowChatroom" styleClass="side-link" text="💬  Chatroom" />
+                  <Button fx:id="workoutCatalogBtn" mnemonicParsing="false" onAction="#onShowWorkoutCatalog" styleClass="side-link" text="🏋  Workout catalog" />
+                  <Button fx:id="feedbackBtn" mnemonicParsing="false" onAction="#onShowFeedback" styleClass="side-link" text="✉  Feedback management" />
+                  <Button fx:id="mentalWellnessBtn" mnemonicParsing="false" onAction="#onShowMentalWellness" styleClass="side-link" text="🧠  Mental wellness" />
+                  <Button fx:id="nutritionBtn" mnemonicParsing="false" onAction="#onShowNutrition" styleClass="side-link" text="🥗  Nutrition plan" />
+                  <Button fx:id="profileBtn" mnemonicParsing="false" onAction="#onShowProfile" styleClass="side-link" text="☺  Profile" />
+                  <Button mnemonicParsing="false" onAction="#onLogout" styleClass="side-link" text="⏻  Sign Out" />
+               </children>
+               <padding>
+                  <Insets bottom="22.0" left="18.0" right="18.0" top="22.0" />
+               </padding>
+            </VBox>
+         </left>
+         <center>
+            <VBox styleClass="admin-main-area" VBox.vgrow="ALWAYS">
+               <children>
+                  <HBox alignment="CENTER_LEFT" styleClass="admin-navbar" VBox.vgrow="NEVER">
+                     <children>
+                        <VBox HBox.hgrow="ALWAYS" spacing="4.0">
+                           <children>
+                              <Label fx:id="navbarPageTitle" styleClass="navbar-page-title" text="Coach dashboard" />
+                              <Label fx:id="navbarPageSubtitle" styleClass="navbar-page-subtitle" text="Train and support your athletes" />
+                           </children>
+                        </VBox>
+                        <Button fx:id="navbarBellBtn" focusTraversable="false" mnemonicParsing="false" styleClass="navbar-bell-btn" text="" />
+                        <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="navbar-profile">
+                           <children>
+                              <VBox alignment="CENTER_LEFT" spacing="2.0">
+                                 <children>
+                                    <Label fx:id="navbarUserName" styleClass="navbar-user-name" text="—" />
+                                    <Label fx:id="navbarUserRole" styleClass="navbar-user-role" text="Coach" />
+                                 </children>
+                              </VBox>
+                              <Label fx:id="navbarAvatar" alignment="CENTER" styleClass="navbar-avatar" text="C" />
+                           </children>
+                        </HBox>
+                     </children>
+                     <padding>
+                        <Insets bottom="16.0" left="24.0" right="24.0" top="16.0" />
+                     </padding>
+                  </HBox>
+                  <StackPane styleClass="admin-center-stack" VBox.vgrow="ALWAYS">
+                     <children>
+                        <VBox fx:id="coachDashboardPane" spacing="14.0" styleClass="admin-content">
+                           <children>
+                              <Label styleClass="page-title" text="Overview" />
+                              <GridPane hgap="12.0" vgap="12.0">
+                                 <children>
+                                    <VBox styleClass="stat-card">
+                                       <children>
+                                          <Label styleClass="stat-title" text="ATHLETES IN ROSTER" />
+                                          <Label fx:id="totalAthletesLabel" styleClass="stat-value" text="0" />
+                                       </children>
+                                       <padding>
+                                          <Insets bottom="12.0" left="14.0" right="14.0" top="12.0" />
+                                       </padding>
+                                    </VBox>
+                                    <VBox styleClass="stat-card" GridPane.columnIndex="1">
+                                       <children>
+                                          <Label styleClass="stat-title" text="ACTIVE ATHLETES" />
+                                          <Label fx:id="activeAthletesLabel" styleClass="stat-value" text="0" />
+                                       </children>
+                                       <padding>
+                                          <Insets bottom="12.0" left="14.0" right="14.0" top="12.0" />
+                                       </padding>
+                                    </VBox>
+                                    <VBox styleClass="stat-card" GridPane.columnIndex="2">
+                                       <children>
+                                          <Label styleClass="stat-title" text="SESSIONS (PLACEHOLDER)" />
+                                          <Label fx:id="sessionsLabel" styleClass="stat-value" text="—" />
+                                       </children>
+                                       <padding>
+                                          <Insets bottom="12.0" left="14.0" right="14.0" top="12.0" />
+                                       </padding>
+                                    </VBox>
+                                 </children>
+                              </GridPane>
+                           </children>
+                           <padding>
+                              <Insets bottom="18.0" left="18.0" right="18.0" top="18.0" />
+                           </padding>
+                        </VBox>
+                        <VBox fx:id="athletesPane" managed="false" spacing="14.0" styleClass="admin-content" visible="false">
+                           <children>
+                              <HBox alignment="CENTER_LEFT" styleClass="users-header">
+                                 <children>
+                                    <VBox HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <Label styleClass="users-title" text="Athletes" />
+                                          <Label styleClass="users-subtitle" text="Users in the system (read-only)" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="8.0" left="2.0" right="2.0" top="2.0" />
+                                 </padding>
+                              </HBox>
+                              <TableView fx:id="athletesTable" prefHeight="520.0" styleClass="users-table">
+                                 <columns>
+                                    <TableColumn fx:id="nameCol" text="User" prefWidth="300.0" />
+                                    <TableColumn fx:id="roleCol" text="Function" prefWidth="150.0" />
+                                    <TableColumn fx:id="statusCol" text="Status" prefWidth="150.0" />
+                                    <TableColumn fx:id="dateCol" text="Date creation" prefWidth="150.0" />
+                                 </columns>
+                              </TableView>
+                           </children>
+                           <padding>
+                              <Insets bottom="18.0" left="18.0" right="18.0" top="18.0" />
+                           </padding>
+                        </VBox>
+                        <VBox fx:id="chatroomPane" managed="false" spacing="12.0" styleClass="admin-content" visible="false">
+                           <children>
+                              <Label styleClass="page-title" text="Chatroom" />
+                              <Label styleClass="users-subtitle" text="Team messaging will appear here." wrapText="true" />
+                           </children>
+                           <padding>
+                              <Insets bottom="18.0" left="18.0" right="18.0" top="18.0" />
+                           </padding>
+                        </VBox>
+                        <VBox fx:id="workoutCatalogPane" managed="false" spacing="12.0" styleClass="admin-content" visible="false">
+                           <children>
+                              <Label styleClass="page-title" text="Workout catalog" />
+                              <Label styleClass="users-subtitle" text="Browse and assign workouts to athletes." wrapText="true" />
+                           </children>
+                           <padding>
+                              <Insets bottom="18.0" left="18.0" right="18.0" top="18.0" />
+                           </padding>
+                        </VBox>
+                        <VBox fx:id="feedbackPane" managed="false" spacing="12.0" styleClass="admin-content" visible="false">
+                           <children>
+                              <Label styleClass="page-title" text="Feedback management" />
+                              <Label styleClass="users-subtitle" text="Review feedback from athletes." wrapText="true" />
+                           </children>
+                           <padding>
+                              <Insets bottom="18.0" left="18.0" right="18.0" top="18.0" />
+                           </padding>
+                        </VBox>
+                        <VBox fx:id="mentalWellnessPane" managed="false" spacing="12.0" styleClass="admin-content" visible="false">
+                           <children>
+                              <Label styleClass="page-title" text="Mental wellness" />
+                              <Label styleClass="users-subtitle" text="Resources and check-ins for mental health." wrapText="true" />
+                           </children>
+                           <padding>
+                              <Insets bottom="18.0" left="18.0" right="18.0" top="18.0" />
+                           </padding>
+                        </VBox>
+                        <VBox fx:id="nutritionPane" managed="false" spacing="12.0" styleClass="admin-content" visible="false">
+                           <children>
+                              <Label styleClass="page-title" text="Nutrition plan" />
+                              <Label styleClass="users-subtitle" text="Meal plans and nutrition guidance." wrapText="true" />
+                           </children>
+                           <padding>
+                              <Insets bottom="18.0" left="18.0" right="18.0" top="18.0" />
+                           </padding>
+                        </VBox>
+                        <VBox fx:id="profilePane" managed="false" spacing="0.0" styleClass="admin-content" visible="false" VBox.vgrow="ALWAYS">
+                           <children>
+                              <fx:include fx:id="coachProfile" source="ProfileFragment.fxml" VBox.vgrow="ALWAYS" />
+                           </children>
+                           <padding>
+                              <Insets bottom="18.0" left="18.0" right="18.0" top="18.0" />
+                           </padding>
+                        </VBox>
+                     </children>
+                  </StackPane>
+               </children>
+            </VBox>
+         </center>
+      </BorderPane>
+   </children>
+</StackPane>

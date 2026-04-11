@@ -16,6 +16,10 @@ public class User {
     private String phoneNumber;
     private String photo;
     private String username;
+    /** From {@code app_user.objective} / {@code objectif} when present (Symfony migration). */
+    private String accountObjective;
+    /** From {@code app_user.gender} / {@code genre} / {@code sexe} when physique row has no gender. */
+    private String accountGender;
 
     public User() {
     }
@@ -131,6 +135,22 @@ public class User {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getAccountObjective() {
+        return accountObjective;
+    }
+
+    public void setAccountObjective(String accountObjective) {
+        this.accountObjective = accountObjective;
+    }
+
+    public String getAccountGender() {
+        return accountGender;
+    }
+
+    public void setAccountGender(String accountGender) {
+        this.accountGender = accountGender;
     }
 
     @Override

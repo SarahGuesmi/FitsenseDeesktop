@@ -1,0 +1,167 @@
+.workout-form-root {
+    -fx-background-color: #070b16;
+    -fx-font-family: "Segoe UI", "Montserrat", "Roboto", sans-serif;
+}
+
+/* Back button */
+.btn-back {
+    -fx-background-color: transparent;
+    -fx-text-fill: #9CA3AF;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-cursor: hand;
+    -fx-padding: 6 0;
+}
+.btn-back:hover {
+    -fx-text-fill: white;
+}
+
+/* Form card */
+.form-card {
+    -fx-background-color: rgba(17, 24, 39, 0.6);
+    -fx-border-color: #1F2937;
+    -fx-border-radius: 16;
+    -fx-background-radius: 16;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 24, 0, 0, 6);
+}
+
+/* Page title */
+.form-page-title {
+    -fx-text-fill: white;
+    -fx-font-size: 28px;
+    -fx-font-weight: 800;
+}
+.form-page-subtitle {
+    -fx-text-fill: #6B7280;
+    -fx-font-size: 13px;
+}
+
+/* Labels */
+.form-label {
+    -fx-text-fill: #9CA3AF;
+    -fx-font-size: 11px;
+    -fx-font-weight: 700;
+}
+
+/* Fields */
+.form-input {
+    -fx-background-color: #0D0D0D;
+    -fx-border-color: #1F1F1F;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: #4B5563;
+    -fx-padding: 12 16 12 16;
+    -fx-font-size: 13px;
+}
+.form-input:focused {
+    -fx-border-color: #22C55E;
+    -fx-effect: dropshadow(gaussian, rgba(34,197,94,0.2), 8, 0, 0, 0);
+}
+.form-input-error {
+    -fx-border-color: #EF4444;
+    -fx-effect: dropshadow(gaussian, rgba(239,68,68,0.25), 8, 0, 0, 0);
+}
+
+.error-label {
+    -fx-text-fill: #FCA5A5;
+    -fx-font-size: 12px;
+}
+
+/* Divider */
+.form-divider {
+    -fx-background-color: #1F2937;
+    -fx-pref-height: 1;
+    -fx-max-height: 1;
+}
+
+/* Buttons */
+.btn-cancel-form {
+    -fx-background-color: #1F2937;
+    -fx-border-color: #374151;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-text-fill: #D1D5DB;
+    -fx-font-weight: 700;
+    -fx-font-size: 13px;
+    -fx-padding: 12 32 12 32;
+    -fx-cursor: hand;
+}
+.btn-cancel-form:hover {
+    -fx-background-color: #374151;
+}
+
+.btn-submit-form {
+    -fx-background-color: linear-gradient(to right, #22C55E, #84CC16);
+    -fx-text-fill: black;
+    -fx-font-weight: 800;
+    -fx-font-size: 13px;
+    -fx-background-radius: 12;
+    -fx-padding: 12 40 12 40;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(34,197,94,0.3), 12, 0, 0, 2);
+}
+.btn-submit-form:hover {
+    -fx-opacity: 0.88;
+}
+
+/* Objectives checkboxes */
+.objective-checkbox {
+    -fx-text-fill: #D1D5DB;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+}
+.objective-checkbox .box {
+    -fx-background-color: #1F2937;
+    -fx-border-color: #374151;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+}
+.objective-checkbox:selected .box {
+    -fx-background-color: #22C55E;
+    -fx-border-color: #22C55E;
+}
+.objective-checkbox:selected .mark {
+    -fx-background-color: black;
+}
+
+/* Exercises list */
+.form-exercises-list {
+    -fx-background-color: #0D0D0D;
+    -fx-border-color: #1F1F1F;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-font-size: 13px;
+}
+.form-exercises-list .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #D1D5DB;
+    -fx-padding: 8 14;
+}
+.form-exercises-list .list-cell:hover {
+    -fx-background-color: #1F2937;
+}
+.form-exercises-list .list-cell:selected {
+    -fx-background-color: rgba(34,197,94,0.15);
+    -fx-text-fill: #22C55E;
+}
+
+/* Image picker */
+.image-preview-pane {
+    -fx-background-color: #1F2937;
+    -fx-background-radius: 10;
+    -fx-border-color: #374151;
+    -fx-border-radius: 10;
+    -fx-border-width: 1;
+}
+
+.btn-choose-image {
+    -fx-background-color: linear-gradient(to right, #22C55E, #84CC16);
+    -fx-text-fill: black;
+    -fx-font-weight: 700;
+    -fx-font-size: 13px;
+    -fx-background-radius: 8;
+    -fx-padding: 8 18 8 18;
+    -fx-cursor: hand;
+}
+.btn-choose-image:hover { -fx-opacity: 0.88; }

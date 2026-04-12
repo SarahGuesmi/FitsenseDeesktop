@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="16.0" styleClass="exercise-root" stylesheets="@../css/exercise.css"
+      style="-fx-background-color: #070b16;"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controllers.ExerciseListController">
+
+    <!-- Top bar -->
+    <HBox alignment="CENTER_RIGHT" spacing="10.0">
+        <Button mnemonicParsing="false" onAction="#onBackToCatalog"
+                styleClass="btn-back-catalog" text="← Back to Catalog" />
+        <Button mnemonicParsing="false" onAction="#onCreateExercise"
+                styleClass="btn-create-exercise" text="+ Create Exercise" />
+    </HBox>
+
+    <!-- Search -->
+    <TextField fx:id="searchField" promptText="Search an exercise..."
+               styleClass="exercise-search-field" onKeyReleased="#onSearch" />
+
+    <!-- Counter row -->
+    <HBox alignment="CENTER_LEFT" spacing="0.0">
+        <Label styleClass="exercise-section-label" text="AVAILABLE EXERCISES" HBox.hgrow="ALWAYS" />
+        <Label fx:id="counterLabel" styleClass="exercise-counter" text="0 exercise(s)" />
+    </HBox>
+
+    <!-- List -->
+    <ScrollPane fitToWidth="true" styleClass="exercise-scroll" VBox.vgrow="ALWAYS"
+                style="-fx-background-color: #070b16; -fx-background: #070b16;">
+        <VBox fx:id="exerciseListBox" spacing="10.0" styleClass="exercise-list-box">
+            <padding><Insets bottom="8.0" right="4.0" /></padding>
+        </VBox>
+    </ScrollPane>
+
+    <!-- Delete confirm modal -->
+    <StackPane fx:id="deleteOverlay" managed="false" visible="false"
+               styleClass="exercise-modal-overlay">
+        <VBox styleClass="exercise-modal" maxWidth="420.0" spacing="16.0" alignment="CENTER">
+            <Label styleClass="exercise-modal-title" text="Delete Exercise?" />
+            <Label fx:id="deleteConfirmLabel" styleClass="exercise-card-desc"
+                   wrapText="true" alignment="CENTER" text="" />
+            <HBox spacing="12.0">
+                <Button mnemonicParsing="false" onAction="#onCancelDelete"
+                        styleClass="btn-modal-cancel" text="Cancel"
+                        HBox.hgrow="ALWAYS" maxWidth="Infinity" />
+                <Button mnemonicParsing="false" onAction="#onConfirmDelete"
+                        styleClass="btn-modal-delete" text="Delete"
+                        HBox.hgrow="ALWAYS" maxWidth="Infinity" />
+            </HBox>
+        </VBox>
+    </StackPane>
+
+    <padding><Insets bottom="18.0" left="18.0" right="18.0" top="18.0" /></padding>
+</VBox>

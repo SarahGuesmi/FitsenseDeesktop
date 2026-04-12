@@ -291,21 +291,10 @@
     -fx-cursor: hand;
 }
 
-.icon-edit {
-    -fx-text-fill: #8eb3ff;
-}
-
-.icon-delete {
-    -fx-text-fill: #ff8f9a;
-}
-
-.icon-activate {
-    -fx-text-fill: #78efc1;
-}
-
-.icon-deactivate {
-    -fx-text-fill: #ffc17f;
-}
+.icon-edit   { -fx-text-fill: #8eb3ff; }
+.icon-delete { -fx-text-fill: #ff8f9a; }
+.icon-activate   { -fx-text-fill: #78efc1; }
+.icon-deactivate { -fx-text-fill: #ffc17f; }
 
 .modal-overlay {
     -fx-background-color: rgba(4, 8, 18, 0.7);
@@ -320,9 +309,7 @@
     -fx-effect: dropshadow(gaussian, rgba(7, 12, 22, 0.85), 24, 0.35, 0, 6);
 }
 
-.modal-card-compact {
-    -fx-padding: 12 16;
-}
+.modal-card-compact { -fx-padding: 12 16; }
 
 .modal-scroll {
     -fx-background-color: transparent;
@@ -330,9 +317,7 @@
     -fx-padding: 0;
 }
 
-.modal-scroll .viewport {
-    -fx-background-color: transparent;
-}
+.modal-scroll .viewport { -fx-background-color: transparent; }
 
 .modal-scroll .scroll-bar:vertical {
     -fx-background-color: rgba(20, 30, 52, 0.85);
@@ -358,19 +343,11 @@
     -fx-font-size: 14px;
 }
 
-.field-label-blue,
-.field-label-red,
-.field-label-green,
-.field-label-gold {
+.field-label {
+    -fx-text-fill: #7fb2ff;
     -fx-font-size: 12px;
     -fx-font-weight: 700;
-    -fx-letter-spacing: 1px;
 }
-
-.field-label-blue { -fx-text-fill: #7fb2ff; }
-.field-label-red { -fx-text-fill: #ff8a92; }
-.field-label-green { -fx-text-fill: #67e0a8; }
-.field-label-gold { -fx-text-fill: #f0d075; }
 
 .modal-field,
 .modal-combo {
@@ -421,7 +398,6 @@
     -fx-border-width: 2px;
 }
 
-/* ComboBox dropdown popup — dark theme (popup uses scene stylesheets, not nested ScrollPane sheets) */
 .combo-box-popup > .list-view {
     -fx-background-color: #151b2e;
     -fx-background-insets: 0;
@@ -449,13 +425,9 @@
     -fx-text-fill: #ffffff;
 }
 
-.combo-box-popup > .list-view .list-cell:empty {
-    -fx-background-color: transparent;
-}
+.combo-box-popup > .list-view .list-cell:empty { -fx-background-color: transparent; }
 
-.combo-box-popup > .list-view > .virtual-flow > .corner {
-    -fx-background-color: #151b2e;
-}
+.combo-box-popup > .list-view > .virtual-flow > .corner { -fx-background-color: #151b2e; }
 
 .combo-box-popup > .list-view .scroll-bar:vertical,
 .combo-box-popup > .list-view .scroll-bar:horizontal {

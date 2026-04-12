@@ -31,16 +31,13 @@ public class DashboardController {
     private Label navbarUserRole;
     @FXML
     private Label navbarAvatar;
-    @FXML
-    private VBox dashHomePane;
-    @FXML
-    private VBox dashProfilePane;
-    @FXML
-    private Button dashHomeBtn;
-    @FXML
-    private Button dashProfileBtn;
-    @FXML
-    private ProfileFragmentController dashProfileController;
+    @FXML private VBox dashHomePane;
+    @FXML private VBox dashProfilePane;
+    @FXML private VBox dashWorkoutsPane;
+    @FXML private Button dashHomeBtn;
+    @FXML private Button dashProfileBtn;
+    @FXML private Button dashWorkoutsBtn;
+    @FXML private ProfileFragmentController dashProfileController;
 
     @FXML
     private void initialize() {
@@ -132,6 +129,16 @@ public class DashboardController {
     }
 
     @FXML
+    private void onShowWorkouts() {
+        if (navbarPageTitle != null) navbarPageTitle.setText("My Workouts");
+        if (navbarPageSubtitle != null) navbarPageSubtitle.setText("Personalized sessions matching your goals");
+        dashHomePane.setManaged(false); dashHomePane.setVisible(false);
+        dashProfilePane.setManaged(false); dashProfilePane.setVisible(false);
+        if (dashWorkoutsPane != null) { dashWorkoutsPane.setManaged(true); dashWorkoutsPane.setVisible(true); }
+        setDashNavActive(dashWorkoutsBtn);
+    }
+
+    @FXML
     private void onShowDashboard() {
         setDashboardNavbarTitles();
         showDashboardHome();
@@ -155,28 +162,17 @@ public class DashboardController {
     }
 
     private void showDashboardHome() {
-        if (dashHomePane != null) {
-            dashHomePane.setManaged(true);
-            dashHomePane.setVisible(true);
-        }
-        if (dashProfilePane != null) {
-            dashProfilePane.setManaged(false);
-            dashProfilePane.setVisible(false);
-        }
+        if (dashHomePane != null) { dashHomePane.setManaged(true); dashHomePane.setVisible(true); }
+        if (dashProfilePane != null) { dashProfilePane.setManaged(false); dashProfilePane.setVisible(false); }
+        if (dashWorkoutsPane != null) { dashWorkoutsPane.setManaged(false); dashWorkoutsPane.setVisible(false); }
         setDashNavActive(dashHomeBtn);
     }
 
     private void setDashNavActive(Button selected) {
-        if (dashHomeBtn != null) {
-            dashHomeBtn.getStyleClass().setAll("dash-side-link");
-            if (selected == dashHomeBtn) {
-                dashHomeBtn.getStyleClass().add("dash-side-link-active");
-            }
-        }
-        if (dashProfileBtn != null) {
-            dashProfileBtn.getStyleClass().setAll("dash-side-link");
-            if (selected == dashProfileBtn) {
-                dashProfileBtn.getStyleClass().add("dash-side-link-active");
+        for (Button b : new Button[]{dashHomeBtn, dashProfileBtn, dashWorkoutsBtn}) {
+            if (b != null) {
+                b.getStyleClass().setAll("dash-side-link");
+                if (b == selected) b.getStyleClass().add("dash-side-link-active");
             }
         }
     }

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="16.0" styleClass="workout-catalog-root"
+      stylesheets="@../css/workout.css"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controllers.WorkoutCatalogController">
+
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" spacing="12.0">
+        <VBox HBox.hgrow="ALWAYS" spacing="4.0">
+            <Label styleClass="page-title" text="Workout catalog" />
+            <Label styleClass="users-subtitle" text="Browse and manage your workout routines" />
+        </VBox>
+        <Button mnemonicParsing="false" onAction="#onManageExercises"
+                styleClass="btn-modal-cancel" text="⚙  Manage Exercises" />
+        <Button fx:id="createWorkoutBtn" mnemonicParsing="false" onAction="#onCreateWorkout"
+                styleClass="btn-create-workout" text="+ Create Workout" />
+    </HBox>
+
+    <!-- Search & filter -->
+    <HBox spacing="12.0" alignment="CENTER_LEFT">
+        <TextField fx:id="searchField" promptText="Search a workout..."
+                   styleClass="workout-search-field" HBox.hgrow="ALWAYS"
+                   onKeyReleased="#onSearch" />
+        <ComboBox fx:id="levelFilter" promptText="All levels"
+                  styleClass="workout-level-filter" prefWidth="160.0"
+                  onAction="#onSearch" />
+    </HBox>
+
+    <!-- Counter -->
+    <Label fx:id="counterLabel" styleClass="workout-counter" text="0 workout(s)" />
+
+    <!-- List -->
+    <ScrollPane fitToWidth="true" styleClass="workout-scroll" VBox.vgrow="ALWAYS">
+        <VBox fx:id="workoutListBox" spacing="10.0" styleClass="workout-list-box">
+            <padding><Insets bottom="8.0" right="8.0" /></padding>
+        </VBox>
+    </ScrollPane>
+
+    <!-- Delete confirm modal -->
+    <StackPane fx:id="deleteOverlay" managed="false" visible="false" styleClass="modal-overlay-bg">
+        <VBox styleClass="workout-modal" maxWidth="420.0" spacing="16.0" alignment="CENTER">
+            <Label styleClass="workout-modal-title" text="Delete Workout?" />
+            <Label fx:id="deleteConfirmLabel" styleClass="users-subtitle"
+                   wrapText="true" alignment="CENTER" text="" />
+            <HBox spacing="12.0">
+                <Button mnemonicParsing="false" onAction="#onCancelDelete"
+                        styleClass="btn-modal-cancel" text="Cancel"
+                        HBox.hgrow="ALWAYS" maxWidth="Infinity" />
+                <Button mnemonicParsing="false" onAction="#onConfirmDelete"
+                        styleClass="btn-modal-delete" text="Delete"
+                        HBox.hgrow="ALWAYS" maxWidth="Infinity" />
+            </HBox>
+        </VBox>
+    </StackPane>
+
+    <padding><Insets bottom="18.0" left="18.0" right="18.0" top="18.0" /></padding>
+</VBox>

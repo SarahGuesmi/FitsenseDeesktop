@@ -140,14 +140,10 @@
                               <Insets bottom="18.0" left="18.0" right="18.0" top="18.0" />
                            </padding>
                         </VBox>
-                        <VBox fx:id="workoutCatalogPane" managed="false" spacing="12.0" styleClass="admin-content" visible="false">
+                        <VBox fx:id="workoutCatalogPane" managed="false" styleClass="admin-content" visible="false" VBox.vgrow="ALWAYS">
                            <children>
-                              <Label styleClass="page-title" text="Workout catalog" />
-                              <Label styleClass="users-subtitle" text="Browse and assign workouts to athletes." wrapText="true" />
+                              <fx:include fx:id="workoutCatalog" source="WorkoutCatalogFragment.fxml" VBox.vgrow="ALWAYS" />
                            </children>
-                           <padding>
-                              <Insets bottom="18.0" left="18.0" right="18.0" top="18.0" />
-                           </padding>
                         </VBox>
                         <VBox fx:id="feedbackPane" managed="false" spacing="12.0" styleClass="admin-content" visible="false">
                            <children>

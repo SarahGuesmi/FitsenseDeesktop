@@ -190,7 +190,7 @@ public class CoachDashboardController {
         feedbackPane.setManaged(true);
         feedbackPane.setVisible(true);
         setNavbarText("Feedback Management", "Create and manage feedback questionnaires for your athletes.");
-        setActiveSidebar(feedbackBtn);
+        setActiveSidebar(feedbackBtn, null);
         setupFeedbackTable();
         refreshFeedbackTable();
     }

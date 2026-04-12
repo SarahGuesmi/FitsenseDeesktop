@@ -51,8 +51,8 @@ public class ProfilePhysiqueService implements CRUD<ProfilePhysique> {
             return null;
         }
         String sql = "SELECT p.* FROM `profile_physique` p "
-                + "INNER JOIN `user` u ON u.`id` = p.`user_id` "
-                + "WHERE u.`email` = ?";
+                + "INNER JOIN `app_user` u ON u.`id` = p.`user_id` "
+                + "WHERE u.`email_email` = ?";
         try (PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setString(1, email.trim());
             try (ResultSet rs = ps.executeQuery()) {

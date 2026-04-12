@@ -22,23 +22,27 @@ public class UserService implements CRUD<User> {
     private static User mapRow(ResultSet rs) throws SQLException {
         Timestamp ts = rs.getTimestamp("date_creation");
         LocalDateTime dateCreation = ts != null ? ts.toLocalDateTime() : null;
-        // id is int, wrap as UUID for compatibility
-        int intId = rs.getInt("id");
-        UUID id = new UUID(0, intId);
-        return new User(
+        UUID id = utils.UuidUtil.fromResultSet(rs, "id");
+        User u = new User(
                 id,
-                rs.getString("email"),
+                rs.getString("email_email"),
                 rs.getString("password"),
                 rs.getString("roles"),
-                rs.getString("firstname"),
-                rs.getString("lastname"),
+                rs.getString("name_firstname"),
+                rs.getString("name_lastname"),
                 rs.getString("account_status"),
                 dateCreation,
-                null, null, null, null);
+                rs.getString("google_authenticator_secret"),
+                rs.getString("phone_number"),
+                rs.getString("photo"),
+                rs.getString("username"));
+        u.setAccountObjective(rs.getString("objective"));
+        u.setAccountGender(rs.getString("gender"));
+        return u;
     }
 
     public User findByEmail(String email) throws SQLException {
-        String sql = "SELECT * FROM `user` WHERE `email` = ?";
+        String sql = "SELECT * FROM `app_user` WHERE `email_email` = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
             stmt.setString(1, email);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -49,7 +53,7 @@ public class UserService implements CRUD<User> {
     }
 
     public User findByUsername(String username) throws SQLException {
-        String sql = "SELECT * FROM `user` WHERE `email` = ?";
+        String sql = "SELECT * FROM `app_user` WHERE `email_email` = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
             stmt.setString(1, username);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -66,7 +70,7 @@ public class UserService implements CRUD<User> {
 
     @Override
     public List<User> read() throws SQLException {
-        String sql = "SELECT * FROM `user`";
+        String sql = "SELECT * FROM `app_user`";
         try (Statement stmt = cnx.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
             List<User> list = new ArrayList<>();
             while (rs.next()) list.add(mapRow(rs));
@@ -76,8 +80,8 @@ public class UserService implements CRUD<User> {
 
     @Override
     public void update(User user) throws SQLException {
-        String sql = "UPDATE `user` SET `email` = ?, `password` = ?, `roles` = ?, "
-                + "`firstname` = ?, `lastname` = ?, `account_status` = ?, `date_creation` = ? "
+        String sql = "UPDATE `app_user` SET `email_email` = ?, `password` = ?, `roles` = ?, "
+                + "`name_firstname` = ?, `name_lastname` = ?, `account_status` = ?, `date_creation` = ? "
                 + "WHERE `id` = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
             stmt.setString(1, user.getEmail());
@@ -87,16 +91,16 @@ public class UserService implements CRUD<User> {
             stmt.setString(5, user.getLastname());
             stmt.setString(6, user.getAccountStatus());
             stmt.setTimestamp(7, user.getDateCreation() != null ? Timestamp.valueOf(user.getDateCreation()) : null);
-            stmt.setInt(8, (int) user.getId().getLeastSignificantBits());
+            stmt.setBytes(8, utils.UuidUtil.toBytes16(user.getId()));
             stmt.executeUpdate();
         }
     }
 
     @Override
     public void delete(User user) throws SQLException {
-        String sql = "DELETE FROM `user` WHERE `id` = ?";
+        String sql = "DELETE FROM `app_user` WHERE `id` = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
-            stmt.setInt(1, (int) user.getId().getLeastSignificantBits());
+            stmt.setBytes(1, utils.UuidUtil.toBytes16(user.getId()));
             stmt.executeUpdate();
         }
     }
@@ -112,16 +116,18 @@ public class UserService implements CRUD<User> {
         if (user.getAccountStatus() == null || user.getAccountStatus().isBlank()) {
             user.setAccountStatus("active");
         }
-        String sql = "INSERT INTO `user` (`email`, `password`, `roles`, `firstname`, `lastname`, "
-                + "`account_status`, `date_creation`) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO `app_user` (`id`, `email_email`, `password`, `roles`, `name_firstname`, `name_lastname`, "
+                + "`account_status`, `date_creation`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
-            stmt.setString(1, user.getEmail());
-            stmt.setString(2, hashPasswordIfPlain(user.getPassword()));
-            stmt.setString(3, user.getRolesJson());
-            stmt.setString(4, user.getFirstname());
-            stmt.setString(5, user.getLastname());
-            stmt.setString(6, user.getAccountStatus());
-            stmt.setTimestamp(7, Timestamp.valueOf(user.getDateCreation()));
+            if (user.getId() == null) user.setId(UUID.randomUUID());
+            stmt.setBytes(1, utils.UuidUtil.toBytes16(user.getId()));
+            stmt.setString(2, user.getEmail());
+            stmt.setString(3, hashPasswordIfPlain(user.getPassword()));
+            stmt.setString(4, user.getRolesJson());
+            stmt.setString(5, user.getFirstname());
+            stmt.setString(6, user.getLastname());
+            stmt.setString(7, user.getAccountStatus());
+            stmt.setTimestamp(8, Timestamp.valueOf(user.getDateCreation()));
             stmt.executeUpdate();
         }
     }
@@ -136,10 +142,10 @@ public class UserService implements CRUD<User> {
 
     public void deleteByIds(List<UUID> ids) throws SQLException {
         if (ids == null || ids.isEmpty()) return;
-        String sql = "DELETE FROM `user` WHERE `id` = ?";
+        String sql = "DELETE FROM `app_user` WHERE `id` = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
             for (UUID id : ids) {
-                stmt.setInt(1, (int) id.getLeastSignificantBits());
+                stmt.setBytes(1, utils.UuidUtil.toBytes16(id));
                 stmt.addBatch();
             }
             stmt.executeBatch();

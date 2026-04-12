@@ -322,21 +322,10 @@
     -fx-cursor: hand;
 }
 
-.icon-edit {
-    -fx-text-fill: #8eb3ff;
-}
-
-.icon-delete {
-    -fx-text-fill: #ff8f9a;
-}
-
-.icon-activate {
-    -fx-text-fill: #78efc1;
-}
-
-.icon-deactivate {
-    -fx-text-fill: #ffc17f;
-}
+.icon-edit   { -fx-text-fill: #8eb3ff; }
+.icon-delete { -fx-text-fill: #ff8f9a; }
+.icon-activate   { -fx-text-fill: #78efc1; }
+.icon-deactivate { -fx-text-fill: #ffc17f; }
 
 .modal-overlay {
     -fx-background-color: rgba(4, 8, 18, 0.7);
@@ -351,9 +340,7 @@
     -fx-effect: dropshadow(gaussian, rgba(7, 12, 22, 0.85), 24, 0.35, 0, 6);
 }
 
-.modal-card-compact {
-    -fx-padding: 12 16;
-}
+.modal-card-compact { -fx-padding: 12 16; }
 
 .modal-scroll {
     -fx-background-color: transparent;
@@ -361,9 +348,7 @@
     -fx-padding: 0;
 }
 
-.modal-scroll .viewport {
-    -fx-background-color: transparent;
-}
+.modal-scroll .viewport { -fx-background-color: transparent; }
 
 .modal-scroll .scroll-bar:vertical {
     -fx-background-color: rgba(20, 30, 52, 0.85);
@@ -389,19 +374,11 @@
     -fx-font-size: 14px;
 }
 
-.field-label-blue,
-.field-label-red,
-.field-label-green,
-.field-label-gold {
+.field-label {
+    -fx-text-fill: #7fb2ff;
     -fx-font-size: 12px;
     -fx-font-weight: 700;
-    -fx-letter-spacing: 1px;
 }
-
-.field-label-blue { -fx-text-fill: #7fb2ff; }
-.field-label-red { -fx-text-fill: #ff8a92; }
-.field-label-green { -fx-text-fill: #67e0a8; }
-.field-label-gold { -fx-text-fill: #f0d075; }
 
 .modal-field,
 .modal-combo {
@@ -452,7 +429,6 @@
     -fx-border-width: 2px;
 }
 
-/* ComboBox dropdown popup — dark theme (popup uses scene stylesheets, not nested ScrollPane sheets) */
 .combo-box-popup > .list-view {
     -fx-background-color: #151b2e;
     -fx-background-insets: 0;
@@ -480,13 +456,9 @@
     -fx-text-fill: #ffffff;
 }
 
-.combo-box-popup > .list-view .list-cell:empty {
-    -fx-background-color: transparent;
-}
+.combo-box-popup > .list-view .list-cell:empty { -fx-background-color: transparent; }
 
-.combo-box-popup > .list-view > .virtual-flow > .corner {
-    -fx-background-color: #151b2e;
-}
+.combo-box-popup > .list-view > .virtual-flow > .corner { -fx-background-color: #151b2e; }
 
 .combo-box-popup > .list-view .scroll-bar:vertical,
 .combo-box-popup > .list-view .scroll-bar:horizontal {
@@ -496,4 +468,60 @@
 .combo-box-popup > .list-view .scroll-bar .thumb {
     -fx-background-color: rgba(176, 196, 246, 0.35);
     -fx-background-radius: 6px;
+}
+
+/* —— User management filters —— */
+.user-filters-bar {
+    -fx-background-color: linear-gradient(to right, rgba(17, 30, 56, 0.95), rgba(20, 28, 52, 0.95));
+    -fx-background-radius: 14px;
+    -fx-border-color: rgba(160, 181, 255, 0.32);
+    -fx-border-radius: 14px;
+    -fx-border-width: 1px;
+}
+
+.filter-field-label {
+    -fx-text-fill: #f4f7ff;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+}
+
+.filter-search-field {
+    -fx-background-color: rgba(12, 18, 32, 0.95);
+    -fx-text-fill: #eff4ff;
+    -fx-prompt-text-fill: #657aa8;
+    -fx-background-radius: 10px;
+    -fx-border-color: rgba(176, 196, 246, 0.45);
+    -fx-border-radius: 10px;
+    -fx-font-size: 14px;
+    -fx-padding: 10 12;
+}
+
+.filter-combo {
+    -fx-background-color: rgba(12, 18, 32, 0.95);
+    -fx-border-color: rgba(176, 196, 246, 0.45);
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-font-size: 14px;
+    -fx-pref-height: 40px;
+}
+
+.filter-combo .list-cell {
+    -fx-text-fill: #eff4ff;
+}
+
+.filter-clear-btn {
+    -fx-background-color: rgba(12, 18, 32, 0.95);
+    -fx-text-fill: #eff4ff;
+    -fx-border-color: rgba(176, 196, 246, 0.45);
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-padding: 10 20;
+    -fx-min-height: 40px;
+    -fx-cursor: hand;
+}
+
+.filter-clear-btn:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.06);
 }

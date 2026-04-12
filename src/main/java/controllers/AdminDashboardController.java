@@ -9,13 +9,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
@@ -27,8 +26,10 @@ import services.UserService;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -61,8 +62,6 @@ public class AdminDashboardController {
     private Label totalUsersLabel;
     @FXML
     private Label activeUsersLabel;
-    @FXML
-    private Label notificationsLabel;
     @FXML
     private Label twoFaLabel;
     @FXML
@@ -109,15 +108,23 @@ public class AdminDashboardController {
     private ComboBox<String> editRoleCombo;
     @FXML
     private ComboBox<String> editStatusCombo;
+    @FXML
+    private TextField userSearchField;
+    @FXML
+    private ComboBox<String> userStatusFilterCombo;
+    @FXML
+    private ComboBox<String> userRoleFilterCombo;
 
     private final UserService userService = new UserService();
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy");
+    private List<User> allManagedUsers = List.of();
     private User editingUser;
     private User pendingDeleteUser;
 
     @FXML
     private void initialize() {
         setupTable();
+        setupUserFilters();
         initializeModalControls();
         if (adminProfileController != null) {
             adminProfileController.setAfterSaveCallback(this::refreshNavbar);
@@ -200,6 +207,20 @@ public class AdminDashboardController {
     @FXML
     private void onShowProfile() {
         showProfile();
+    }
+
+    @FXML
+    private void onClearUserFilters() {
+        if (userSearchField != null) {
+            userSearchField.clear();
+        }
+        if (userStatusFilterCombo != null) {
+            userStatusFilterCombo.setValue("All");
+        }
+        if (userRoleFilterCombo != null) {
+            userRoleFilterCombo.setValue("All");
+        }
+        applyUserFilters();
     }
 
     @FXML
@@ -455,6 +476,58 @@ public class AdminDashboardController {
         });
     }
 
+    private void setupUserFilters() {
+        if (userStatusFilterCombo != null) {
+            userStatusFilterCombo.setItems(FXCollections.observableArrayList("All", "Active", "Inactive"));
+            userStatusFilterCombo.setValue("All");
+            userStatusFilterCombo.valueProperty().addListener((o, a, b) -> applyUserFilters());
+        }
+        if (userRoleFilterCombo != null) {
+            userRoleFilterCombo.setItems(FXCollections.observableArrayList("All", "User", "Coach"));
+            userRoleFilterCombo.setValue("All");
+            userRoleFilterCombo.valueProperty().addListener((o, a, b) -> applyUserFilters());
+        }
+        if (userSearchField != null) {
+            userSearchField.textProperty().addListener((o, a, b) -> applyUserFilters());
+        }
+    }
+
+    private void applyUserFilters() {
+        if (usersTable == null || allManagedUsers == null) {
+            return;
+        }
+        String q = safe(userSearchField != null ? userSearchField.getText() : "").trim().toLowerCase(Locale.ROOT);
+        String st = userStatusFilterCombo != null ? userStatusFilterCombo.getValue() : "All";
+        String roleUi = userRoleFilterCombo != null ? userRoleFilterCombo.getValue() : "All";
+
+        List<User> filtered = allManagedUsers.stream()
+                .filter(u -> q.isEmpty() || matchesUserSearch(u, q))
+                .filter(u -> {
+                    if (st == null || "All".equals(st)) {
+                        return true;
+                    }
+                    return st.equalsIgnoreCase(safe(u.getAccountStatus()));
+                })
+                .filter(u -> {
+                    if (roleUi == null || "All".equals(roleUi)) {
+                        return true;
+                    }
+                    String rj = safe(u.getRolesJson());
+                    if ("Coach".equals(roleUi)) {
+                        return rj.contains("ROLE_COACH");
+                    }
+                    return rj.contains("ROLE_USER") && !rj.contains("ROLE_COACH");
+                })
+                .collect(Collectors.toList());
+        usersTable.setItems(FXCollections.observableArrayList(filtered));
+    }
+
+    private static boolean matchesUserSearch(User u, String qLower) {
+        String name = (safe(u.getFirstname()) + " " + safe(u.getLastname())).trim().toLowerCase(Locale.ROOT);
+        String email = safe(u.getEmail()).toLowerCase(Locale.ROOT);
+        return name.contains(qLower) || email.contains(qLower);
+    }
+
     private static Button createIconButton(String text, String styleClass) {
         Button btn = new Button(text);
         btn.getStyleClass().addAll("table-icon-btn", styleClass);
@@ -612,18 +685,26 @@ public class AdminDashboardController {
                     .filter(u -> !ADMIN_EMAIL.equalsIgnoreCase(safe(u.getEmail())))
                     .filter(u -> !safe(u.getRolesJson()).contains("ROLE_ADMIN"))
                     .collect(Collectors.toList());
+            allManagedUsers = new ArrayList<>(users);
+            applyUserFilters();
 
             long activeCount = users.stream()
                     .filter(u -> "active".equalsIgnoreCase(safe(u.getAccountStatus())))
                     .count();
-
-            totalUsersLabel.setText(String.valueOf(users.size()));
-            activeUsersLabel.setText(String.valueOf(activeCount));
-            notificationsLabel.setText("8");
-            twoFaLabel.setText("0");
-
-            usersTable.setItems(FXCollections.observableArrayList(users));
+            long twoFaCount = users.stream()
+                    .filter(u -> !safe(u.getGoogleAuthenticatorSecret()).isBlank())
+                    .count();
+            if (totalUsersLabel != null) {
+                totalUsersLabel.setText(String.valueOf(users.size()));
+            }
+            if (activeUsersLabel != null) {
+                activeUsersLabel.setText(String.valueOf(activeCount));
+            }
+            if (twoFaLabel != null) {
+                twoFaLabel.setText(String.valueOf(twoFaCount));
+            }
         } catch (SQLException e) {
+            allManagedUsers = List.of();
             usersTable.setItems(FXCollections.observableArrayList());
         }
     }

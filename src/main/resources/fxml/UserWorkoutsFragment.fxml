@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="16.0" styleClass="user-workouts-root" stylesheets="@../css/user_workouts.css"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controllers.UserWorkoutsController">
+
+    <!-- Objective pills -->
+    <FlowPane fx:id="objectivePillsPane" hgap="8.0" vgap="8.0" />
+
+    <!-- Filters -->
+    <HBox spacing="12.0" alignment="CENTER_LEFT">
+        <ComboBox fx:id="levelFilter" styleClass="filter-combo"
+                  prefWidth="160.0" onAction="#onFilter" />
+        <ComboBox fx:id="durationFilter" styleClass="filter-combo"
+                  prefWidth="160.0" onAction="#onFilter" />
+    </HBox>
+
+    <!-- Workouts grid (2 columns) -->
+    <ScrollPane fitToWidth="true" styleClass="workouts-scroll" VBox.vgrow="ALWAYS"
+                style="-fx-background-color: transparent; -fx-background: transparent;">
+        <VBox fx:id="workoutsContainer" spacing="0.0" />
+    </ScrollPane>
+
+    <padding><Insets bottom="18.0" left="18.0" right="18.0" top="18.0" /></padding>
+</VBox>

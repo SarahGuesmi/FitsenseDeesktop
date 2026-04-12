@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+
+<VBox styleClass="workout-form-root" stylesheets="@../css/workout_form.css"
+      style="-fx-background-color: #070b16;"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controllers.ExerciseFormController">
+
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
+                style="-fx-background-color:transparent;-fx-background:transparent;-fx-border-color:transparent;">
+        <VBox spacing="20.0" maxWidth="720.0">
+            <padding><Insets top="28.0" bottom="32.0" left="40.0" right="40.0" /></padding>
+
+            <Button mnemonicParsing="false" onAction="#onBack"
+                    styleClass="btn-back" text="← Back to Exercises" />
+
+            <VBox spacing="4.0">
+                <Label fx:id="formTitle" styleClass="form-page-title" text="Create Exercise" />
+                <Label styleClass="form-page-subtitle" text="Add a new exercise to the catalog" />
+            </VBox>
+
+            <VBox styleClass="form-card" spacing="18.0">
+                <padding><Insets top="28.0" bottom="28.0" left="28.0" right="28.0" /></padding>
+
+                <VBox spacing="6.0">
+                    <Label styleClass="form-label" text="EXERCISE NAME" />
+                    <TextField fx:id="nameField" promptText="Enter exercise name" styleClass="form-input" />
+                    <Label fx:id="nameError" styleClass="error-label" managed="false" visible="false" text="" />
+                </VBox>
+
+                <VBox spacing="6.0">
+                    <Label styleClass="form-label" text="TYPE" />
+                    <ComboBox fx:id="typeField" styleClass="form-input" prefWidth="Infinity" promptText="Select type" />
+                    <Label fx:id="typeError" styleClass="error-label" managed="false" visible="false" text="" />
+                </VBox>
+
+                <HBox spacing="16.0">
+                    <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                        <Label styleClass="form-label" text="DURATION (SEC)" />
+                        <TextField fx:id="durationField" promptText="e.g. 60" styleClass="form-input" />
+                        <Label fx:id="durationError" styleClass="error-label" managed="false" visible="false" text="" />
+                    </VBox>
+                    <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                        <Label styleClass="form-label" text="SETS (optional)" />
+                        <TextField fx:id="setsField" promptText="e.g. 3" styleClass="form-input" />
+                        <Label fx:id="setsError" styleClass="error-label" managed="false" visible="false" text="" />
+                    </VBox>
+                    <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                        <Label styleClass="form-label" text="REPS (optional)" />
+                        <TextField fx:id="repsField" promptText="e.g. 12" styleClass="form-input" />
+                        <Label fx:id="repsError" styleClass="error-label" managed="false" visible="false" text="" />
+                    </VBox>
+                </HBox>
+
+                <VBox spacing="6.0">
+                    <Label styleClass="form-label" text="DESCRIPTION" />
+                    <TextArea fx:id="descriptionField" promptText="Enter description"
+                              styleClass="form-input" prefRowCount="3" wrapText="true" />
+                </VBox>
+
+                <!-- Exercise Image -->
+                <VBox spacing="8.0">
+                    <Label styleClass="form-label" text="EXERCISE IMAGE" />
+                    <!-- Current image preview -->
+                    <StackPane fx:id="imagePreviewPane" styleClass="image-preview-pane"
+                               managed="false" visible="false"
+                               maxWidth="160.0" maxHeight="160.0"
+                               minWidth="160.0" minHeight="160.0">
+                        <javafx.scene.image.ImageView fx:id="imagePreview"
+                                                      fitWidth="160.0" fitHeight="160.0"
+                                                      preserveRatio="true" smooth="true" />
+                    </StackPane>
+                    <Label fx:id="currentImageLabel" styleClass="exercise-card-desc"
+                           text="" managed="false" visible="false" />
+                    <!-- File picker row -->
+                    <HBox spacing="12.0" alignment="CENTER_LEFT">
+                        <Button mnemonicParsing="false" onAction="#onChooseImage"
+                                styleClass="btn-choose-image" text="Choose a file" />
+                        <Label fx:id="selectedFileLabel" styleClass="exercise-card-desc"
+                               text="No file chosen" />
+                    </HBox>
+                    <!-- Delete current image checkbox -->
+                    <CheckBox fx:id="deleteImageCheck" styleClass="objective-checkbox"
+                              text="Delete current image"
+                              managed="false" visible="false" />
+                </VBox>
+
+                <Region styleClass="form-divider" maxWidth="Infinity" />
+
+                <HBox spacing="12.0" alignment="CENTER_RIGHT">
+                    <Button mnemonicParsing="false" onAction="#onCancel"
+                            styleClass="btn-cancel-form" text="Cancel" />
+                    <Button fx:id="submitBtn" mnemonicParsing="false" onAction="#onSubmit"
+                            styleClass="btn-submit-form" text="Create Exercise" />
+                </HBox>
+            </VBox>
+        </VBox>
+    </ScrollPane>
+</VBox>

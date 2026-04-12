@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox styleClass="workout-form-root" stylesheets="@../css/workout_form.css"
+      style="-fx-background-color: #070b16;"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controllers.WorkoutFormController">
+
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
+                style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;">
+        <VBox spacing="20.0" maxWidth="860.0">
+            <padding><Insets top="28.0" bottom="32.0" left="40.0" right="40.0" /></padding>
+
+            <!-- Back -->
+            <Button fx:id="backBtn" mnemonicParsing="false" onAction="#onBack"
+                    styleClass="btn-back" text="← Back to Catalog" />
+
+            <!-- Title -->
+            <VBox spacing="4.0">
+                <Label fx:id="formTitle" styleClass="form-page-title" text="Create Workout" />
+                <Label styleClass="form-page-subtitle"
+                       text="Configure your athlete's training routine" />
+            </VBox>
+
+            <!-- Card -->
+            <VBox styleClass="form-card" spacing="20.0">
+                <padding><Insets top="28.0" bottom="28.0" left="28.0" right="28.0" /></padding>
+
+                <!-- Workout Name -->
+                <VBox spacing="6.0">
+                    <Label styleClass="form-label" text="WORKOUT NAME" />
+                    <TextField fx:id="nameField" promptText="Enter workout name"
+                               styleClass="form-input" />
+                    <Label fx:id="nameError" styleClass="error-label"
+                           managed="false" visible="false" text="" />
+                </VBox>
+
+                <!-- Workout Objectives (checkboxes) -->
+                <VBox spacing="6.0">
+                    <Label styleClass="form-label" text="WORKOUT OBJECTIVES" />
+                    <FlowPane fx:id="objectivesPane" hgap="12.0" vgap="8.0"
+                              styleClass="form-input" minHeight="48.0">
+                        <!-- populated in controller -->
+                    </FlowPane>
+                </VBox>
+
+                <!-- Difficulty Level -->
+                <VBox spacing="6.0">
+                    <Label styleClass="form-label" text="DIFFICULTY LEVEL" />
+                    <ComboBox fx:id="levelField" styleClass="form-input"
+                              prefWidth="Infinity" promptText="Select a level" />
+                    <Label fx:id="levelError" styleClass="error-label"
+                           managed="false" visible="false" text="" />
+                </VBox>
+
+                <!-- Duration -->
+                <VBox spacing="6.0">
+                    <Label styleClass="form-label" text="ESTIMATED DURATION (MINUTES)" />
+                    <TextField fx:id="durationField"
+                               promptText="Enter estimated duration (1–300 min)"
+                               styleClass="form-input" />
+                    <Label fx:id="durationError" styleClass="error-label"
+                           managed="false" visible="false" text="" />
+                </VBox>
+
+                <!-- Description -->
+                <VBox spacing="6.0">
+                    <Label styleClass="form-label" text="DESCRIPTION" />
+                    <TextArea fx:id="descriptionField" promptText="Enter description"
+                              styleClass="form-input" prefRowCount="4" wrapText="true" />
+                </VBox>
+
+                <!-- Exercises to Include -->
+                <VBox spacing="6.0">
+                    <Label styleClass="form-label" text="EXERCISES TO INCLUDE" />
+                    <ListView fx:id="exercisesList" styleClass="form-exercises-list"
+                              prefHeight="200.0" />
+                    <Label fx:id="exercisesError" styleClass="error-label"
+                           managed="false" visible="false" text="" />
+                </VBox>
+
+                <!-- Divider -->
+                <Region styleClass="form-divider" maxWidth="Infinity" />
+
+                <!-- Actions -->
+                <HBox spacing="12.0" alignment="CENTER_RIGHT">
+                    <Button mnemonicParsing="false" onAction="#onCancel"
+                            styleClass="btn-cancel-form" text="Cancel" />
+                    <Button fx:id="submitBtn" mnemonicParsing="false" onAction="#onSubmit"
+                            styleClass="btn-submit-form" text="Create Workout" />
+                </HBox>
+
+            </VBox>
+        </VBox>
+    </ScrollPane>
+</VBox>

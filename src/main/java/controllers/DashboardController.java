@@ -39,9 +39,13 @@ public class DashboardController {
     @FXML
     private VBox dashMentalHealthPane;
     @FXML
+    private VBox dashWorkoutsPane;
+    @FXML
     private Button dashHomeBtn;
     @FXML
     private Button dashProfileBtn;
+    @FXML
+    private Button dashWorkoutsBtn;
     @FXML
     private Button dashMentalHealthBtn;
     @FXML
@@ -146,6 +150,29 @@ public class DashboardController {
     }
 
     @FXML
+    private void onShowWorkouts() {
+        if (navbarPageTitle != null) navbarPageTitle.setText("My Workouts");
+        if (navbarPageSubtitle != null) navbarPageSubtitle.setText("Personalized sessions matching your goals");
+        if (dashHomePane != null) {
+            dashHomePane.setManaged(false);
+            dashHomePane.setVisible(false);
+        }
+        if (dashProfilePane != null) {
+            dashProfilePane.setManaged(false);
+            dashProfilePane.setVisible(false);
+        }
+        if (dashMentalHealthPane != null) {
+            dashMentalHealthPane.setManaged(false);
+            dashMentalHealthPane.setVisible(false);
+        }
+        if (dashWorkoutsPane != null) {
+            dashWorkoutsPane.setManaged(true);
+            dashWorkoutsPane.setVisible(true);
+        }
+        setDashNavActive(dashWorkoutsBtn);
+    }
+
+    @FXML
     private void onShowDashboard() {
         setDashboardNavbarTitles();
         showDashboardHome();
@@ -161,6 +188,10 @@ public class DashboardController {
         if (dashMentalHealthPane != null) {
             dashMentalHealthPane.setManaged(false);
             dashMentalHealthPane.setVisible(false);
+        }
+        if (dashWorkoutsPane != null) {
+            dashWorkoutsPane.setManaged(false);
+            dashWorkoutsPane.setVisible(false);
         }
         if (dashProfilePane != null) {
             dashProfilePane.setManaged(true);
@@ -183,6 +214,10 @@ public class DashboardController {
             dashProfilePane.setManaged(false);
             dashProfilePane.setVisible(false);
         }
+        if (dashWorkoutsPane != null) {
+            dashWorkoutsPane.setManaged(false);
+            dashWorkoutsPane.setVisible(false);
+        }
         if (dashMentalHealthPane != null) {
             dashMentalHealthPane.setManaged(true);
             dashMentalHealthPane.setVisible(true);
@@ -203,11 +238,15 @@ public class DashboardController {
             dashMentalHealthPane.setManaged(false);
             dashMentalHealthPane.setVisible(false);
         }
+        if (dashWorkoutsPane != null) {
+            dashWorkoutsPane.setManaged(false);
+            dashWorkoutsPane.setVisible(false);
+        }
         setDashNavActive(dashHomeBtn);
     }
 
     private void setDashNavActive(Button selected) {
-        Stream.of(dashHomeBtn, dashProfileBtn, dashMentalHealthBtn)
+        Stream.of(dashHomeBtn, dashProfileBtn, dashWorkoutsBtn, dashMentalHealthBtn)
                 .filter(Objects::nonNull)
                 .forEach(b -> {
                     b.getStyleClass().setAll("dash-side-link");

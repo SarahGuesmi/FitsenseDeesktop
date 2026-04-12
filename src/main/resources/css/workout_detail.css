@@ -1,0 +1,153 @@
+.workout-detail-root {
+    -fx-background-color: #070b16;
+    -fx-font-family: "Segoe UI", "Montserrat", "Roboto", sans-serif;
+}
+
+/* Back button */
+.btn-back-workouts {
+    -fx-background-color: transparent;
+    -fx-text-fill: #6B7280;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-cursor: hand;
+    -fx-padding: 4 0;
+}
+.btn-back-workouts:hover { -fx-text-fill: white; }
+
+/* Header */
+.detail-workout-name {
+    -fx-text-fill: white;
+    -fx-font-size: 26px;
+    -fx-font-weight: 800;
+}
+.detail-workout-meta {
+    -fx-text-fill: #6B7280;
+    -fx-font-size: 13px;
+}
+
+/* Description card */
+.detail-card {
+    -fx-background-color: #111827;
+    -fx-border-color: #1F2937;
+    -fx-border-radius: 14;
+    -fx-background-radius: 14;
+}
+.detail-section-title {
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: 800;
+}
+.detail-desc {
+    -fx-text-fill: #9CA3AF;
+    -fx-font-size: 13px;
+}
+
+/* Objective badge */
+.obj-badge {
+    -fx-background-color: rgba(59,130,246,0.1);
+    -fx-border-color: rgba(59,130,246,0.2);
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-text-fill: #60A5FA;
+    -fx-font-size: 11px;
+    -fx-font-weight: 800;
+    -fx-padding: 3 10;
+}
+
+/* Exercise row */
+.exercise-row {
+    -fx-background-color: #111827;
+    -fx-border-color: #1F2937;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-cursor: hand;
+}
+.exercise-row:hover {
+    -fx-border-color: #3B82F6;
+    -fx-background-color: rgba(255,255,255,0.03);
+}
+.exercise-row-name {
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-font-weight: 700;
+}
+.exercise-row-type {
+    -fx-text-fill: #6B7280;
+    -fx-font-size: 11px;
+    -fx-font-weight: 700;
+}
+.exercise-row-duration {
+    -fx-text-fill: #60A5FA;
+    -fx-font-size: 14px;
+    -fx-font-weight: 800;
+}
+.exercise-icon-green {
+    -fx-background-color: linear-gradient(to bottom right, #22C55E, #16A34A);
+    -fx-background-radius: 10;
+    -fx-min-width: 52px;
+    -fx-min-height: 52px;
+    -fx-max-width: 52px;
+    -fx-max-height: 52px;
+    -fx-alignment: center;
+    -fx-font-size: 22px;
+}
+
+/* Progress */
+.progress-bar-bg {
+    -fx-background-color: #1F2937;
+    -fx-background-radius: 6;
+    -fx-pref-height: 10;
+    -fx-max-height: 10;
+}
+.progress-bar-fill {
+    -fx-background-color: linear-gradient(to right, #3B82F6, #8B5CF6);
+    -fx-background-radius: 6;
+    -fx-pref-height: 10;
+    -fx-max-height: 10;
+}
+.progress-label {
+    -fx-text-fill: #60A5FA;
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+}
+
+/* Start button */
+.btn-start-session {
+    -fx-background-color: linear-gradient(to right, #22C55E, #84CC16);
+    -fx-text-fill: black;
+    -fx-font-weight: 800;
+    -fx-font-size: 14px;
+    -fx-background-radius: 12;
+    -fx-padding: 14 0;
+    -fx-cursor: hand;
+    -fx-max-width: Infinity;
+}
+.btn-start-session:hover { -fx-opacity: 0.88; }
+.btn-start-disabled {
+    -fx-background-color: #1F2937;
+    -fx-text-fill: #4B5563;
+    -fx-font-weight: 800;
+    -fx-font-size: 14px;
+    -fx-background-radius: 12;
+    -fx-padding: 14 0;
+    -fx-max-width: Infinity;
+}
+
+/* Scroll */
+.detail-scroll {
+    -fx-background-color: #070b16;
+    -fx-background: #070b16;
+    -fx-border-color: transparent;
+}
+.detail-scroll > .viewport { -fx-background-color: #070b16; }
+
+.btn-start-disabled {
+    -fx-background-color: #1F2937;
+    -fx-text-fill: #4B5563;
+    -fx-font-weight: 800;
+    -fx-font-size: 13px;
+    -fx-background-radius: 12;
+    -fx-padding: 14 0;
+    -fx-max-width: Infinity;
+    -fx-opacity: 0.7;
+}

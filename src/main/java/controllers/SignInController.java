@@ -22,7 +22,7 @@ import java.sql.SQLException;
 import java.util.Objects;
 
 public class SignInController {
-    private static final String ADMIN_EMAIL = "sarahguesmi223@gmail.com";
+    private static final String ADMIN_EMAIL = "admin@fitsense.com";
 
     @FXML
     private StackPane root;

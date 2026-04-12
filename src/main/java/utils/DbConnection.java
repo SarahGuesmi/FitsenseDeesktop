@@ -24,7 +24,7 @@ public class DbConnection {
             System.out.println("FitSense connected: " + DB_URL);
         } catch (SQLException e) {
             System.err.println("Database connection failed: " + e.getMessage());
-            e.printStackTrace();
+            throw new RuntimeException("Cannot connect to database: " + e.getMessage(), e);
         }
     }
 

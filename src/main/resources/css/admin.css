@@ -181,22 +181,52 @@
     -fx-border-color: rgba(140, 166, 255, 0.28);
     -fx-border-radius: 14px;
     -fx-border-width: 1px;
-    -fx-padding: 6px;
+    -fx-padding: 10px 14px 10px 14px;
 }
 
-.users-header {
-    -fx-background-color: linear-gradient(to right, rgba(17, 30, 56, 0.95), rgba(13, 24, 47, 0.95));
-    -fx-background-radius: 14px;
-    -fx-border-color: rgba(160, 181, 255, 0.32);
-    -fx-border-radius: 14px;
-    -fx-padding: 12 14;
-    -fx-min-height: 112px;
+.users-table .column-header-background {
+    -fx-background-color: transparent;
 }
 
-.users-title {
-    -fx-text-fill: #b7c9f8;
-    -fx-font-size: 40px;
-    -fx-font-weight: 800;
+.users-table .column-header,
+.users-table .filler {
+    -fx-background-color: transparent;
+}
+
+.users-table .column-header .label {
+    -fx-text-fill: #a8bce8;
+    -fx-font-size: 15px;
+    -fx-font-weight: 700;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 0 0 0 12px;
+}
+
+.users-table .table-row-cell {
+    -fx-background-color: #121c33;
+    -fx-text-fill: #e4e8f2;
+    -fx-border-color: transparent transparent rgba(255,255,255,0.03) transparent;
+    -fx-padding: 0;
+}
+
+.users-table .table-row-cell:odd {
+    -fx-background-color: #14203a;
+}
+
+.users-table .table-row-cell:hover {
+    -fx-background-color: linear-gradient(to right, rgba(73, 106, 207, 0.22), rgba(94, 69, 191, 0.22));
+}
+
+.users-table .table-cell {
+    -fx-text-fill: #e4e8f2;
+    -fx-alignment: CENTER_LEFT;
+    -fx-border-color: transparent;
+    -fx-font-size: 14px;
+    -fx-padding: 14px 12px 14px 12px;
+}
+
+.users-table .virtual-flow .scroll-bar:vertical,
+.users-table .virtual-flow .scroll-bar:horizontal {
+    -fx-background-color: transparent;
 }
 
 .users-subtitle {
@@ -216,48 +246,6 @@
 
 .add-coach-btn:hover {
     -fx-effect: dropshadow(gaussian, rgba(94, 146, 255, 0.55), 14, 0.25, 0, 1);
-}
-
-.users-table .column-header-background {
-    -fx-background-color: transparent;
-}
-
-.users-table .column-header,
-.users-table .filler {
-    -fx-background-color: transparent;
-}
-
-.users-table .column-header .label {
-    -fx-text-fill: #a8bce8;
-    -fx-font-size: 15px;
-    -fx-font-weight: 700;
-}
-
-.users-table .table-row-cell {
-    -fx-background-color: #121c33;
-    -fx-text-fill: #e4e8f2;
-    -fx-border-color: transparent transparent rgba(255,255,255,0.03) transparent;
-    -fx-padding: 8 0;
-}
-
-.users-table .table-row-cell:odd {
-    -fx-background-color: #14203a;
-}
-
-.users-table .table-row-cell:hover {
-    -fx-background-color: linear-gradient(to right, rgba(73, 106, 207, 0.22), rgba(94, 69, 191, 0.22));
-}
-
-.users-table .table-cell {
-    -fx-text-fill: #e4e8f2;
-    -fx-alignment: center-left;
-    -fx-border-color: transparent;
-    -fx-font-size: 14px;
-}
-
-.users-table .virtual-flow .scroll-bar:vertical,
-.users-table .virtual-flow .scroll-bar:horizontal {
-    -fx-background-color: transparent;
 }
 
 .user-cell {
@@ -452,6 +440,13 @@
     -fx-border-width: 2px;
 }
 
+.field-error-label {
+    -fx-text-fill: #ff7f8b;
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+    -fx-padding: 4 0 0 0;
+}
+
 /* ComboBox dropdown popup — dark theme (popup uses scene stylesheets, not nested ScrollPane sheets) */
 .combo-box-popup > .list-view {
     -fx-background-color: #151b2e;
@@ -498,58 +493,63 @@
     -fx-background-radius: 6px;
 }
 
-/* —— User management filters —— */
-.user-filters-bar {
-    -fx-background-color: linear-gradient(to right, rgba(17, 30, 56, 0.95), rgba(20, 28, 52, 0.95));
-    -fx-background-radius: 14px;
-    -fx-border-color: rgba(160, 181, 255, 0.32);
-    -fx-border-radius: 14px;
-    -fx-border-width: 1px;
-}
-
-.filter-field-label {
-    -fx-text-fill: #f4f7ff;
-    -fx-font-size: 12px;
-    -fx-font-weight: 600;
-}
-
-.filter-search-field {
-    -fx-background-color: rgba(12, 18, 32, 0.95);
-    -fx-text-fill: #eff4ff;
-    -fx-prompt-text-fill: #657aa8;
-    -fx-background-radius: 10px;
-    -fx-border-color: rgba(176, 196, 246, 0.45);
-    -fx-border-radius: 10px;
+/* Feedback modal styles */
+.btn-add-primary {
+    -fx-background-color: linear-gradient(to right, #7b5fff, #3a8dff);
+    -fx-text-fill: #ffffff;
     -fx-font-size: 14px;
-    -fx-padding: 10 12;
-}
-
-.filter-combo {
-    -fx-background-color: rgba(12, 18, 32, 0.95);
-    -fx-border-color: rgba(176, 196, 246, 0.45);
-    -fx-border-radius: 10px;
-    -fx-background-radius: 10px;
-    -fx-font-size: 14px;
-    -fx-pref-height: 40px;
-}
-
-.filter-combo .list-cell {
-    -fx-text-fill: #eff4ff;
-}
-
-.filter-clear-btn {
-    -fx-background-color: rgba(12, 18, 32, 0.95);
-    -fx-text-fill: #eff4ff;
-    -fx-border-color: rgba(176, 196, 246, 0.45);
-    -fx-border-radius: 10px;
-    -fx-background-radius: 10px;
-    -fx-font-size: 14px;
-    -fx-font-weight: 600;
-    -fx-padding: 10 20;
-    -fx-min-height: 40px;
+    -fx-font-weight: 700;
+    -fx-background-radius: 12px;
+    -fx-padding: 11 20;
     -fx-cursor: hand;
 }
 
-.filter-clear-btn:hover {
-    -fx-background-color: rgba(255, 255, 255, 0.06);
+.btn-add-primary:hover {
+    -fx-effect: dropshadow(gaussian, rgba(94, 100, 255, 0.55), 14, 0.25, 0, 1);
+}
+
+.search-bar-box {
+    -fx-background-color: rgba(17, 27, 44, 0.95);
+    -fx-background-radius: 12px;
+    -fx-border-color: rgba(176, 196, 246, 0.3);
+    -fx-border-radius: 12px;
+    -fx-max-width: 360px;
+}
+
+.search-field {
+    -fx-background-color: transparent;
+    -fx-text-fill: #eff4ff;
+    -fx-prompt-text-fill: #657aa8;
+    -fx-font-size: 14px;
+    -fx-border-color: transparent;
+    -fx-padding: 4 0;
+}
+
+.search-icon {
+    -fx-text-fill: #657aa8;
+    -fx-font-size: 14px;
+}
+
+.empty-icon {
+    -fx-font-size: 32px;
+    -fx-text-fill: #4a5a7a;
+}
+
+.field-label {
+    -fx-text-fill: #91a1c5;
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+}
+
+.delete-icon-circle {
+    -fx-background-color: rgba(180, 40, 40, 0.35);
+    -fx-background-radius: 50px;
+    -fx-text-fill: #ff7070;
+    -fx-font-size: 28px;
+    -fx-min-width: 72px;
+    -fx-min-height: 72px;
+    -fx-max-width: 72px;
+    -fx-max-height: 72px;
+    -fx-alignment: center;
+    -fx-padding: 0;
 }

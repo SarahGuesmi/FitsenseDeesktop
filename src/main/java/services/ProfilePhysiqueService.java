@@ -25,35 +25,19 @@ public class ProfilePhysiqueService implements CRUD<ProfilePhysique> {
         Float height = rs.wasNull() ? null : h;
         Object genderObj = ResultSetColumns.getFirstObject(rs, "gender", "genre", "sexe");
         String gender = ResultSetColumns.normalizeGenderDbValue(genderObj);
-        return new ProfilePhysique(
-                UuidUtil.fromResultSet(rs, "id"),
-                weight,
-                height,
-                gender,
-                UuidUtil.fromResultSet(rs, "user_id"));
+        // id and user_id are int in DB — wrap as UUID for model compatibility
+        UUID id = new UUID(0, rs.getInt("id"));
+        UUID userId = new UUID(0, rs.getInt("user_id"));
+        return new ProfilePhysique(id, weight, height, gender, userId);
     }
 
     public List<ProfilePhysique> findByUserId(UUID userId) throws SQLException {
         String sql = "SELECT * FROM `profile_physique` WHERE `user_id` = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
-            stmt.setBytes(1, UuidUtil.toBytes16(userId));
+            stmt.setInt(1, (int) userId.getLeastSignificantBits());
             try (ResultSet rs = stmt.executeQuery()) {
                 List<ProfilePhysique> list = new ArrayList<>();
-                while (rs.next()) {
-                    list.add(mapRow(rs));
-                }
-                if (!list.isEmpty()) {
-                    return list;
-                }
-            }
-        }
-        try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
-            stmt.setString(1, userId.toString());
-            try (ResultSet rs = stmt.executeQuery()) {
-                List<ProfilePhysique> list = new ArrayList<>();
-                while (rs.next()) {
-                    list.add(mapRow(rs));
-                }
+                while (rs.next()) list.add(mapRow(rs));
                 return list;
             }
         }
@@ -67,8 +51,8 @@ public class ProfilePhysiqueService implements CRUD<ProfilePhysique> {
             return null;
         }
         String sql = "SELECT p.* FROM `profile_physique` p "
-                + "INNER JOIN `app_user` u ON u.`id` = p.`user_id` "
-                + "WHERE u.`email_email` = ?";
+                + "INNER JOIN `user` u ON u.`id` = p.`user_id` "
+                + "WHERE u.`email` = ?";
         try (PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setString(1, email.trim());
             try (ResultSet rs = ps.executeQuery()) {
@@ -118,8 +102,8 @@ public class ProfilePhysiqueService implements CRUD<ProfilePhysique> {
                 stmt.setNull(i++, Types.FLOAT);
             }
             stmt.setString(i++, profilePhysique.getGender());
-            stmt.setBytes(i++, UuidUtil.toBytes16(profilePhysique.getUserId()));
-            stmt.setBytes(i, UuidUtil.toBytes16(profilePhysique.getId()));
+            stmt.setInt(i++, (int) profilePhysique.getUserId().getLeastSignificantBits());
+            stmt.setInt(i, (int) profilePhysique.getId().getLeastSignificantBits());
             stmt.executeUpdate();
         }
     }
@@ -128,21 +112,18 @@ public class ProfilePhysiqueService implements CRUD<ProfilePhysique> {
     public void delete(ProfilePhysique profilePhysique) throws SQLException {
         String sql = "DELETE FROM `profile_physique` WHERE `id` = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
-            stmt.setBytes(1, UuidUtil.toBytes16(profilePhysique.getId()));
+            stmt.setInt(1, (int) profilePhysique.getId().getLeastSignificantBits());
             stmt.executeUpdate();
         }
     }
 
     @Override
     public void createPrepared(ProfilePhysique profilePhysique) throws SQLException {
-        if (profilePhysique.getId() == null) {
-            profilePhysique.setId(UUID.randomUUID());
-        }
-        String sql = "INSERT INTO `profile_physique` (`id`, `weight`, `height`, `gender`, `user_id`) "
-                + "VALUES (?, ?, ?, ?, ?)";
+        // id is auto_increment, don't insert it
+        String sql = "INSERT INTO `profile_physique` (`weight`, `height`, `gender`, `user_id`) "
+                + "VALUES (?, ?, ?, ?)";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
             int i = 1;
-            stmt.setBytes(i++, UuidUtil.toBytes16(profilePhysique.getId()));
             if (profilePhysique.getWeight() != null) {
                 stmt.setFloat(i++, profilePhysique.getWeight());
             } else {
@@ -154,7 +135,7 @@ public class ProfilePhysiqueService implements CRUD<ProfilePhysique> {
                 stmt.setNull(i++, Types.FLOAT);
             }
             stmt.setString(i++, profilePhysique.getGender());
-            stmt.setBytes(i, UuidUtil.toBytes16(profilePhysique.getUserId()));
+            stmt.setInt(i, (int) profilePhysique.getUserId().getLeastSignificantBits());
             stmt.executeUpdate();
         }
     }

@@ -11,9 +11,9 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
-import utils.WebAssets;
 import models.User;
 import services.UserService;
+import utils.WebAssets;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -52,13 +52,17 @@ public class SignUpController {
 
     @FXML
     private void initialize() {
-        WebAssets.loadPublicAsset(heroImageView, WebAssets.HERO_SPORT_IMAGE);
+        try {
+            WebAssets.loadPublicAsset(heroImageView, WebAssets.HERO_SPORT_IMAGE);
+        } catch (Exception e) {
+            System.out.println("Impossible de charger l'image hero : " + e.getMessage());
+        }
     }
 
     @FXML
     private void onGoHome() {
-        switchScene("/fxml/HomeView.fxml", "/css/home.css");
-    }
+        switchScene("/fxml/HomeView.fxml", "/css/home.css");    }
+
 
     @FXML
     private void onSignUp() {
@@ -68,13 +72,14 @@ public class SignUpController {
         String password = passwordField.getText() != null ? passwordField.getText().trim() : "";
 
         if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || password.isEmpty()) {
-            showWarning("Missing Information", "Please fill in all required fields.");
-            return;
+            showWarning("Missing Information", "Please fill in all required fields.");            return;
         }
+
         if (!isValidEmail(email)) {
             showWarning("Invalid Email", "Please enter a valid email address.");
             return;
         }
+
         if (password.length() < 6) {
             showWarning("Weak Password", "Password must contain at least 6 characters.");
             return;
@@ -90,7 +95,7 @@ public class SignUpController {
             user.setFirstname(firstName);
             user.setLastname(lastName);
             user.setEmail(email);
-            user.setPassword(password); // UserService hashes it with BCrypt
+            user.setPassword(password);
             user.setRolesJson("[\"ROLE_USER\"]");
             user.setAccountStatus("active");
             user.setPhoneNumber(null);
@@ -101,8 +106,10 @@ public class SignUpController {
             userService.createPrepared(user);
             AppSession.setCurrentUser(user);
             AppSession.resetOnboarding();
+
             showInfo("Account Created", "Your account was created successfully. Let's set up your profile.");
             switchScene("/fxml/HeightView.fxml", "/css/onboarding.css");
+
         } catch (SQLException e) {
             showError("Sign Up Failed", "Could not create the account: " + e.getMessage());
         }
@@ -116,14 +123,18 @@ public class SignUpController {
     private String uniqueUsernameFromEmail(String email) {
         int at = email.indexOf('@');
         String base = (at > 0 ? email.substring(0, at) : email).replaceAll("[^a-zA-Z0-9._-]", "");
+
         if (base.isBlank()) {
             base = "user";
         }
+
         if (base.length() > 48) {
             base = base.substring(0, 48);
         }
+
         String candidate = base;
         int suffix = 0;
+
         try {
             while (userService.findByUsername(candidate) != null) {
                 suffix++;
@@ -133,6 +144,7 @@ public class SignUpController {
         } catch (SQLException ignored) {
             return base + "_" + System.currentTimeMillis();
         }
+
         return candidate;
     }
 

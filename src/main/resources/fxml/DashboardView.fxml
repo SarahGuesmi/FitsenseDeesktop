@@ -19,7 +19,7 @@
                   <Label styleClass="dash-side-sub" text="YOUR SPACE" />
                   <Button fx:id="dashHomeBtn" mnemonicParsing="false" onAction="#onShowDashboard" styleClass="dash-side-link" text="◈  Dashboard" />
                   <Button fx:id="dashProfileBtn" mnemonicParsing="false" onAction="#onShowProfile" styleClass="dash-side-link" text="☺  Profile" />
-                  <Button mnemonicParsing="false" styleClass="dash-side-link" text="▣  My Workouts" />
+                  <Button fx:id="dashWorkoutsBtn" mnemonicParsing="false" onAction="#onShowWorkouts" styleClass="dash-side-link" text="▣  My Workouts" />
                   <Button fx:id="dashMentalHealthBtn" mnemonicParsing="false" onAction="#onShowMentalHealth" styleClass="dash-side-link" text="◉  Mental Health" />
                   <Button mnemonicParsing="false" styleClass="dash-side-link" text="◇  Nutrition" />
                   <Button mnemonicParsing="false" styleClass="dash-side-link" text="💬  Chatroom" />
@@ -98,6 +98,12 @@
                            <padding>
                               <Insets bottom="22.0" left="22.0" right="22.0" top="22.0" />
                            </padding>
+                        </VBox>
+                        <VBox fx:id="dashWorkoutsPane" managed="false" visible="false"
+                              styleClass="dash-content" VBox.vgrow="ALWAYS">
+                           <children>
+                              <fx:include fx:id="dashWorkouts" source="UserWorkoutsFragment.fxml" VBox.vgrow="ALWAYS" />
+                           </children>
                         </VBox>
                      </children>
                   </StackPane>

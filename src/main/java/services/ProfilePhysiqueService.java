@@ -3,7 +3,6 @@ package services;
 import models.ProfilePhysique;
 import utils.DbConnection;
 import utils.ResultSetColumns;
-import utils.UuidUtil;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -25,59 +24,41 @@ public class ProfilePhysiqueService implements CRUD<ProfilePhysique> {
         Float height = rs.wasNull() ? null : h;
         Object genderObj = ResultSetColumns.getFirstObject(rs, "gender", "genre", "sexe");
         String gender = ResultSetColumns.normalizeGenderDbValue(genderObj);
-        return new ProfilePhysique(
-                UuidUtil.fromResultSet(rs, "id"),
-                weight,
-                height,
-                gender,
-                UuidUtil.fromResultSet(rs, "user_id"));
+
+        // id and user_id are INT in this schema
+        int rawId = rs.getInt("id");
+        UUID id = new UUID(0L, rawId);
+        int rawUserId = rs.getInt("user_id");
+        UUID userId = new UUID(0L, rawUserId);
+
+        return new ProfilePhysique(id, weight, height, gender, userId);
     }
 
     public List<ProfilePhysique> findByUserId(UUID userId) throws SQLException {
         String sql = "SELECT * FROM `profile_physique` WHERE `user_id` = ?";
+        long intId = userId.getLeastSignificantBits();
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
-            stmt.setBytes(1, UuidUtil.toBytes16(userId));
+            stmt.setLong(1, intId);
             try (ResultSet rs = stmt.executeQuery()) {
                 List<ProfilePhysique> list = new ArrayList<>();
-                while (rs.next()) {
-                    list.add(mapRow(rs));
-                }
-                if (!list.isEmpty()) {
-                    return list;
-                }
-            }
-        }
-        try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
-            stmt.setString(1, userId.toString());
-            try (ResultSet rs = stmt.executeQuery()) {
-                List<ProfilePhysique> list = new ArrayList<>();
-                while (rs.next()) {
-                    list.add(mapRow(rs));
-                }
+                while (rs.next()) list.add(mapRow(rs));
                 return list;
             }
         }
     }
 
-    /**
-     * Gender from any physique row for this login, using the same {@code email_email} join as manual SQL.
-     */
     public String findGenderByUserEmail(String email) throws SQLException {
-        if (email == null || email.isBlank()) {
-            return null;
-        }
+        if (email == null || email.isBlank()) return null;
         String sql = "SELECT p.* FROM `profile_physique` p "
-                + "INNER JOIN `app_user` u ON u.`id` = p.`user_id` "
-                + "WHERE u.`email_email` = ?";
+                + "INNER JOIN `user` u ON u.`id` = p.`user_id` "
+                + "WHERE u.`email` = ?";
         try (PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setString(1, email.trim());
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Object g = ResultSetColumns.getFirstObject(rs, "gender", "genre", "sexe");
                     String n = ResultSetColumns.normalizeGenderDbValue(g);
-                    if (n != null && !n.isBlank()) {
-                        return n;
-                    }
+                    if (n != null && !n.isBlank()) return n;
                 }
                 return null;
             }
@@ -85,77 +66,57 @@ public class ProfilePhysiqueService implements CRUD<ProfilePhysique> {
     }
 
     @Override
-    public void create(ProfilePhysique profilePhysique) throws SQLException {
-        createPrepared(profilePhysique);
-    }
+    public void create(ProfilePhysique p) throws SQLException { createPrepared(p); }
 
     @Override
     public List<ProfilePhysique> read() throws SQLException {
         String sql = "SELECT * FROM `profile_physique`";
         try (Statement stmt = cnx.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
             List<ProfilePhysique> list = new ArrayList<>();
-            while (rs.next()) {
-                list.add(mapRow(rs));
-            }
+            while (rs.next()) list.add(mapRow(rs));
             return list;
         }
     }
 
     @Override
-    public void update(ProfilePhysique profilePhysique) throws SQLException {
-        String sql = "UPDATE `profile_physique` SET `weight` = ?, `height` = ?, `gender` = ?, `user_id` = ? "
-                + "WHERE `id` = ?";
+    public void update(ProfilePhysique p) throws SQLException {
+        String sql = "UPDATE `profile_physique` SET `weight` = ?, `height` = ?, `gender` = ? WHERE `id` = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
-            int i = 1;
-            if (profilePhysique.getWeight() != null) {
-                stmt.setFloat(i++, profilePhysique.getWeight());
-            } else {
-                stmt.setNull(i++, Types.FLOAT);
-            }
-            if (profilePhysique.getHeight() != null) {
-                stmt.setFloat(i++, profilePhysique.getHeight());
-            } else {
-                stmt.setNull(i++, Types.FLOAT);
-            }
-            stmt.setString(i++, profilePhysique.getGender());
-            stmt.setBytes(i++, UuidUtil.toBytes16(profilePhysique.getUserId()));
-            stmt.setBytes(i, UuidUtil.toBytes16(profilePhysique.getId()));
+            if (p.getWeight() != null) stmt.setFloat(1, p.getWeight());
+            else stmt.setNull(1, Types.FLOAT);
+            if (p.getHeight() != null) stmt.setFloat(2, p.getHeight());
+            else stmt.setNull(2, Types.FLOAT);
+            stmt.setString(3, p.getGender());
+            stmt.setLong(4, p.getId().getLeastSignificantBits());
             stmt.executeUpdate();
         }
     }
 
     @Override
-    public void delete(ProfilePhysique profilePhysique) throws SQLException {
+    public void delete(ProfilePhysique p) throws SQLException {
         String sql = "DELETE FROM `profile_physique` WHERE `id` = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
-            stmt.setBytes(1, UuidUtil.toBytes16(profilePhysique.getId()));
+            stmt.setLong(1, p.getId().getLeastSignificantBits());
             stmt.executeUpdate();
         }
     }
 
     @Override
-    public void createPrepared(ProfilePhysique profilePhysique) throws SQLException {
-        if (profilePhysique.getId() == null) {
-            profilePhysique.setId(UUID.randomUUID());
-        }
-        String sql = "INSERT INTO `profile_physique` (`id`, `weight`, `height`, `gender`, `user_id`) "
-                + "VALUES (?, ?, ?, ?, ?)";
-        try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
-            int i = 1;
-            stmt.setBytes(i++, UuidUtil.toBytes16(profilePhysique.getId()));
-            if (profilePhysique.getWeight() != null) {
-                stmt.setFloat(i++, profilePhysique.getWeight());
-            } else {
-                stmt.setNull(i++, Types.FLOAT);
-            }
-            if (profilePhysique.getHeight() != null) {
-                stmt.setFloat(i++, profilePhysique.getHeight());
-            } else {
-                stmt.setNull(i++, Types.FLOAT);
-            }
-            stmt.setString(i++, profilePhysique.getGender());
-            stmt.setBytes(i, UuidUtil.toBytes16(profilePhysique.getUserId()));
+    public void createPrepared(ProfilePhysique p) throws SQLException {
+        String sql = "INSERT INTO `profile_physique` (`weight`, `height`, `gender`, `user_id`) VALUES (?, ?, ?, ?)";
+        try (PreparedStatement stmt = cnx.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            if (p.getWeight() != null) stmt.setFloat(1, p.getWeight());
+            else stmt.setNull(1, Types.FLOAT);
+            if (p.getHeight() != null) stmt.setFloat(2, p.getHeight());
+            else stmt.setNull(2, Types.FLOAT);
+            stmt.setString(3, p.getGender());
+            stmt.setLong(4, p.getUserId().getLeastSignificantBits());
             stmt.executeUpdate();
+            try (ResultSet keys = stmt.getGeneratedKeys()) {
+                if (keys.next()) {
+                    p.setId(new UUID(0L, keys.getLong(1)));
+                }
+            }
         }
     }
 }

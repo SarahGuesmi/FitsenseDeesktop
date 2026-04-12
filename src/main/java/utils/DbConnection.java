@@ -8,10 +8,11 @@ public class DbConnection {
 
     /**
      * Override with {@code -Dfitsense.db.url=jdbc:mysql://host:port/db?serverTimezone=UTC}
+     * Use {@code characterEncoding=UTF-8} (Java charset name). MySQL {@code utf8mb4} is configured on the server/schema.
      */
     public static final String DB_URL = System.getProperty(
             "fitsense.db.url",
-            "jdbc:mysql://127.0.0.1:3306/fitsense?serverTimezone=UTC&characterEncoding=utf8");
+            "jdbc:mysql://127.0.0.1:3308/fitsense?serverTimezone=UTC&characterEncoding=UTF-8");
     public static final String DB_USER = "root";
     public static final String DB_PASSWORD = "root";
 

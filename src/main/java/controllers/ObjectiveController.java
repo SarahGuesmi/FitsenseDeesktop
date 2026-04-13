@@ -37,7 +37,7 @@ public class ObjectiveController {
     private final ProfilePhysiqueService profileService = new ProfilePhysiqueService();
     private final ObjectifSportifService objectifService = new ObjectifSportifService();
     private final List<Button> objectiveButtons = new ArrayList<>();
-    private String selectedObjective;
+    private final Set<String> selectedObjectives = new LinkedHashSet<>();
 
     @FXML
     private void initialize() {
@@ -58,11 +58,14 @@ public class ObjectiveController {
     @FXML
     private void onObjectiveClick(javafx.event.ActionEvent event) {
         Button clicked = (Button) event.getSource();
-        selectedObjective = String.valueOf(clicked.getUserData());
-        for (Button b : objectiveButtons) {
-            b.getStyleClass().remove("choice-selected");
+        String name = String.valueOf(clicked.getUserData());
+        if (selectedObjectives.contains(name)) {
+            selectedObjectives.remove(name);
+            clicked.getStyleClass().remove("choice-selected");
+        } else {
+            selectedObjectives.add(name);
+            clicked.getStyleClass().add("choice-selected");
         }
-        clicked.getStyleClass().add("choice-selected");
     }
 
     @FXML
@@ -73,12 +76,12 @@ public class ObjectiveController {
             switchScene("/fxml/SignInView.fxml", "/css/signin.css");
             return;
         }
-        if (selectedObjective == null || selectedObjective.isBlank()) {
-            showAlert(Alert.AlertType.WARNING, "Select Objective", "Please choose one objective.");
+        if (selectedObjectives.isEmpty()) {
+            showAlert(Alert.AlertType.WARNING, "Select Objective", "Please choose at least one objective.");
             return;
         }
 
-        AppSession.getOnboardingData().setObjectiveName(selectedObjective);
+        AppSession.getOnboardingData().setObjectiveName(String.join(", ", selectedObjectives));
 
         ProfilePhysique profile = new ProfilePhysique();
         profile.setUserId(currentUser.getId());
@@ -86,13 +89,14 @@ public class ObjectiveController {
         profile.setWeight(AppSession.getOnboardingData().getWeightKg());
         profile.setGender(AppSession.getOnboardingData().getGender());
 
-        ObjectifSportif objectif = new ObjectifSportif();
-        objectif.setName(selectedObjective);
-
         try {
             profileService.createPrepared(profile);
-            objectif.setProfilePhysiqueId(profile.getId());
-            objectifService.createPrepared(objectif);
+            for (String name : selectedObjectives) {
+                ObjectifSportif objectif = new ObjectifSportif();
+                objectif.setName(name);
+                objectif.setProfilePhysiqueId(profile.getId());
+                objectifService.createPrepared(objectif);
+            }
             switchScene("/fxml/DashboardView.fxml", "/css/dashboard.css");
         } catch (SQLException e) {
             showAlert(Alert.AlertType.ERROR, "Save Failed", e.getMessage());

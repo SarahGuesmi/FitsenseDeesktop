@@ -14,6 +14,7 @@ import models.Workout;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 public class WorkoutDetailController {
 
@@ -28,7 +29,7 @@ public class WorkoutDetailController {
     @FXML private Button startBtn;
 
     private Workout workout;
-    private final Set<Integer> doneExerciseIds = new HashSet<>();
+    private final Set<UUID> doneExerciseIds = new HashSet<>();
 
     public void setWorkout(Workout w) {
         this.workout = w;

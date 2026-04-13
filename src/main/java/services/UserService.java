@@ -3,7 +3,6 @@ package services;
 import models.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import utils.DbConnection;
-import utils.ResultSetColumns;
 import utils.UuidUtil;
 
 import java.sql.*;
@@ -22,79 +21,83 @@ public class UserService implements CRUD<User> {
         cnx = DbConnection.getInstance().getCnx();
     }
 
+    // ── column names in app_user ──────────────────────────────────────────────
+    // id                        binary(16)
+    // email_email               varchar(180)
+    // password                  varchar(255)
+    // roles                     json
+    // account_status            varchar(50)
+    // date_creation             datetime
+    // google_authenticator_secret varchar(255)
+    // photo                     varchar(255)
+    // username                  varchar(255)
+    // objective                 varchar(512)
+    // height_cm                 double
+    // weight_kg                 double
+    // gender                    varchar(32)
+    // name_firstname            varchar(255)
+    // name_lastname             varchar(255)
+    // phone_number              varchar(255)
+    // ─────────────────────────────────────────────────────────────────────────
+
     private static User mapRow(ResultSet rs) throws SQLException {
+        UUID id = UuidUtil.fromResultSet(rs, "id");
+
         Timestamp ts = rs.getTimestamp("date_creation");
         LocalDateTime dateCreation =
                 ts != null ? ts.toInstant().atZone(ZoneOffset.UTC).toLocalDateTime() : null;
 
-        // id is INT in this schema — convert to UUID for the model
-        UUID id = null;
-        Object idObj = rs.getObject("id");
-        if (idObj instanceof Integer i) {
-            id = new UUID(0L, i.longValue());
-        } else if (idObj instanceof Long l) {
-            id = new UUID(0L, l);
-        } else if (idObj != null) {
-            try { id = UuidUtil.fromResultSet(rs, "id"); } catch (SQLException ignored) {}
-        }
-
         User user = new User(
                 id,
-                rs.getString("email"),
+                rs.getString("email_email"),
                 rs.getString("password"),
                 rs.getString("roles"),
-                rs.getString("firstname"),
-                rs.getString("lastname"),
+                rs.getString("name_firstname"),
+                rs.getString("name_lastname"),
                 rs.getString("account_status"),
                 dateCreation,
-                null, // google_authenticator_secret — not in this schema
-                null, // phone_number
-                null, // photo
-                null); // username
-        String obj = null;
-        try {
-            obj = ResultSetColumns.coalesceNonBlank(
-                    ResultSetColumns.getFirstString(rs, "objective"),
-                    ResultSetColumns.getFirstString(rs, "objectif"));
-        } catch (SQLException ignored) {}
-        user.setAccountObjective(obj);
-        Object genderObj = null;
-        try {
-            genderObj = ResultSetColumns.getFirstObject(rs, "gender", "genre", "sexe");
-        } catch (SQLException ignored) {}
-        user.setAccountGender(ResultSetColumns.normalizeGenderDbValue(genderObj));
+                rs.getString("google_authenticator_secret"),
+                rs.getString("phone_number"),
+                rs.getString("photo"),
+                rs.getString("username"));
+
+        user.setAccountObjective(safeGetString(rs, "objective"));
+        user.setAccountGender(safeGetString(rs, "gender"));
         return user;
     }
 
+    private static String safeGetString(ResultSet rs, String col) {
+        try { return rs.getString(col); } catch (SQLException ignored) { return null; }
+    }
+
     private String hashPasswordIfPlain(String password) {
-        if (password == null) {
-            return null;
-        }
+        if (password == null) return null;
         if (password.startsWith("$2a$") || password.startsWith("$2y$") || password.startsWith("$2b$")) {
             return password;
         }
         return passwordEncoder.encode(password);
     }
 
-    /**
-     * Same as {@link #findByEmail(String)} — matches Symfony login lookup.
-     */
     public User findByEmail(String email) throws SQLException {
-        String sql = "SELECT * FROM `user` WHERE `email` = ?";
+        String sql = "SELECT * FROM `app_user` WHERE `email_email` = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
             stmt.setString(1, email);
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return mapRow(rs);
-                }
+                if (rs.next()) return mapRow(rs);
             }
         }
         return null;
     }
 
     public User findByUsername(String username) throws SQLException {
-        // username column doesn't exist in this schema — fallback to email
-        return findByEmail(username);
+        String sql = "SELECT * FROM `app_user` WHERE `username` = ?";
+        try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
+            stmt.setString(1, username);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return mapRow(rs);
+            }
+        }
+        return null;
     }
 
     @Override
@@ -104,20 +107,18 @@ public class UserService implements CRUD<User> {
 
     @Override
     public List<User> read() throws SQLException {
-        String sql = "SELECT * FROM `user`";
+        String sql = "SELECT * FROM `app_user`";
         try (Statement stmt = cnx.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
             List<User> list = new ArrayList<>();
-            while (rs.next()) {
-                list.add(mapRow(rs));
-            }
+            while (rs.next()) list.add(mapRow(rs));
             return list;
         }
     }
 
     @Override
     public void update(User user) throws SQLException {
-        String sql = "UPDATE `user` SET `email` = ?, `password` = ?, `roles` = ?, "
-                + "`firstname` = ?, `lastname` = ?, `account_status` = ? "
+        String sql = "UPDATE `app_user` SET `email_email` = ?, `password` = ?, `roles` = ?, "
+                + "`name_firstname` = ?, `name_lastname` = ?, `account_status` = ? "
                 + "WHERE `id` = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
             stmt.setString(1, user.getEmail());
@@ -126,29 +127,26 @@ public class UserService implements CRUD<User> {
             stmt.setString(4, user.getFirstname());
             stmt.setString(5, user.getLastname());
             stmt.setString(6, user.getAccountStatus());
-            stmt.setLong(7, user.getId() != null ? user.getId().getLeastSignificantBits() : 0);
+            stmt.setBytes(7, UuidUtil.toBytes16(user.getId()));
             stmt.executeUpdate();
         }
     }
 
     @Override
     public void delete(User user) throws SQLException {
-        String sql = "DELETE FROM `user` WHERE `id` = ?";
+        String sql = "DELETE FROM `app_user` WHERE `id` = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
-            stmt.setLong(1, user.getId() != null ? user.getId().getLeastSignificantBits() : 0);
+            stmt.setBytes(1, UuidUtil.toBytes16(user.getId()));
             stmt.executeUpdate();
         }
     }
 
-    /**
-     * Deletes several users by id (same idea as Symfony {@code bulkDelete}).
-     */
     public void deleteByIds(List<UUID> ids) throws SQLException {
         if (ids == null || ids.isEmpty()) return;
-        String sql = "DELETE FROM `user` WHERE `id` = ?";
+        String sql = "DELETE FROM `app_user` WHERE `id` = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
             for (UUID id : ids) {
-                stmt.setLong(1, id.getLeastSignificantBits());
+                stmt.setBytes(1, UuidUtil.toBytes16(id));
                 stmt.addBatch();
             }
             stmt.executeBatch();
@@ -163,21 +161,26 @@ public class UserService implements CRUD<User> {
         if (user.getAccountStatus() == null || user.getAccountStatus().isBlank()) {
             user.setAccountStatus("active");
         }
-        String sql = "INSERT INTO `user` (`email`, `password`, `roles`, `firstname`, `lastname`, `account_status`, `date_creation`) "
-                + "VALUES (?, ?, ?, ?, ?, ?, NOW())";
-        try (PreparedStatement stmt = cnx.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, user.getEmail());
-            stmt.setString(2, hashPasswordIfPlain(user.getPassword()));
-            stmt.setString(3, user.getRolesJson());
-            stmt.setString(4, user.getFirstname());
-            stmt.setString(5, user.getLastname());
-            stmt.setString(6, user.getAccountStatus());
+        UUID newId = UUID.randomUUID();
+        String sql = "INSERT INTO `app_user` "
+                + "(`id`, `email_email`, `password`, `roles`, `name_firstname`, `name_lastname`, "
+                + "`account_status`, `date_creation`, `username`, `phone_number`, `photo`, "
+                + "`google_authenticator_secret`) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?, ?, ?)";
+        try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
+            stmt.setBytes(1, UuidUtil.toBytes16(newId));
+            stmt.setString(2, user.getEmail());
+            stmt.setString(3, hashPasswordIfPlain(user.getPassword()));
+            stmt.setString(4, user.getRolesJson());
+            stmt.setString(5, user.getFirstname());
+            stmt.setString(6, user.getLastname());
+            stmt.setString(7, user.getAccountStatus());
+            stmt.setString(8, user.getUsername());
+            stmt.setString(9, user.getPhoneNumber());
+            stmt.setString(10, user.getPhoto());
+            stmt.setString(11, user.getGoogleAuthenticatorSecret());
             stmt.executeUpdate();
-            try (ResultSet keys = stmt.getGeneratedKeys()) {
-                if (keys.next()) {
-                    user.setId(new UUID(0L, keys.getLong(1)));
-                }
-            }
+            user.setId(newId);
         }
     }
 }

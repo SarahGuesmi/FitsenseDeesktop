@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 public class WorkoutFormController {
 
@@ -85,7 +86,7 @@ public class WorkoutFormController {
         descriptionField.setText(safe(workout.getDescription()));
 
         // Pre-select exercises
-        List<Integer> exerciseIds = workout.getExercises().stream()
+        List<UUID> exerciseIds = workout.getExercises().stream()
                 .map(Exercise::getId).toList();
 
         for (int i = 0; i < allExercises.size(); i++) {

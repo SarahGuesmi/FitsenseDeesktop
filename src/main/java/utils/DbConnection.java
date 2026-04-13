@@ -12,7 +12,7 @@ public class DbConnection {
      */
     public static final String DB_URL = System.getProperty(
             "fitsense.db.url",
-            "jdbc:mysql://127.0.0.1:3308/fitsense?serverTimezone=UTC&characterEncoding=UTF-8");
+            "jdbc:mysql://127.0.0.1:3306/fitsense?serverTimezone=UTC&characterEncoding=UTF-8");
     public static final String DB_USER = "root";
     public static final String DB_PASSWORD = "root";
 

@@ -24,7 +24,6 @@ public class ProfilePhysiqueService implements CRUD<ProfilePhysique> {
         Float height = rs.wasNull() ? null : h;
         Object genderObj = ResultSetColumns.getFirstObject(rs, "gender", "genre", "sexe");
         String gender = ResultSetColumns.normalizeGenderDbValue(genderObj);
-
         UUID id = utils.UuidUtil.fromResultSet(rs, "id");
         UUID userId = utils.UuidUtil.fromResultSet(rs, "user_id");
 

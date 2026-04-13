@@ -95,16 +95,15 @@ public class HomeController {
             scene.getStylesheets().setAll(Objects.requireNonNull(getClass().getResource(cssPath)).toExternalForm());
         } catch (Exception e) {
             e.printStackTrace();
+            Throwable root = e;
+            while (root.getCause() != null) root = root.getCause();
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Could not open screen");
             alert.setHeaderText("Failed to load " + fxmlPath);
-            Throwable c = e;
-            while (c.getCause() != null) {
-                c = c.getCause();
-            }
-            alert.setContentText(c.getClass().getSimpleName() + ": " + c.getMessage()
+            alert.setContentText(root.getClass().getSimpleName() + ": " + root.getMessage()
                     + "\n\nCheck the Run console for the full stack trace. "
                     + "If you see ClassNotFoundException, use Maven Reload in the IDE.");
+            alert.getDialogPane().setMinWidth(600);
             alert.showAndWait();
         }
     }

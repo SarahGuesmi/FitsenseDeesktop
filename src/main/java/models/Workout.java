@@ -7,6 +7,7 @@ import java.util.UUID;
 public class Workout {
 
     private UUID id;
+    private User coach;
     private String nom;
     private String niveau;
     private Integer duree;
@@ -21,8 +22,15 @@ public class Workout {
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
 
+    public User getCoach() { return coach; }
+    public void setCoach(User coach) { this.coach = coach; }
+
     public String getNom() { return nom; }
     public void setNom(String nom) { this.nom = nom; }
+
+    /** Alias for compatibility with mergeFeedback code. */
+    public String getName() { return nom; }
+    public void setName(String name) { this.nom = name; }
 
     public String getNiveau() { return niveau; }
     public void setNiveau(String niveau) { this.niveau = niveau; }
@@ -51,4 +59,9 @@ public class Workout {
         if (!objectifs.contains(objectif)) objectifs.add(objectif);
     }
     public void removeObjectif(ObjectifSportif objectif) { objectifs.remove(objectif); }
+
+    @Override
+    public String toString() {
+        return "Workout{id=" + id + ", nom='" + nom + "', niveau='" + niveau + "', duree=" + duree + "}";
+    }
 }

@@ -2,7 +2,7 @@ package tests;
 
 import models.Questionnaire;
 import models.FeedbackResponse;
-import services.QuestionnaireService;
+import services.FeedbackService;
 import services.FeedbackResponseService;
 import utils.DbConnection;
 
@@ -10,7 +10,7 @@ import java.sql.SQLException;
 
 public class Main {
     public static void main(String[] args) {
-        QuestionnaireService qs = new QuestionnaireService(DbConnection.getInstance().getCnx());
+        FeedbackService qs = new FeedbackService(DbConnection.getInstance().getCnx());
         FeedbackResponseService fs = new FeedbackResponseService(DbConnection.getInstance().getCnx());
 
         try {

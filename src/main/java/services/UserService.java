@@ -21,25 +21,6 @@ public class UserService implements CRUD<User> {
         cnx = DbConnection.getInstance().getCnx();
     }
 
-    // ── column names in app_user ──────────────────────────────────────────────
-    // id                        binary(16)
-    // email_email               varchar(180)
-    // password                  varchar(255)
-    // roles                     json
-    // account_status            varchar(50)
-    // date_creation             datetime
-    // google_authenticator_secret varchar(255)
-    // photo                     varchar(255)
-    // username                  varchar(255)
-    // objective                 varchar(512)
-    // height_cm                 double
-    // weight_kg                 double
-    // gender                    varchar(32)
-    // name_firstname            varchar(255)
-    // name_lastname             varchar(255)
-    // phone_number              varchar(255)
-    // ─────────────────────────────────────────────────────────────────────────
-
     private static User mapRow(ResultSet rs) throws SQLException {
         UUID id = UuidUtil.fromResultSet(rs, "id");
 
@@ -101,9 +82,7 @@ public class UserService implements CRUD<User> {
     }
 
     @Override
-    public void create(User user) throws SQLException {
-        createPrepared(user);
-    }
+    public void create(User user) throws SQLException { createPrepared(user); }
 
     @Override
     public List<User> read() throws SQLException {

@@ -108,8 +108,8 @@ public class WorkoutService implements CRUD<Workout> {
     @Override
     public void createPrepared(Workout workout) throws SQLException {
         UUID newId = UUID.randomUUID();
-        String sql = "INSERT INTO `workout` (`id`, `nom`, `niveau`, `duree`, `description`, `status`) "
-                + "VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO `workout` (`id`, `nom`, `niveau`, `duree`, `description`, `status`, `coach_id`) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
             stmt.setBytes(1, UuidUtil.toBytes16(newId));
             stmt.setString(2, workout.getNom());
@@ -117,6 +117,11 @@ public class WorkoutService implements CRUD<Workout> {
             stmt.setObject(4, workout.getDuree(), Types.INTEGER);
             stmt.setString(5, workout.getDescription());
             stmt.setString(6, workout.getStatus());
+            if (workout.getCoach() != null && workout.getCoach().getId() != null) {
+                stmt.setBytes(7, UuidUtil.toBytes16(workout.getCoach().getId()));
+            } else {
+                stmt.setNull(7, Types.BINARY);
+            }
             stmt.executeUpdate();
             workout.setId(newId);
         }

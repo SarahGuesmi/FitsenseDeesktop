@@ -79,19 +79,18 @@ public class ProfilePhysiqueService implements CRUD<ProfilePhysique> {
         String sql = "UPDATE `profile_physique` SET `weight` = ?, `height` = ?, `gender` = ? WHERE `id` = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
             int i = 1;
-            if (profilePhysique.getWeight() != null) {
-                stmt.setFloat(i++, profilePhysique.getWeight());
+            if (p.getWeight() != null) {
+                stmt.setFloat(i++, p.getWeight());
             } else {
                 stmt.setNull(i++, Types.FLOAT);
             }
-            if (profilePhysique.getHeight() != null) {
-                stmt.setFloat(i++, profilePhysique.getHeight());
+            if (p.getHeight() != null) {
+                stmt.setFloat(i++, p.getHeight());
             } else {
                 stmt.setNull(i++, Types.FLOAT);
             }
-            stmt.setString(i++, profilePhysique.getGender());
-            stmt.setInt(i++, (int) profilePhysique.getUserId().getLeastSignificantBits());
-            stmt.setInt(i, (int) profilePhysique.getId().getLeastSignificantBits());
+            stmt.setString(i++, p.getGender());
+            stmt.setInt(i, (int) p.getId().getLeastSignificantBits());
             stmt.executeUpdate();
         }
     }
@@ -100,7 +99,7 @@ public class ProfilePhysiqueService implements CRUD<ProfilePhysique> {
     public void delete(ProfilePhysique p) throws SQLException {
         String sql = "DELETE FROM `profile_physique` WHERE `id` = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
-            stmt.setInt(1, (int) profilePhysique.getId().getLeastSignificantBits());
+            stmt.setInt(1, (int) p.getId().getLeastSignificantBits());
             stmt.executeUpdate();
         }
     }

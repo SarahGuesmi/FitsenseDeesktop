@@ -62,7 +62,7 @@ public class WorkoutDetailController {
         doneExerciseUuids.addAll(done);
         // Sync integer ids only for exercises actually in done set
         for (Exercise e : workout.getExercises()) {
-            if (e.getUuid() != null && done.contains(e.getUuid())) {
+            if (e.getId() != null && done.contains(e.getId())) {
                 doneExerciseIds.add(e.getId());
                 System.out.println("DEBUG: exercise done = " + e.getNom());
             }
@@ -123,7 +123,7 @@ public class WorkoutDetailController {
 
     private HBox buildExerciseCard(Exercise e) {
         // Use UUID-based check only — int id can have hash collisions
-        boolean isDone = e.getUuid() != null && doneExerciseUuids.contains(e.getUuid());
+        boolean isDone = e.getId() != null && doneExerciseUuids.contains(e.getId());
 
         HBox card = new HBox(16);
         card.setPadding(new Insets(18));

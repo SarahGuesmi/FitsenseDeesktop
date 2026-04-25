@@ -18,7 +18,7 @@ public class ObjectifSportifService implements CRUD<ObjectifSportif> {
     }
 
     private static ObjectifSportif mapRow(ResultSet rs) throws SQLException {
-        String name = extractObjectiveLabel(rs);
+        String name = rs.getString("name");
         int intId = rs.getInt("id");
         UUID id = new UUID(0, intId);
         int profileIntId = rs.getInt("profile_physique_id");
@@ -88,9 +88,8 @@ public class ObjectifSportifService implements CRUD<ObjectifSportif> {
     public void update(ObjectifSportif o) throws SQLException {
         String sql = "UPDATE `objectif_sportif` SET `name` = ? WHERE `id` = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
-            stmt.setString(1, objectifSportif.getName());
-            stmt.setInt(2, (int) objectifSportif.getProfilePhysiqueId().getLeastSignificantBits());
-            stmt.setInt(3, (int) objectifSportif.getId().getLeastSignificantBits());
+            stmt.setString(1, o.getName());
+            stmt.setInt(2, (int) o.getId().getLeastSignificantBits());
             stmt.executeUpdate();
         }
     }
@@ -99,7 +98,7 @@ public class ObjectifSportifService implements CRUD<ObjectifSportif> {
     public void delete(ObjectifSportif o) throws SQLException {
         String sql = "DELETE FROM `objectif_sportif` WHERE `id` = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
-            stmt.setInt(1, (int) objectifSportif.getId().getLeastSignificantBits());
+            stmt.setInt(1, (int) o.getId().getLeastSignificantBits());
             stmt.executeUpdate();
         }
     }

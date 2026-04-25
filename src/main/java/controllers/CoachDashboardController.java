@@ -137,7 +137,6 @@ public class CoachDashboardController {
 
     private final UserService userService = new UserService();
     private final WorkoutService workoutService = new WorkoutService();
-    private final ExerciseService exerciseService = new ExerciseService();
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy");
 
     @FXML

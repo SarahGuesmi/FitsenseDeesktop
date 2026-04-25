@@ -232,7 +232,6 @@ public class DashboardController {
 
     @FXML
     private void onLogout() {
-        ActivityTracker.reset();
         AppSession.setCurrentUser(null);
         AppSession.resetOnboarding();
         switchScene("/fxml/SignInView.fxml", "/css/signin.css");

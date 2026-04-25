@@ -33,8 +33,10 @@ public class ObjectifSportifService implements CRUD<ObjectifSportif> {
 
     private static ObjectifSportif mapRow(ResultSet rs) throws SQLException {
         String name = extractObjectiveLabel(rs);
-        UUID id = safeUuidFromRow(rs, "id");
-        UUID profilePhysiqueId = safeUuidFromRow(rs, "profile_physique_id", "profile_id", "physique_id");
+        int intId = rs.getInt("id");
+        UUID id = new UUID(0, intId);
+        int profileIntId = rs.getInt("profile_physique_id");
+        UUID profilePhysiqueId = new UUID(0, profileIntId);
         return new ObjectifSportif(id, name, profilePhysiqueId);
     }
 
@@ -158,25 +160,10 @@ public class ObjectifSportifService implements CRUD<ObjectifSportif> {
     public List<ObjectifSportif> findByProfilePhysiqueId(UUID profilePhysiqueId) throws SQLException {
         String sql = "SELECT * FROM `objectif_sportif` WHERE `profile_physique_id` = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
-            stmt.setBytes(1, UuidUtil.toBytes16(profilePhysiqueId));
+            stmt.setInt(1, (int) profilePhysiqueId.getLeastSignificantBits());
             try (ResultSet rs = stmt.executeQuery()) {
                 List<ObjectifSportif> list = new ArrayList<>();
-                while (rs.next()) {
-                    list.add(mapRow(rs));
-                }
-                if (!list.isEmpty()) {
-                    return list;
-                }
-            }
-        }
-        // Symfony / some schemas store FK as CHAR(36); BINARY(16) bind would match nothing.
-        try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
-            stmt.setString(1, profilePhysiqueId.toString());
-            try (ResultSet rs = stmt.executeQuery()) {
-                List<ObjectifSportif> list = new ArrayList<>();
-                while (rs.next()) {
-                    list.add(mapRow(rs));
-                }
+                while (rs.next()) list.add(mapRow(rs));
                 return list;
             }
         }
@@ -204,8 +191,8 @@ public class ObjectifSportifService implements CRUD<ObjectifSportif> {
         String sql = "UPDATE `objectif_sportif` SET `name` = ?, `profile_physique_id` = ? WHERE `id` = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
             stmt.setString(1, objectifSportif.getName());
-            stmt.setBytes(2, UuidUtil.toBytes16(objectifSportif.getProfilePhysiqueId()));
-            stmt.setBytes(3, UuidUtil.toBytes16(objectifSportif.getId()));
+            stmt.setInt(2, (int) objectifSportif.getProfilePhysiqueId().getLeastSignificantBits());
+            stmt.setInt(3, (int) objectifSportif.getId().getLeastSignificantBits());
             stmt.executeUpdate();
         }
     }
@@ -214,22 +201,24 @@ public class ObjectifSportifService implements CRUD<ObjectifSportif> {
     public void delete(ObjectifSportif objectifSportif) throws SQLException {
         String sql = "DELETE FROM `objectif_sportif` WHERE `id` = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
-            stmt.setBytes(1, UuidUtil.toBytes16(objectifSportif.getId()));
+            stmt.setInt(1, (int) objectifSportif.getId().getLeastSignificantBits());
             stmt.executeUpdate();
         }
     }
 
     @Override
     public void createPrepared(ObjectifSportif objectifSportif) throws SQLException {
-        if (objectifSportif.getId() == null) {
-            objectifSportif.setId(UUID.randomUUID());
-        }
-        String sql = "INSERT INTO `objectif_sportif` (`id`, `name`, `profile_physique_id`) VALUES (?, ?, ?)";
-        try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
-            stmt.setBytes(1, UuidUtil.toBytes16(objectifSportif.getId()));
-            stmt.setString(2, objectifSportif.getName());
-            stmt.setBytes(3, UuidUtil.toBytes16(objectifSportif.getProfilePhysiqueId()));
+        // id is auto_increment, don't insert it
+        String sql = "INSERT INTO `objectif_sportif` (`name`, `profile_physique_id`) VALUES (?, ?)";
+        try (PreparedStatement stmt = cnx.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, objectifSportif.getName());
+            stmt.setInt(2, (int) objectifSportif.getProfilePhysiqueId().getLeastSignificantBits());
             stmt.executeUpdate();
+            try (ResultSet keys = stmt.getGeneratedKeys()) {
+                if (keys.next()) {
+                    objectifSportif.setId(new UUID(0, keys.getInt(1)));
+                }
+            }
         }
     }
 }

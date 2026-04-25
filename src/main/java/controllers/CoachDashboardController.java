@@ -7,6 +7,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -79,12 +81,19 @@ public class CoachDashboardController {
     @FXML
     private Label navbarAvatar;
 
-    @FXML
-    private Label totalAthletesLabel;
-    @FXML
-    private Label activeAthletesLabel;
-    @FXML
-    private Label sessionsLabel;
+    @FXML private Label totalAthletesLabel;
+    @FXML private Label activeAthletesLabel;
+    @FXML private Label sessionsLabel;
+    @FXML private Label positiveSentimentLabel;
+    @FXML private VBox ratingChartContainer;
+    @FXML private VBox sentimentChartContainer;
+    @FXML private TableView<models.FeedbackResponse> dashFeedbackTable;
+    @FXML private TableColumn<models.FeedbackResponse, String> dashUserCol;
+    @FXML private TableColumn<models.FeedbackResponse, String> dashWorkoutCol;
+    @FXML private TableColumn<models.FeedbackResponse, String> dashRatingCol;
+    @FXML private TableColumn<models.FeedbackResponse, String> dashSentimentCol;
+    @FXML private TableColumn<models.FeedbackResponse, String> dashCommentCol;
+    @FXML private TableColumn<models.FeedbackResponse, String> dashDateCol;
 
     @FXML
     private TableView<User> athletesTable;
@@ -119,6 +128,10 @@ public class CoachDashboardController {
     @FXML private VBox optionsList;
     @FXML private Label modalTitreErrorLabel;
     @FXML private Label workoutsErrorLabel;
+
+    // Recent responses
+    @FXML private VBox responsesContainer;
+    @FXML private Label responsesCountLabel;
 
     private Questionnaire pendingDeleteQuestionnaire;
 
@@ -185,6 +198,7 @@ public class CoachDashboardController {
         setActiveSidebar(feedbackBtn);
         setupFeedbackTable();
         refreshFeedbackTable();
+        refreshResponseCards();
     }
 
     @FXML
@@ -514,6 +528,148 @@ public class CoachDashboardController {
     }
 
     @FXML
+    private void onSendDailyReport() {
+        try {
+            List<models.FeedbackResponse> responses = new services.FeedbackResponseService().readWithDetails();
+            utils.EmailReportService.sendDailyReport(responses);
+            new Alert(Alert.AlertType.INFORMATION, "Daily report sent to nourammarr9@gmail.com").showAndWait();
+        } catch (Exception e) {
+            new Alert(Alert.AlertType.ERROR, "Failed to send report: " + e.getMessage()).showAndWait();
+        }
+    }
+
+    private void refreshResponseCards() {
+        if (responsesContainer == null) return;
+        responsesContainer.getChildren().clear();
+
+        List<models.FeedbackResponse> responses;
+        try {
+            responses = new services.FeedbackResponseService().readWithDetails();
+        } catch (SQLException e) {
+            return;
+        }
+
+        if (responsesCountLabel != null)
+            responsesCountLabel.setText(responses.size() + " responses");
+
+        HBox row = null;
+        for (int i = 0; i < responses.size(); i++) {
+            if (i % 3 == 0) {
+                row = new HBox(14);
+                row.setAlignment(Pos.TOP_LEFT);
+                responsesContainer.getChildren().add(row);
+            }
+            row.getChildren().add(buildResponseCard(responses.get(i)));
+        }
+    }
+
+    private VBox buildResponseCard(models.FeedbackResponse f) {
+        VBox card = new VBox(8);
+        card.getStyleClass().add("response-card");
+        card.setPrefWidth(300);
+        card.setMaxWidth(340);
+        HBox.setHgrow(card, javafx.scene.layout.Priority.ALWAYS);
+
+        // Analyze sentiment from comment if not already set
+        String sentiment = f.getSentiment();
+        if ((sentiment == null || sentiment.isBlank()) && f.getComment() != null && !f.getComment().isBlank()) {
+            utils.SentimentAnalyzer.AnalysisResult result = utils.SentimentAnalyzer.analyze(f.getComment());
+            sentiment = result.sentiment();
+            try {
+                f.setSentiment(sentiment);
+                f.setKeywords(result.keywords());
+                new services.FeedbackResponseService().update(f);
+            } catch (SQLException ignored) {}
+        }
+
+        String rating = f.getRating() != null ? f.getRating() : "N/A";
+        String workoutName = f.getWorkout() != null ? f.getWorkout().getNom() : null;
+
+        Label titleLbl = new Label("Workout Feedback");
+        titleLbl.getStyleClass().add("rc-title");
+
+        // Rating badge (user's choice)
+        Label ratingBadge = new Label(rating);
+        ratingBadge.getStyleClass().addAll("rc-badge", sentimentBadgeStyle(rating));
+
+        Button deleteBtn = new Button("🗑");
+        deleteBtn.getStyleClass().add("rc-delete-btn");
+        deleteBtn.setOnAction(e -> {
+            try {
+                new services.FeedbackResponseService().delete(f);
+                refreshResponseCards();
+            } catch (SQLException ex) {
+                new Alert(Alert.AlertType.ERROR, "Could not delete: " + ex.getMessage()).showAndWait();
+            }
+        });
+
+        HBox header = new HBox(8, titleLbl, ratingBadge, deleteBtn);
+        header.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(titleLbl, javafx.scene.layout.Priority.ALWAYS);
+
+        Label userLbl = new Label("👤 " + f.getUserName());
+        userLbl.getStyleClass().add("rc-user");
+        card.getChildren().addAll(header, userLbl);
+
+        if (workoutName != null && !workoutName.isBlank()) {
+            Label workoutBadge = new Label("↔ " + workoutName);
+            workoutBadge.getStyleClass().add("rc-workout-badge");
+            card.getChildren().add(workoutBadge);
+        }
+
+        if (f.getComment() != null && !f.getComment().isBlank()) {
+            Label commentLbl = new Label("❝ " + f.getComment());
+            commentLbl.getStyleClass().add("rc-comment");
+            commentLbl.setWrapText(true);
+            card.getChildren().add(commentLbl);
+
+            // Sentiment badge
+            if (sentiment != null && !sentiment.isBlank()) {
+                Label sentimentLbl = new Label("🧠 " + sentiment);
+                sentimentLbl.getStyleClass().addAll("rc-badge", sentimentBadgeStyle(sentiment));
+                card.getChildren().add(sentimentLbl);
+            }
+
+            // Keywords badges
+            String keywords = f.getKeywords();
+            if (keywords != null && !keywords.isBlank()) {
+                HBox kwBox = new HBox(6);
+                kwBox.setAlignment(Pos.CENTER_LEFT);
+                for (String kw : keywords.split(",")) {
+                    String k = kw.trim();
+                    if (!k.isEmpty()) {
+                        Label kwLbl = new Label("# " + k);
+                        kwLbl.getStyleClass().add("rc-keyword");
+                        kwBox.getChildren().add(kwLbl);
+                    }
+                }
+                card.getChildren().add(kwBox);
+            }
+        }
+
+        if (f.getCreatedAt() != null) {
+            java.time.format.DateTimeFormatter fmt = java.time.format.DateTimeFormatter
+                    .ofPattern("MMM dd, yyyy HH:mm")
+                    .withZone(java.time.ZoneId.systemDefault());
+            Label dateLbl = new Label("🕐 " + fmt.format(f.getCreatedAt()));
+            dateLbl.getStyleClass().add("rc-date");
+            card.getChildren().add(dateLbl);
+        }
+
+        card.setPadding(new Insets(14));
+        return card;
+    }
+
+    private String sentimentBadgeStyle(String sentiment) {
+        if (sentiment == null) return "rc-badge-na";
+        return switch (sentiment.toLowerCase()) {
+            case "positive" -> "rc-badge-excellent";
+            case "negative" -> "rc-badge-poor";
+            default -> "rc-badge-average";
+        };
+    }
+
+    @FXML
     private void onShowMentalWellness() {
         hideAllContent();
         mentalWellnessPane.setManaged(true);
@@ -698,15 +854,94 @@ public class CoachDashboardController {
         long active = roster.stream()
                 .filter(u -> "active".equalsIgnoreCase(safe(u.getAccountStatus())))
                 .count();
-        if (totalAthletesLabel != null) {
-            totalAthletesLabel.setText(String.valueOf(roster.size()));
+        if (totalAthletesLabel != null) totalAthletesLabel.setText(String.valueOf(roster.size()));
+        if (activeAthletesLabel != null) activeAthletesLabel.setText(String.valueOf(active));
+
+        try {
+            List<models.FeedbackResponse> responses = new services.FeedbackResponseService().readWithDetails();
+            if (sessionsLabel != null) sessionsLabel.setText(String.valueOf(responses.size()));
+
+            long positive = responses.stream().filter(f -> "positive".equalsIgnoreCase(f.getSentiment())).count();
+            int pct = responses.isEmpty() ? 0 : (int) (positive * 100 / responses.size());
+            if (positiveSentimentLabel != null) positiveSentimentLabel.setText(pct + "%");
+
+            buildRatingChart(responses);
+            buildSentimentChart(responses);
+            buildDashFeedbackTable(responses);
+        } catch (SQLException e) {
+            if (sessionsLabel != null) sessionsLabel.setText("—");
         }
-        if (activeAthletesLabel != null) {
-            activeAthletesLabel.setText(String.valueOf(active));
+    }
+
+    private void buildRatingChart(List<models.FeedbackResponse> responses) {
+        if (ratingChartContainer == null) return;
+        ratingChartContainer.getChildren().clear();
+
+        java.util.Map<String, Long> counts = new java.util.LinkedHashMap<>();
+        counts.put("Excellent", 0L); counts.put("Good", 0L);
+        counts.put("Average", 0L); counts.put("Poor", 0L);
+        for (models.FeedbackResponse f : responses) {
+            String r = f.getRating();
+            if (r == null) continue;
+            for (String key : counts.keySet()) {
+                if (r.toLowerCase().contains(key.toLowerCase())) {
+                    counts.put(key, counts.get(key) + 1);
+                }
+            }
         }
-        if (sessionsLabel != null) {
-            sessionsLabel.setText("—");
+
+        javafx.scene.chart.PieChart chart = new javafx.scene.chart.PieChart();
+        chart.setLegendVisible(true);
+        chart.setPrefHeight(180);
+        String[] colors = {"#22c55e", "#60a5fa", "#eab308", "#ef4444"};
+        int i = 0;
+        for (var entry : counts.entrySet()) {
+            javafx.scene.chart.PieChart.Data slice = new javafx.scene.chart.PieChart.Data(entry.getKey(), entry.getValue());
+            chart.getData().add(slice);
         }
+        chart.setStyle("-fx-background-color: transparent;");
+        ratingChartContainer.getChildren().add(chart);
+    }
+
+    private void buildSentimentChart(List<models.FeedbackResponse> responses) {
+        if (sentimentChartContainer == null) return;
+        sentimentChartContainer.getChildren().clear();
+
+        long pos = responses.stream().filter(f -> "positive".equalsIgnoreCase(f.getSentiment())).count();
+        long neg = responses.stream().filter(f -> "negative".equalsIgnoreCase(f.getSentiment())).count();
+        long neu = responses.stream().filter(f -> "neutral".equalsIgnoreCase(f.getSentiment())).count();
+
+        javafx.scene.chart.CategoryAxis xAxis = new javafx.scene.chart.CategoryAxis();
+        javafx.scene.chart.NumberAxis yAxis = new javafx.scene.chart.NumberAxis();
+        javafx.scene.chart.BarChart<String, Number> chart = new javafx.scene.chart.BarChart<>(xAxis, yAxis);
+        chart.setLegendVisible(false);
+        chart.setPrefHeight(180);
+        chart.setStyle("-fx-background-color: transparent;");
+
+        javafx.scene.chart.XYChart.Series<String, Number> series = new javafx.scene.chart.XYChart.Series<>();
+        series.setName("Nombre de réponses");
+        series.getData().add(new javafx.scene.chart.XYChart.Data<>("Positive", pos));
+        series.getData().add(new javafx.scene.chart.XYChart.Data<>("Neutral", neu));
+        series.getData().add(new javafx.scene.chart.XYChart.Data<>("Negative", neg));
+        chart.getData().add(series);
+        sentimentChartContainer.getChildren().add(chart);
+    }
+
+    private void buildDashFeedbackTable(List<models.FeedbackResponse> responses) {
+        if (dashFeedbackTable == null) return;
+        java.time.format.DateTimeFormatter fmt = java.time.format.DateTimeFormatter
+                .ofPattern("MMM dd, yyyy HH:mm").withZone(java.time.ZoneId.systemDefault());
+
+        dashUserCol.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getUserName()));
+        dashWorkoutCol.setCellValueFactory(d -> new SimpleStringProperty(
+                d.getValue().getWorkout() != null ? d.getValue().getWorkout().getNom() : ""));
+        dashRatingCol.setCellValueFactory(d -> new SimpleStringProperty(safe(d.getValue().getRating())));
+        dashSentimentCol.setCellValueFactory(d -> new SimpleStringProperty(safe(d.getValue().getSentiment())));
+        dashCommentCol.setCellValueFactory(d -> new SimpleStringProperty(safe(d.getValue().getComment())));
+        dashDateCol.setCellValueFactory(d -> new SimpleStringProperty(
+                d.getValue().getCreatedAt() != null ? fmt.format(d.getValue().getCreatedAt()) : ""));
+
+        dashFeedbackTable.setItems(javafx.collections.FXCollections.observableArrayList(responses));
     }
 
     private void refreshAthletesTable() {

@@ -1,0 +1,101 @@
+.fb-root {
+    -fx-background-color: #0f1117;
+    -fx-padding: 20;
+}
+
+.fb-card {
+    -fx-background-color: #1a1d2e;
+    -fx-background-radius: 16;
+    -fx-border-radius: 16;
+    -fx-border-color: #2e3250;
+    -fx-border-width: 1;
+}
+
+.fb-title {
+    -fx-text-fill: #eff4ff;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+.fb-question {
+    -fx-text-fill: #c4c9e2;
+    -fx-font-size: 14px;
+}
+
+/* Option cell */
+.fb-option-cell {
+    -fx-background-color: #252840;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: #3a3f6e;
+    -fx-border-width: 1.5;
+    -fx-padding: 12 16 12 16;
+    -fx-cursor: hand;
+    -fx-min-width: 220;
+}
+
+.fb-option-cell:hover {
+    -fx-border-color: #6d5acd;
+    -fx-background-color: #2d3060;
+}
+
+.fb-option-selected {
+    -fx-border-color: #7c3aed;
+    -fx-background-color: #2d2060;
+}
+
+.fb-radio {
+    -fx-text-fill: #eff4ff;
+    -fx-font-size: 14px;
+    -fx-background-color: transparent;
+}
+
+.fb-radio .radio {
+    -fx-border-color: #6b7280;
+    -fx-border-radius: 50%;
+    -fx-background-radius: 50%;
+}
+
+.fb-radio:selected .radio {
+    -fx-border-color: #7c3aed;
+}
+
+.fb-radio:selected .dot {
+    -fx-background-color: #7c3aed;
+}
+
+/* Comment area */
+.fb-textarea {
+    -fx-background-color: #252840;
+    -fx-text-fill: #eff4ff;
+    -fx-border-color: #3a3f6e;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-border-width: 1.5;
+    -fx-prompt-text-fill: #6b7280;
+    -fx-font-size: 13px;
+    -fx-padding: 10;
+}
+
+.fb-textarea .content {
+    -fx-background-color: #252840;
+}
+
+.fb-textarea:focused {
+    -fx-border-color: #7c3aed;
+}
+
+/* Submit button */
+.fb-submit-btn {
+    -fx-background-color: linear-gradient(to right, #4f46e5, #7c3aed);
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10;
+    -fx-padding: 14 0 14 0;
+    -fx-cursor: hand;
+}
+
+.fb-submit-btn:hover {
+    -fx-background-color: linear-gradient(to right, #4338ca, #6d28d9);
+}

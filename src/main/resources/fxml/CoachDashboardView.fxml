@@ -12,6 +12,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
@@ -70,37 +71,72 @@
                      <children>                        <VBox fx:id="coachDashboardPane" spacing="14.0" styleClass="admin-content">
                            <children>
                               <Label styleClass="page-title" text="Overview" />
-                              <GridPane hgap="12.0" vgap="12.0">
+                              <!-- Stat cards row -->
+                              <HBox spacing="14.0">
                                  <children>
-                                    <VBox styleClass="stat-card">
+                                    <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
                                        <children>
                                           <Label styleClass="stat-title" text="ATHLETES IN ROSTER" />
                                           <Label fx:id="totalAthletesLabel" styleClass="stat-value" text="0" />
                                        </children>
-                                       <padding>
-                                          <Insets bottom="12.0" left="14.0" right="14.0" top="12.0" />
-                                       </padding>
+                                       <padding><Insets bottom="12.0" left="14.0" right="14.0" top="12.0" /></padding>
                                     </VBox>
-                                    <VBox styleClass="stat-card" GridPane.columnIndex="1">
+                                    <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
                                        <children>
                                           <Label styleClass="stat-title" text="ACTIVE ATHLETES" />
                                           <Label fx:id="activeAthletesLabel" styleClass="stat-value" text="0" />
                                        </children>
-                                       <padding>
-                                          <Insets bottom="12.0" left="14.0" right="14.0" top="12.0" />
-                                       </padding>
+                                       <padding><Insets bottom="12.0" left="14.0" right="14.0" top="12.0" /></padding>
                                     </VBox>
-                                    <VBox styleClass="stat-card" GridPane.columnIndex="2">
+                                    <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
                                        <children>
-                                          <Label styleClass="stat-title" text="SESSIONS (PLACEHOLDER)" />
-                                          <Label fx:id="sessionsLabel" styleClass="stat-value" text="—" />
+                                          <Label styleClass="stat-title" text="TOTAL FEEDBACKS" />
+                                          <Label fx:id="sessionsLabel" styleClass="stat-value" text="0" />
                                        </children>
-                                       <padding>
-                                          <Insets bottom="12.0" left="14.0" right="14.0" top="12.0" />
-                                       </padding>
+                                       <padding><Insets bottom="12.0" left="14.0" right="14.0" top="12.0" /></padding>
+                                    </VBox>
+                                    <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <Label styleClass="stat-title" text="POSITIVE SENTIMENT" />
+                                          <Label fx:id="positiveSentimentLabel" styleClass="stat-value" text="0%" />
+                                       </children>
+                                       <padding><Insets bottom="12.0" left="14.0" right="14.0" top="12.0" /></padding>
                                     </VBox>
                                  </children>
-                              </GridPane>
+                              </HBox>
+
+                              <!-- Charts row -->
+                              <HBox spacing="14.0">
+                                 <children>
+                                    <VBox styleClass="stat-card" HBox.hgrow="ALWAYS" spacing="8.0">
+                                       <children>
+                                          <Label styleClass="stat-title" text="RÉPARTITION SATISFAITS" />
+                                          <VBox fx:id="ratingChartContainer" prefHeight="200.0" />
+                                       </children>
+                                       <padding><Insets bottom="12.0" left="14.0" right="14.0" top="12.0" /></padding>
+                                    </VBox>
+                                    <VBox styleClass="stat-card" HBox.hgrow="ALWAYS" spacing="8.0">
+                                       <children>
+                                          <Label styleClass="stat-title" text="INTENSITÉ DES FEEDBACKS" />
+                                          <VBox fx:id="sentimentChartContainer" prefHeight="200.0" />
+                                       </children>
+                                       <padding><Insets bottom="12.0" left="14.0" right="14.0" top="12.0" /></padding>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+
+                              <!-- Recent feedbacks table -->
+                              <Label styleClass="page-title" text="Derniers feedbacks réels" />
+                              <TableView fx:id="dashFeedbackTable" prefHeight="200.0" styleClass="users-table">
+                                 <columns>
+                                    <TableColumn fx:id="dashUserCol" text="USER" prefWidth="180.0" />
+                                    <TableColumn fx:id="dashWorkoutCol" text="WORKOUT" prefWidth="180.0" />
+                                    <TableColumn fx:id="dashRatingCol" text="RATING" prefWidth="120.0" />
+                                    <TableColumn fx:id="dashSentimentCol" text="SENTIMENT" prefWidth="120.0" />
+                                    <TableColumn fx:id="dashCommentCol" text="COMMENT" prefWidth="260.0" />
+                                    <TableColumn fx:id="dashDateCol" text="DATE" prefWidth="150.0" />
+                                 </columns>
+                              </TableView>
                            </children>
                            <padding>
                               <Insets bottom="18.0" left="18.0" right="18.0" top="18.0" />
@@ -171,7 +207,7 @@
                                     <TextField fx:id="feedbackSearchField" promptText="Search by title..." styleClass="search-field" HBox.hgrow="ALWAYS" />
                                  </children>
                               </HBox>
-                              <TableView fx:id="feedbackTable" prefHeight="520.0" styleClass="users-table">
+                              <TableView fx:id="feedbackTable" prefHeight="260.0" styleClass="users-table">
                                  <columns>
                                     <TableColumn fx:id="feedbackTitleCol" text="TITLE" prefWidth="320.0" />
                                     <TableColumn fx:id="feedbackWorkoutsCol" text="LINKED WORKOUTS" prefWidth="260.0" />
@@ -179,6 +215,23 @@
                                     <TableColumn fx:id="feedbackActionsCol" text="ACTIONS" prefWidth="140.0" />
                                  </columns>
                               </TableView>
+
+                              <!-- Recent Feedback responses -->
+                              <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                 <children>
+                                    <Label styleClass="page-title" text="Recent Feedback" />
+                                    <Label fx:id="responsesCountLabel" styleClass="responses-badge" text="0 responses" />
+                                    <Region HBox.hgrow="ALWAYS" />
+                                    <Button mnemonicParsing="false" onAction="#onSendDailyReport" styleClass="btn-send-report" text="✉  Send Daily Report" />
+                                 </children>
+                              </HBox>
+                              <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS">
+                                 <content>
+                                    <VBox fx:id="responsesContainer" spacing="14.0">
+                                       <padding><Insets bottom="10.0" right="4.0" /></padding>
+                                    </VBox>
+                                 </content>
+                              </ScrollPane>
                            </children>
                            <padding>
                               <Insets bottom="18.0" left="18.0" right="18.0" top="18.0" />

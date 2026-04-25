@@ -522,3 +522,106 @@
     -fx-alignment: center;
     -fx-padding: 0;
 }
+
+/* ── Response cards ─────────────────────────────────── */
+.responses-badge {
+    -fx-background-color: rgba(99,179,100,0.18);
+    -fx-text-fill: #63b364;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-border-color: rgba(99,179,100,0.4);
+    -fx-border-width: 1;
+    -fx-padding: 3 10;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.response-card {
+    -fx-background-color: #141928;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: #252d4a;
+    -fx-border-width: 1;
+}
+
+.rc-title {
+    -fx-text-fill: #eff4ff;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.rc-user {
+    -fx-text-fill: #8b92b8;
+    -fx-font-size: 12px;
+}
+
+.rc-workout-badge {
+    -fx-background-color: rgba(58,141,255,0.12);
+    -fx-text-fill: #5ab4ff;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-border-color: rgba(90,180,255,0.4);
+    -fx-border-width: 1;
+    -fx-padding: 3 10;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.rc-comment {
+    -fx-text-fill: #c4c9e2;
+    -fx-font-size: 13px;
+    -fx-font-style: italic;
+}
+
+.rc-date {
+    -fx-text-fill: #6b7280;
+    -fx-font-size: 11px;
+}
+
+.rc-delete-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #6b7280;
+    -fx-cursor: hand;
+    -fx-padding: 2 6;
+    -fx-font-size: 13px;
+}
+.rc-delete-btn:hover { -fx-text-fill: #ef4444; }
+
+/* Rating badges */
+.rc-badge {
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-padding: 3 10;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+.rc-badge-excellent { -fx-background-color: rgba(34,197,94,0.18); -fx-text-fill: #22c55e; -fx-border-color: rgba(34,197,94,0.4); -fx-border-width:1; }
+.rc-badge-good      { -fx-background-color: rgba(59,130,246,0.18); -fx-text-fill: #60a5fa; -fx-border-color: rgba(59,130,246,0.4); -fx-border-width:1; }
+.rc-badge-average   { -fx-background-color: rgba(234,179,8,0.18);  -fx-text-fill: #eab308; -fx-border-color: rgba(234,179,8,0.4);  -fx-border-width:1; }
+.rc-badge-poor      { -fx-background-color: rgba(239,68,68,0.18);  -fx-text-fill: #f87171; -fx-border-color: rgba(239,68,68,0.4);  -fx-border-width:1; }
+.rc-badge-very-poor { -fx-background-color: rgba(127,29,29,0.3);   -fx-text-fill: #fca5a5; -fx-border-color: rgba(239,68,68,0.5);  -fx-border-width:1; }
+.rc-badge-na        { -fx-background-color: rgba(107,114,128,0.2); -fx-text-fill: #9ca3af; -fx-border-color: rgba(107,114,128,0.4);-fx-border-width:1; }
+
+.rc-keyword {
+    -fx-background-color: rgba(124,58,237,0.15);
+    -fx-text-fill: #a78bfa;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-border-color: rgba(124,58,237,0.35);
+    -fx-border-width: 1;
+    -fx-padding: 2 8;
+    -fx-font-size: 11px;
+}
+
+.btn-send-report {
+    -fx-background-color: linear-gradient(to right, #4f46e5, #7c3aed);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 20;
+    -fx-padding: 10 20 10 20;
+    -fx-cursor: hand;
+    -fx-font-size: 13px;
+}
+.btn-send-report:hover {
+    -fx-background-color: linear-gradient(to right, #4338ca, #6d28d9);
+}

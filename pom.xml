@@ -33,13 +33,11 @@
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-base</artifactId>
             <version>21</version>
-        </dependency>
-        <dependency>
+        </dependency>        <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-media</artifactId>
             <version>21</version>
-        </dependency>
-        <dependency>
+        </dependency>        <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-crypto</artifactId>
             <version>6.2.1</version>

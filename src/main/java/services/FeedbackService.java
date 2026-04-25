@@ -115,4 +115,59 @@ public class FeedbackService implements CRUD<Questionnaire> {
             ps.executeUpdate();
         }
     }
+
+    /**
+     * Returns all responses (type='response') with user name joined from user table.
+     */
+    public List<Questionnaire> readResponses() throws SQLException {
+        List<Questionnaire> list = new ArrayList<>();
+        String sql = "SELECT q.*, CONCAT(COALESCE(u.firstname,''), ' ', COALESCE(u.lastname,'')) AS full_name " +
+                "FROM questionnaire q LEFT JOIN user u ON u.id = q.user_id " +
+                "WHERE q.type = 'response' ORDER BY q.date_soumission DESC";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                Questionnaire q = new Questionnaire();
+                q.setId(rs.getObject("id", Integer.class));
+                q.setTitre(rs.getString("titre"));
+                q.setType(rs.getString("type"));
+                q.setExercicesCompris(rs.getString("exercices_compris"));
+                q.setCommentaire(rs.getString("commentaire"));
+                q.setOptions(rs.getString("options"));
+                String fullName = rs.getString("full_name");
+                q.setUserName(fullName != null ? fullName.trim() : null);
+                Timestamp ts = rs.getTimestamp("date_soumission");
+                if (ts != null) q.setDateSoumission(ts.toInstant());
+                list.add(q);
+            }
+        }
+        return list;
+    }
+
+    /**
+     * Finds the coach-created template (type='template') linked to a given workout.
+     */
+    public Questionnaire findTemplateByWorkoutId(Integer workoutId) throws SQLException {
+        String sql = "SELECT q.* FROM questionnaire q " +
+                "INNER JOIN questionnaire_workout qw ON qw.questionnaire_id = q.id " +
+                "WHERE qw.workout_id = ? AND q.type = 'template' " +
+                "ORDER BY q.id DESC LIMIT 1";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, workoutId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Questionnaire q = new Questionnaire();
+                    q.setId(rs.getObject("id", Integer.class));
+                    q.setTitre(rs.getString("titre"));
+                    q.setType(rs.getString("type"));
+                    q.setOptions(rs.getString("options"));
+                    q.setIntensite(rs.getString("intensite"));
+                    q.setDuree(rs.getString("duree"));
+                    q.setCommentaire(rs.getString("commentaire"));
+                    return q;
+                }
+            }
+        }
+        return null;
+    }
 }

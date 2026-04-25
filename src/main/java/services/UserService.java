@@ -114,7 +114,7 @@ public class UserService implements CRUD<User> {
         }
         String sql = "INSERT INTO `user` (`email`, `password`, `roles`, `firstname`, `lastname`, "
                 + "`account_status`, `date_creation`) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
+        try (PreparedStatement stmt = cnx.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, user.getEmail());
             stmt.setString(2, hashPasswordIfPlain(user.getPassword()));
             stmt.setString(3, user.getRolesJson());
@@ -123,6 +123,13 @@ public class UserService implements CRUD<User> {
             stmt.setString(6, user.getAccountStatus());
             stmt.setTimestamp(7, Timestamp.valueOf(user.getDateCreation()));
             stmt.executeUpdate();
+            // Retrieve generated int id and store as UUID
+            try (ResultSet keys = stmt.getGeneratedKeys()) {
+                if (keys.next()) {
+                    int generatedId = keys.getInt(1);
+                    user.setId(new java.util.UUID(0, generatedId));
+                }
+            }
         }
     }
 

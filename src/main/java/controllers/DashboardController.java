@@ -10,6 +10,8 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import models.User;
+import models.Workout;
+import utils.FeedbackLauncher;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -179,6 +181,13 @@ public class DashboardController {
                 dashProfileBtn.getStyleClass().add("dash-side-link-active");
             }
         }
+    }
+
+    @FXML
+    private void onTestFeedback() {
+        // Test: use workout id=1 (change to any existing workout id in your DB)
+        Workout testWorkout = new Workout(1, "Test Workout", "Medium", 45, "Test", "active", null);
+        FeedbackLauncher.show(testWorkout, () -> System.out.println("Feedback done"));
     }
 
     @FXML

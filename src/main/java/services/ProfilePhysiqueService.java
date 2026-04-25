@@ -122,7 +122,7 @@ public class ProfilePhysiqueService implements CRUD<ProfilePhysique> {
         // id is auto_increment, don't insert it
         String sql = "INSERT INTO `profile_physique` (`weight`, `height`, `gender`, `user_id`) "
                 + "VALUES (?, ?, ?, ?)";
-        try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
+        try (PreparedStatement stmt = cnx.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             int i = 1;
             if (profilePhysique.getWeight() != null) {
                 stmt.setFloat(i++, profilePhysique.getWeight());
@@ -137,6 +137,11 @@ public class ProfilePhysiqueService implements CRUD<ProfilePhysique> {
             stmt.setString(i++, profilePhysique.getGender());
             stmt.setInt(i, (int) profilePhysique.getUserId().getLeastSignificantBits());
             stmt.executeUpdate();
+            try (ResultSet keys = stmt.getGeneratedKeys()) {
+                if (keys.next()) {
+                    profilePhysique.setId(new java.util.UUID(0, keys.getInt(1)));
+                }
+            }
         }
     }
 }

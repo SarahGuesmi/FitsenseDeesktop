@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="TOP_CENTER" prefWidth="600.0" spacing="0.0"
+      styleClass="fb-root"
+      stylesheets="@../css/feedback.css"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controllers.WorkoutFeedbackController">
+
+    <!-- Card wrapper -->
+    <VBox styleClass="fb-card" spacing="20.0" VBox.vgrow="ALWAYS">
+        <padding><Insets bottom="28.0" left="28.0" right="28.0" top="28.0" /></padding>
+
+        <!-- Title -->
+        <Label fx:id="workoutTitleLabel" styleClass="fb-title" text="📋  Feedback for: ..." />
+
+        <!-- Question label -->
+        <Label styleClass="fb-question" text="How was your workout?" />
+
+        <!-- Options grid (built dynamically in controller) -->
+        <VBox fx:id="optionsGrid" spacing="10.0" />
+
+        <!-- Comments -->
+        <Label styleClass="fb-question" text="Comments (optional)" />
+        <TextArea fx:id="commentArea"
+                  promptText="Share your thoughts about this workout..."
+                  prefRowCount="4"
+                  styleClass="fb-textarea"
+                  wrapText="true" />
+
+        <!-- Submit button -->
+        <Button fx:id="submitBtn" mnemonicParsing="false" onAction="#onSubmit"
+                maxWidth="Infinity"
+                styleClass="fb-submit-btn" text="Submit Feedback" />
+
+    </VBox>
+
+</VBox>

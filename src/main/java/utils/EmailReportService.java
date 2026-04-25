@@ -14,7 +14,18 @@ import java.util.List;
 public class EmailReportService {
 
     // Replace with your SendGrid API key
-    private static final String SENDGRID_API_KEY = "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";
+    private static final String SENDGRID_API_KEY = loadKey("sendgrid.api.key");
+
+    private static String loadKey(String property) {
+        try (java.io.InputStream is = EmailReportService.class.getResourceAsStream("/config.properties")) {
+            if (is != null) {
+                java.util.Properties props = new java.util.Properties();
+                props.load(is);
+                return props.getProperty(property, "");
+            }
+        } catch (Exception ignored) {}
+        return "";
+    }
     private static final String FROM_EMAIL = "nourammarr9@gmail.com";
     private static final String TO_EMAIL = "nourammarr9@gmail.com";
     private static final String API_URL = "https://api.sendgrid.com/v3/mail/send";

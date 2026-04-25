@@ -12,9 +12,20 @@ import java.util.List;
  */
 public class SentimentAnalyzer {
 
-    private static final String OPENAI_API_KEY = "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";
+    private static final String OPENAI_API_KEY = loadKey("groq.api.key");
     private static final String API_URL = "https://api.groq.com/openai/v1/chat/completions";
     private static final String MODEL = "llama-3.3-70b-versatile";
+
+    private static String loadKey(String property) {
+        try (java.io.InputStream is = SentimentAnalyzer.class.getResourceAsStream("/config.properties")) {
+            if (is != null) {
+                java.util.Properties props = new java.util.Properties();
+                props.load(is);
+                return props.getProperty(property, "");
+            }
+        } catch (Exception ignored) {}
+        return "";
+    }
 
     public record AnalysisResult(String sentiment, String keywords) {}
 

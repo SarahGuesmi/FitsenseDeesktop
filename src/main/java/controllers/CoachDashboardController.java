@@ -17,6 +17,7 @@ import models.Questionnaire;
 import models.User;
 import models.Workout;
 import services.UserService;
+import services.WorkoutService;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -24,6 +25,7 @@ import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -95,16 +97,11 @@ public class CoachDashboardController {
     @FXML private TableColumn<models.FeedbackResponse, String> dashCommentCol;
     @FXML private TableColumn<models.FeedbackResponse, String> dashDateCol;
 
-    @FXML
-    private TableView<User> athletesTable;
-    @FXML
-    private TableColumn<User, String> nameCol;
-    @FXML
-    private TableColumn<User, String> roleCol;
-    @FXML
-    private TableColumn<User, String> statusCol;
-    @FXML
-    private TableColumn<User, String> dateCol;
+    @FXML private TableView<User> athletesTable;
+    @FXML private TableColumn<User, String> nameCol;
+    @FXML private TableColumn<User, String> roleCol;
+    @FXML private TableColumn<User, String> statusCol;
+    @FXML private TableColumn<User, String> dateCol;
 
     // Feedback management fields
     @FXML
@@ -139,6 +136,8 @@ public class CoachDashboardController {
     private ProfileFragmentController coachProfileController;
 
     private final UserService userService = new UserService();
+    private final WorkoutService workoutService = new WorkoutService();
+    private final ExerciseService exerciseService = new ExerciseService();
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy");
 
     @FXML
@@ -158,7 +157,7 @@ public class CoachDashboardController {
         coachDashboardPane.setVisible(true);
         setNavbarText("Coach dashboard", "Train and support your athletes");
         setActiveSidebar(coachHomeBtn);
-        refreshStats();
+        refreshStats(); // always refresh on navigate
     }
 
     @FXML
@@ -942,6 +941,11 @@ public class CoachDashboardController {
                 d.getValue().getCreatedAt() != null ? fmt.format(d.getValue().getCreatedAt()) : ""));
 
         dashFeedbackTable.setItems(javafx.collections.FXCollections.observableArrayList(responses));
+    }
+
+    private static String capitalize(String s) {
+        if (s == null || s.isBlank()) return s;
+        return Character.toUpperCase(s.charAt(0)) + s.substring(1).toLowerCase();
     }
 
     private void refreshAthletesTable() {

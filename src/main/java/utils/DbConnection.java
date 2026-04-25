@@ -6,9 +6,10 @@ import java.sql.SQLException;
 
 public class DbConnection {
 
-    public static final String DB_URL = "jdbc:mysql://127.0.0.1:3306/fitsense?serverTimezone=UTC&characterEncoding=utf8";
-    public static final String DB_USER = "root";
-    public static final String DB_PASSWORD = "root";
+    public static final String DB_URL = AppConfig.get("db.url",
+            "jdbc:mysql://root@127.0.0.1:3306/fitsensee?serverVersion=8.0&charset=utf8mb4");
+    public static final String DB_USER = AppConfig.get("db.user", "root");
+    public static final String DB_PASSWORD = AppConfig.get("db.password", "");
 
     public Connection cnx;
     public static DbConnection instance;

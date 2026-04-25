@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.web.WebView?>
+<?import javafx.scene.shape.Circle?>
+
+<VBox style="-fx-background-color:#070b16;"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controllers.ExerciseDetailController">
+
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
+                style="-fx-background-color:#070b16;-fx-background:#070b16;-fx-border-color:transparent;">
+        <VBox spacing="16.0" maxWidth="860.0">
+            <padding><Insets top="24.0" bottom="48.0" left="32.0" right="32.0"/></padding>
+
+            <!-- Back -->
+            <Button mnemonicParsing="false" onAction="#onBack"
+                    style="-fx-background-color:transparent;-fx-text-fill:#6B7280;-fx-font-size:13px;-fx-font-weight:600;-fx-cursor:hand;-fx-padding:4 0;"
+                    text="← Back to Workout" />
+
+            <!-- Hero image -->
+            <StackPane fx:id="imagePane" managed="false" visible="false"
+                       style="-fx-background-color:#111827;-fx-background-radius:20;-fx-border-color:#1F2937;-fx-border-radius:20;"
+                       prefHeight="280.0">
+                <ImageView fx:id="exerciseImage" fitWidth="860" fitHeight="280"
+                           preserveRatio="false" smooth="true" />
+            </StackPane>
+
+            <!-- Header card -->
+            <VBox style="-fx-background-color:#111827;-fx-border-color:#1F2937;-fx-border-radius:20;-fx-background-radius:20;-fx-padding:24;">
+                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                    <Label fx:id="nameLabel"
+                           style="-fx-text-fill:white;-fx-font-size:26px;-fx-font-weight:900;" text="" />
+                    <Label fx:id="doneBadge" managed="false" visible="false"
+                           style="-fx-background-color:rgba(34,197,94,0.15);-fx-border-color:rgba(34,197,94,0.4);-fx-border-radius:999;-fx-background-radius:999;-fx-text-fill:#4ADE80;-fx-font-size:11px;-fx-font-weight:700;-fx-padding:4 12;"
+                           text="✔ Done" />
+                </HBox>
+                <HBox spacing="10.0" style="-fx-padding:10 0 0 0;">
+                    <Label fx:id="typeBadge"
+                           style="-fx-background-color:rgba(255,255,255,0.05);-fx-border-color:#1F2937;-fx-border-radius:999;-fx-background-radius:999;-fx-text-fill:#9CA3AF;-fx-font-size:12px;-fx-padding:5 14;" text="" />
+                    <Label fx:id="targetBadge"
+                           style="-fx-background-color:rgba(255,255,255,0.05);-fx-border-color:#1F2937;-fx-border-radius:999;-fx-background-radius:999;-fx-text-fill:#9CA3AF;-fx-font-size:12px;-fx-padding:5 14;" text="" />
+                    <Label fx:id="setsBadge" managed="false" visible="false"
+                           style="-fx-background-color:rgba(255,255,255,0.05);-fx-border-color:#1F2937;-fx-border-radius:999;-fx-background-radius:999;-fx-text-fill:#9CA3AF;-fx-font-size:12px;-fx-padding:5 14;" text="" />
+                </HBox>
+
+                <!-- Star rating -->
+                <HBox spacing="6.0" alignment="CENTER_LEFT" style="-fx-padding:14 0 0 0;">
+                    <Label style="-fx-text-fill:#6B7280;-fx-font-size:11px;-fx-font-weight:800;" text="YOUR RATING" />
+                    <Label fx:id="star1" text="☆" style="-fx-font-size:26px;-fx-cursor:hand;-fx-text-fill:#6B7280;" onMouseClicked="#onStar1" onMouseEntered="#onStarHover1" onMouseExited="#onStarExit" />
+                    <Label fx:id="star2" text="☆" style="-fx-font-size:26px;-fx-cursor:hand;-fx-text-fill:#6B7280;" onMouseClicked="#onStar2" onMouseEntered="#onStarHover2" onMouseExited="#onStarExit" />
+                    <Label fx:id="star3" text="☆" style="-fx-font-size:26px;-fx-cursor:hand;-fx-text-fill:#6B7280;" onMouseClicked="#onStar3" onMouseEntered="#onStarHover3" onMouseExited="#onStarExit" />
+                    <Label fx:id="star4" text="☆" style="-fx-font-size:26px;-fx-cursor:hand;-fx-text-fill:#6B7280;" onMouseClicked="#onStar4" onMouseEntered="#onStarHover4" onMouseExited="#onStarExit" />
+                    <Label fx:id="star5" text="☆" style="-fx-font-size:26px;-fx-cursor:hand;-fx-text-fill:#6B7280;" onMouseClicked="#onStar5" onMouseEntered="#onStarHover5" onMouseExited="#onStarExit" />
+                    <Label fx:id="ratingLabel" style="-fx-text-fill:#6B7280;-fx-font-size:12px;-fx-padding:0 0 0 4;" text="" />
+                    <Label fx:id="avgRatingLabel" style="-fx-text-fill:#F59E0B;-fx-font-size:12px;-fx-font-weight:700;" text="" />
+                </HBox>
+            </VBox>
+
+            <!-- Instructions card -->
+            <VBox style="-fx-background-color:#0F172A;-fx-border-color:#1F2937;-fx-border-radius:20;-fx-background-radius:20;-fx-padding:24;" spacing="12.0">
+                <HBox spacing="8.0" alignment="CENTER_LEFT">
+                    <Label style="-fx-text-fill:#22C55E;-fx-font-size:13px;-fx-font-weight:800;" text="▮▮" />
+                    <Label style="-fx-text-fill:#6B7280;-fx-font-size:11px;-fx-font-weight:700;-fx-letter-spacing:1;" text="INSTRUCTIONS" />
+                </HBox>
+                <Label fx:id="descLabel"
+                       style="-fx-text-fill:#D1D5DB;-fx-font-size:14px;-fx-line-spacing:4;"
+                       wrapText="true" text="" />
+            </VBox>
+
+            <!-- YouTube card — thumbnail + play/pause via JS -->
+            <VBox fx:id="videoPane" managed="false" visible="false"
+                  style="-fx-background-color:#0F172A;-fx-border-color:#1F2937;-fx-border-radius:20;-fx-background-radius:20;"
+                  spacing="0.0">
+                <HBox spacing="10.0" alignment="CENTER_LEFT"
+                      style="-fx-padding:16 20;-fx-border-color:transparent transparent #1F2937 transparent;">
+                    <Label style="-fx-text-fill:#FF4444;-fx-font-size:18px;" text="▶" />
+                    <Label style="-fx-text-fill:#E5E7EB;-fx-font-size:14px;-fx-font-weight:700;" text="Tutorial Video" />
+                </HBox>
+                <!-- Thumbnail with overlay play button -->
+                <StackPane fx:id="videoThumbPane" style="-fx-cursor:hand;" prefHeight="360.0">
+                    <ImageView fx:id="videoThumbnail" fitWidth="860" fitHeight="360"
+                               preserveRatio="false" smooth="true" />
+                    <!-- Dark overlay -->
+                    <Region style="-fx-background-color:rgba(0,0,0,0.3);" />
+                    <!-- Play button circle -->
+                    <StackPane fx:id="playOverlay" alignment="CENTER">
+                        <Label style="-fx-background-color:rgba(255,0,0,0.9);-fx-background-radius:50;-fx-min-width:80;-fx-min-height:80;-fx-max-width:80;-fx-max-height:80;" />
+                        <Label fx:id="playPauseIcon"
+                               style="-fx-text-fill:white;-fx-font-size:32px;-fx-font-weight:900;" text="▶" />
+                    </StackPane>
+                </StackPane>
+                <!-- Controls bar -->
+                <HBox spacing="12.0" alignment="CENTER"
+                      style="-fx-background-color:#0D1117;-fx-padding:14 20;-fx-border-color:#1F2937 transparent transparent transparent;">
+                    <Button fx:id="videoPlayBtn" mnemonicParsing="false" onAction="#onVideoPlay"
+                            style="-fx-background-color:#FF0000;-fx-text-fill:white;-fx-font-weight:800;-fx-font-size:13px;-fx-background-radius:10;-fx-padding:10 24;-fx-cursor:hand;"
+                            text="▶  Play" />
+                    <Button fx:id="videoPauseBtn" mnemonicParsing="false" onAction="#onVideoPause"
+                            managed="false" visible="false"
+                            style="-fx-background-color:#374151;-fx-text-fill:white;-fx-font-weight:800;-fx-font-size:13px;-fx-background-radius:10;-fx-padding:10 24;-fx-cursor:hand;"
+                            text="⏸  Pause" />
+                    <Label fx:id="videoStatusLabel"
+                           style="-fx-text-fill:#6B7280;-fx-font-size:12px;" text="Click Play to watch the tutorial" />
+                </HBox>
+                <!-- Embedded WebView — shown only when playing -->
+                <WebView fx:id="youtubeWebView" prefHeight="0.0" prefWidth="860.0"
+                         managed="false" visible="false"
+                         style="-fx-background-color:#000;" />
+            </VBox>
+
+            <!-- Result banner (persistent) -->
+            <Label fx:id="resultBanner" managed="false" visible="false" wrapText="true"
+                   style="-fx-background-color:rgba(34,197,94,0.1);-fx-border-color:rgba(34,197,94,0.3);-fx-border-radius:16;-fx-background-radius:16;-fx-text-fill:#4ADE80;-fx-font-size:13px;-fx-font-weight:600;-fx-padding:14 20;" />
+
+            <!-- Music Player -->
+            <VBox style="-fx-background-color:#0D1117;-fx-border-color:#1F2937;-fx-border-radius:16;-fx-background-radius:16;-fx-padding:18;" spacing="12.0">
+                <HBox spacing="8.0" alignment="CENTER_LEFT">
+                    <Label style="-fx-text-fill:#22C55E;-fx-font-size:16px;" text="🎵" />
+                    <Label style="-fx-text-fill:white;-fx-font-size:13px;-fx-font-weight:800;" text="Workout Music" />
+                    <Label style="-fx-text-fill:#6B7280;-fx-font-size:11px;" text="powered by Jamendo" />
+                </HBox>
+
+                <!-- Mood buttons -->
+                <HBox spacing="8.0" alignment="CENTER_LEFT">
+                    <Button fx:id="moodWorkout" mnemonicParsing="false" onAction="#onMoodWorkout"
+                            style="-fx-background-color:#1F2937;-fx-border-color:#374151;-fx-border-radius:10;-fx-background-radius:10;-fx-text-fill:#9CA3AF;-fx-font-size:12px;-fx-font-weight:700;-fx-padding:8 14;-fx-cursor:hand;"
+                            text="💪 Workout" />
+                    <Button fx:id="moodHiit" mnemonicParsing="false" onAction="#onMoodHiit"
+                            style="-fx-background-color:#1F2937;-fx-border-color:#374151;-fx-border-radius:10;-fx-background-radius:10;-fx-text-fill:#9CA3AF;-fx-font-size:12px;-fx-font-weight:700;-fx-padding:8 14;-fx-cursor:hand;"
+                            text="🔥 HIIT / Cardio" />
+                    <Button fx:id="moodRelax" mnemonicParsing="false" onAction="#onMoodRelax"
+                            style="-fx-background-color:#1F2937;-fx-border-color:#374151;-fx-border-radius:10;-fx-background-radius:10;-fx-text-fill:#9CA3AF;-fx-font-size:12px;-fx-font-weight:700;-fx-padding:8 14;-fx-cursor:hand;"
+                            text="🧘 Relax / Yoga" />
+                    <Button fx:id="moodEnergy" mnemonicParsing="false" onAction="#onMoodEnergy"
+                            style="-fx-background-color:#1F2937;-fx-border-color:#374151;-fx-border-radius:10;-fx-background-radius:10;-fx-text-fill:#9CA3AF;-fx-font-size:12px;-fx-font-weight:700;-fx-padding:8 14;-fx-cursor:hand;"
+                            text="⚡ Energy Boost" />
+                </HBox>
+
+                <!-- Loading -->
+                <Label fx:id="musicLoadingLabel" managed="false" visible="false"
+                       style="-fx-text-fill:#6B7280;-fx-font-size:12px;" text="⏳ Loading tracks..." />
+
+                <!-- Now playing -->
+                <HBox fx:id="nowPlayingBox" managed="false" visible="false"
+                      spacing="12.0" alignment="CENTER_LEFT"
+                      style="-fx-background-color:#111827;-fx-border-color:#22C55E;-fx-border-radius:10;-fx-background-radius:10;-fx-padding:10;">
+                    <Label style="-fx-text-fill:#22C55E;-fx-font-size:18px;" text="♫" />
+                    <VBox HBox.hgrow="ALWAYS" spacing="2.0">
+                        <Label fx:id="trackTitleLabel" style="-fx-text-fill:white;-fx-font-size:13px;-fx-font-weight:700;" text="" />
+                        <Label fx:id="trackArtistLabel" style="-fx-text-fill:#6B7280;-fx-font-size:11px;" text="" />
+                    </VBox>
+                    <HBox spacing="8.0" alignment="CENTER">
+                        <Button fx:id="prevTrackBtn" mnemonicParsing="false" onAction="#onPrevTrack"
+                                style="-fx-background-color:transparent;-fx-text-fill:#9CA3AF;-fx-font-size:16px;-fx-cursor:hand;" text="⏮" />
+                        <Button fx:id="playPauseMusicBtn" mnemonicParsing="false" onAction="#onPlayPauseMusic"
+                                style="-fx-background-color:#22C55E;-fx-text-fill:black;-fx-font-weight:900;-fx-font-size:14px;-fx-background-radius:999;-fx-min-width:36;-fx-min-height:36;-fx-max-width:36;-fx-max-height:36;-fx-cursor:hand;" text="⏸" />
+                        <Button fx:id="nextTrackBtn" mnemonicParsing="false" onAction="#onNextTrack"
+                                style="-fx-background-color:transparent;-fx-text-fill:#9CA3AF;-fx-font-size:16px;-fx-cursor:hand;" text="⏭" />
+                    </HBox>
+                </HBox>
+
+                <!-- Track list -->
+                <VBox fx:id="trackListBox" spacing="4.0" managed="false" visible="false" />
+            </VBox>
+
+            <!-- Timer card -->
+            <VBox fx:id="timerCard"
+                  style="-fx-background-color:#111827;-fx-border-color:#1F2937;-fx-border-radius:24;-fx-background-radius:24;-fx-padding:36 24;"
+                  spacing="12.0" alignment="CENTER">
+
+                <!-- Status pill -->
+                <Label fx:id="statusLabel" managed="false" visible="false"
+                       style="-fx-background-color:rgba(59,130,246,0.15);-fx-border-color:rgba(59,130,246,0.4);-fx-border-radius:999;-fx-background-radius:999;-fx-text-fill:#60A5FA;-fx-font-size:13px;-fx-font-weight:700;-fx-padding:8 20;" text="" />
+
+                <!-- Progress ring + timer -->
+                <StackPane alignment="CENTER" prefWidth="140.0" prefHeight="140.0">
+                    <!-- Outer ring bg -->
+                    <Label fx:id="ringBg"
+                           style="-fx-background-color:transparent;-fx-border-color:#1F2937;-fx-border-radius:70;-fx-border-width:7;-fx-min-width:140;-fx-min-height:140;-fx-max-width:140;-fx-max-height:140;" />
+                    <!-- Progress arc (simulated with colored border) -->
+                    <Label fx:id="ringArc"
+                           style="-fx-background-color:transparent;-fx-border-color:#22C55E;-fx-border-radius:70;-fx-border-width:7;-fx-min-width:140;-fx-min-height:140;-fx-max-width:140;-fx-max-height:140;-fx-opacity:0.15;" />
+                    <Label fx:id="timerLabel"
+                           style="-fx-text-fill:white;-fx-font-size:40px;-fx-font-weight:900;-fx-font-family:'Courier New';" text="00:00" />
+                </StackPane>
+
+                <Label fx:id="elapsedLabel"
+                       style="-fx-text-fill:#6B7280;-fx-font-size:13px;" text="Elapsed time" />
+
+                <!-- Overtime alert -->
+                <Label fx:id="overtimeAlert" managed="false" visible="false" wrapText="true"
+                       style="-fx-background-color:rgba(239,68,68,0.1);-fx-border-color:rgba(239,68,68,0.3);-fx-border-radius:12;-fx-background-radius:12;-fx-text-fill:#F87171;-fx-font-size:13px;-fx-font-weight:600;-fx-padding:10 16;"
+                       text="" />
+
+                <!-- Result message (inline) -->
+                <Label fx:id="resultMessage" managed="false" visible="false" wrapText="true"
+                       style="-fx-background-radius:12;-fx-border-radius:12;-fx-font-size:13px;-fx-font-weight:600;-fx-padding:10 16;" text="" />
+
+                <!-- Buttons -->
+                <HBox spacing="12.0" alignment="CENTER" style="-fx-padding:8 0 0 0;">
+                    <Button fx:id="startBtn" mnemonicParsing="false" onAction="#onStartTimer"
+                            style="-fx-background-color:linear-gradient(to right,#22C55E,#16A34A);-fx-text-fill:black;-fx-font-weight:900;-fx-font-size:14px;-fx-background-radius:14;-fx-padding:14 32;-fx-cursor:hand;"
+                            text="▶  Start Exercise" />
+                    <Button fx:id="repeatBtn" mnemonicParsing="false" onAction="#onRepeat"
+                            managed="false" visible="false"
+                            style="-fx-background-color:linear-gradient(to right,#F59E0B,#D97706);-fx-text-fill:black;-fx-font-weight:900;-fx-font-size:14px;-fx-background-radius:14;-fx-padding:14 32;-fx-cursor:hand;"
+                            text="↺  Repeat this exercise" />
+                    <Button fx:id="doneBtn" mnemonicParsing="false" onAction="#onMarkDone"
+                            style="-fx-background-color:#1F2937;-fx-text-fill:#4B5563;-fx-font-weight:900;-fx-font-size:14px;-fx-background-radius:14;-fx-padding:14 32;"
+                            text="✔  Mark Done" disable="true" />
+                </HBox>
+            </VBox>
+
+        </VBox>
+    </ScrollPane>
+</VBox>

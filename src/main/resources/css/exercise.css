@@ -1,0 +1,179 @@
+.exercise-root {
+    -fx-background-color: #070b16;
+    -fx-font-family: "Segoe UI", "Montserrat", "Roboto", sans-serif;
+}
+
+/* Top bar */
+.btn-back-catalog {
+    -fx-background-color: #1F2937;
+    -fx-border-color: #374151;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-text-fill: #D1D5DB;
+    -fx-font-weight: 700;
+    -fx-font-size: 13px;
+    -fx-padding: 10 20 10 20;
+    -fx-cursor: hand;
+}
+.btn-back-catalog:hover { -fx-background-color: #374151; }
+
+.btn-create-exercise {
+    -fx-background-color: linear-gradient(to right, #22C55E, #84CC16);
+    -fx-text-fill: black;
+    -fx-font-weight: 800;
+    -fx-font-size: 13px;
+    -fx-background-radius: 10;
+    -fx-padding: 10 20 10 20;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(34,197,94,0.3), 10, 0, 0, 2);
+}
+.btn-create-exercise:hover { -fx-opacity: 0.88; }
+
+/* Search */
+.exercise-search-field {
+    -fx-background-color: #0D0D0D;
+    -fx-border-color: #1F2937;
+    -fx-border-radius: 14;
+    -fx-background-radius: 14;
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: #4B5563;
+    -fx-padding: 14 18 14 18;
+    -fx-font-size: 13px;
+    -fx-pref-height: 48;
+}
+.exercise-search-field:focused {
+    -fx-border-color: #22C55E;
+    -fx-effect: dropshadow(gaussian, rgba(34,197,94,0.15), 8, 0, 0, 0);
+}
+
+/* Section header */
+.exercise-section-label {
+    -fx-text-fill: #6B7280;
+    -fx-font-size: 11px;
+    -fx-font-weight: 800;
+}
+.exercise-counter {
+    -fx-text-fill: #6B7280;
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+}
+
+/* Scroll */
+.exercise-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+}
+.exercise-scroll > .viewport { -fx-background-color: transparent; }
+.exercise-list-box { -fx-background-color: transparent; }
+
+/* Card */
+.exercise-card {
+    -fx-background-color: #111827;
+    -fx-border-color: #1F2937;
+    -fx-border-radius: 14;
+    -fx-background-radius: 14;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 6, 0, 0, 2);
+}
+.exercise-card:hover {
+    -fx-border-color: #374151;
+    -fx-effect: dropshadow(gaussian, rgba(34,197,94,0.08), 14, 0, 0, 3);
+}
+
+.exercise-card-name {
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-font-weight: 800;
+}
+.exercise-card-desc {
+    -fx-text-fill: #6B7280;
+    -fx-font-size: 12px;
+}
+
+/* Type badge base */
+.exercise-type-badge {
+    -fx-font-size: 11px;
+    -fx-font-weight: 800;
+    -fx-background-radius: 6;
+    -fx-padding: 3 8;
+}
+
+.exercise-duration-label {
+    -fx-text-fill: #9CA3AF;
+    -fx-font-size: 12px;
+}
+
+/* Action buttons */
+.btn-exercise-edit {
+    -fx-background-color: #1F2937;
+    -fx-border-color: #374151;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-text-fill: #D1D5DB;
+    -fx-font-size: 14px;
+    -fx-min-width: 38px;
+    -fx-min-height: 38px;
+    -fx-padding: 6 10;
+    -fx-cursor: hand;
+}
+.btn-exercise-edit:hover { -fx-background-color: #374151; }
+
+.btn-exercise-delete {
+    -fx-background-color: rgba(239,68,68,0.12);
+    -fx-border-color: rgba(239,68,68,0.25);
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-text-fill: #EF4444;
+    -fx-font-size: 14px;
+    -fx-min-width: 38px;
+    -fx-min-height: 38px;
+    -fx-padding: 6 10;
+    -fx-cursor: hand;
+}
+.btn-exercise-delete:hover { -fx-background-color: rgba(239,68,68,0.22); }
+
+/* Delete modal */
+.exercise-modal-overlay { -fx-background-color: rgba(0,0,0,0.75); }
+.exercise-modal {
+    -fx-background-color: #0D1117;
+    -fx-border-color: #1F2937;
+    -fx-border-radius: 16;
+    -fx-background-radius: 16;
+    -fx-padding: 28;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 30, 0, 0, 8);
+}
+.exercise-modal-title {
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+.btn-modal-cancel {
+    -fx-background-color: #1F2937;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10;
+    -fx-padding: 10 0;
+    -fx-cursor: hand;
+}
+.btn-modal-cancel:hover { -fx-background-color: #374151; }
+.btn-modal-delete {
+    -fx-background-color: #EF4444;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10;
+    -fx-padding: 10 0;
+    -fx-cursor: hand;
+}
+.btn-modal-delete:hover { -fx-background-color: #DC2626; }
+
+/* YouTube search button */
+.btn-youtube-search {
+    -fx-background-color: #FF0000;
+    -fx-text-fill: white;
+    -fx-font-weight: 800;
+    -fx-font-size: 12px;
+    -fx-background-radius: 8;
+    -fx-padding: 10 18;
+    -fx-cursor: hand;
+}
+.btn-youtube-search:hover { -fx-background-color: #CC0000; }

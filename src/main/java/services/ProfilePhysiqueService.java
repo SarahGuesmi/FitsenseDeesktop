@@ -23,7 +23,7 @@ public class ProfilePhysiqueService implements CRUD<ProfilePhysique> {
         Float weight = rs.wasNull() ? null : w;
         float h = rs.getFloat("height");
         Float height = rs.wasNull() ? null : h;
-        Object genderObj = ResultSetColumns.getFirstObject(rs, "gender", "genre", "sexe");
+        Object genderObj = ResultSetColumns.getFirstObject(rs, "gender");
         String gender = ResultSetColumns.normalizeGenderDbValue(genderObj);
         // id and user_id are int in DB — wrap as UUID for model compatibility
         UUID id = new UUID(0, rs.getInt("id"));
@@ -43,13 +43,8 @@ public class ProfilePhysiqueService implements CRUD<ProfilePhysique> {
         }
     }
 
-    /**
-     * Gender from any physique row for this login, using the same {@code email_email} join as manual SQL.
-     */
     public String findGenderByUserEmail(String email) throws SQLException {
-        if (email == null || email.isBlank()) {
-            return null;
-        }
+        if (email == null || email.isBlank()) return null;
         String sql = "SELECT p.* FROM `profile_physique` p "
                 + "INNER JOIN `user` u ON u.`id` = p.`user_id` "
                 + "WHERE u.`email` = ?";
@@ -57,11 +52,9 @@ public class ProfilePhysiqueService implements CRUD<ProfilePhysique> {
             ps.setString(1, email.trim());
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    Object g = ResultSetColumns.getFirstObject(rs, "gender", "genre", "sexe");
+                    Object g = ResultSetColumns.getFirstObject(rs, "gender");
                     String n = ResultSetColumns.normalizeGenderDbValue(g);
-                    if (n != null && !n.isBlank()) {
-                        return n;
-                    }
+                    if (n != null && !n.isBlank()) return n;
                 }
                 return null;
             }
@@ -69,26 +62,21 @@ public class ProfilePhysiqueService implements CRUD<ProfilePhysique> {
     }
 
     @Override
-    public void create(ProfilePhysique profilePhysique) throws SQLException {
-        createPrepared(profilePhysique);
-    }
+    public void create(ProfilePhysique p) throws SQLException { createPrepared(p); }
 
     @Override
     public List<ProfilePhysique> read() throws SQLException {
         String sql = "SELECT * FROM `profile_physique`";
         try (Statement stmt = cnx.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
             List<ProfilePhysique> list = new ArrayList<>();
-            while (rs.next()) {
-                list.add(mapRow(rs));
-            }
+            while (rs.next()) list.add(mapRow(rs));
             return list;
         }
     }
 
     @Override
-    public void update(ProfilePhysique profilePhysique) throws SQLException {
-        String sql = "UPDATE `profile_physique` SET `weight` = ?, `height` = ?, `gender` = ?, `user_id` = ? "
-                + "WHERE `id` = ?";
+    public void update(ProfilePhysique p) throws SQLException {
+        String sql = "UPDATE `profile_physique` SET `weight` = ?, `height` = ?, `gender` = ? WHERE `id` = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
             int i = 1;
             if (profilePhysique.getWeight() != null) {
@@ -109,7 +97,7 @@ public class ProfilePhysiqueService implements CRUD<ProfilePhysique> {
     }
 
     @Override
-    public void delete(ProfilePhysique profilePhysique) throws SQLException {
+    public void delete(ProfilePhysique p) throws SQLException {
         String sql = "DELETE FROM `profile_physique` WHERE `id` = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
             stmt.setInt(1, (int) profilePhysique.getId().getLeastSignificantBits());

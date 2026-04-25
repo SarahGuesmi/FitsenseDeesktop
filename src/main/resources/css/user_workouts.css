@@ -1,0 +1,122 @@
+.user-workouts-root {
+    -fx-background-color: transparent;
+    -fx-font-family: "Segoe UI", "Montserrat", "Roboto", sans-serif;
+}
+
+/* Objective pills */
+.objective-pill {
+    -fx-background-color: rgba(59,130,246,0.15);
+    -fx-border-color: rgba(59,130,246,0.3);
+    -fx-border-radius: 20;
+    -fx-background-radius: 20;
+    -fx-text-fill: #60A5FA;
+    -fx-font-size: 11px;
+    -fx-font-weight: 800;
+    -fx-padding: 5 14;
+}
+
+/* Filters */
+.filter-combo {
+    -fx-background-color: #1F2937;
+    -fx-border-color: #374151;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-padding: 6 12;
+}
+
+/* Section title */
+.section-title {
+    -fx-text-fill: white;
+    -fx-font-size: 26px;
+    -fx-font-weight: 800;
+}
+.section-subtitle {
+    -fx-text-fill: #6B7280;
+    -fx-font-size: 13px;
+}
+
+/* Scroll */
+.workouts-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+}
+.workouts-scroll > .viewport { -fx-background-color: transparent; }
+
+/* Workout card */
+.workout-user-card {
+    -fx-background-color: #111827;
+    -fx-border-color: #1F2937;
+    -fx-border-radius: 16;
+    -fx-background-radius: 16;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 8, 0, 0, 2);
+    -fx-cursor: hand;
+}
+.workout-user-card:hover {
+    -fx-border-color: #3B82F6;
+    -fx-effect: dropshadow(gaussian, rgba(59,130,246,0.15), 16, 0, 0, 4);
+}
+
+/* Card image area */
+.card-image-area {
+    -fx-background-color: linear-gradient(to bottom right, #1F2937, #111827);
+    -fx-background-radius: 16 16 0 0;
+    -fx-pref-height: 120;
+    -fx-min-height: 120;
+}
+
+.card-level-badge {
+    -fx-font-size: 10px;
+    -fx-font-weight: 800;
+    -fx-background-radius: 6;
+    -fx-padding: 3 8;
+}
+.badge-beginner     { -fx-background-color: #3B82F6; -fx-text-fill: white; }
+.badge-intermediate { -fx-background-color: #8B5CF6; -fx-text-fill: white; }
+.badge-advanced     { -fx-background-color: #EF4444; -fx-text-fill: white; }
+
+.card-workout-name {
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: 800;
+}
+.card-workout-name:hover { -fx-text-fill: #60A5FA; }
+
+.card-meta-label {
+    -fx-text-fill: #6B7280;
+    -fx-font-size: 12px;
+}
+.card-desc {
+    -fx-text-fill: #9CA3AF;
+    -fx-font-size: 12px;
+}
+
+.btn-start-workout {
+    -fx-background-color: #1F2937;
+    -fx-border-color: #374151;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-text-fill: white;
+    -fx-font-weight: 700;
+    -fx-font-size: 13px;
+    -fx-padding: 10 0;
+    -fx-cursor: hand;
+    -fx-max-width: Infinity;
+}
+.btn-start-workout:hover {
+    -fx-background-color: white;
+    -fx-text-fill: black;
+}
+
+/* Empty state */
+.empty-state-label {
+    -fx-text-fill: #6B7280;
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+}
+.empty-state-sub {
+    -fx-text-fill: #4B5563;
+    -fx-font-size: 12px;
+}

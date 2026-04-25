@@ -15,6 +15,11 @@ public class Workout {
     private List<Workout> exercises = new ArrayList<>();
     private List<Workout> objectifs = new ArrayList<>();
 
+    // 🔗 Relations
+    private List<Exercise> exercises = new ArrayList<>();
+    private List<ObjectifSportif> objectifs = new ArrayList<>();
+
+    // 🔧 Constructor
     public Workout() {}
 
     public Workout(Integer id, String nom, String niveau, Integer duree, String description, String status, User coach) {

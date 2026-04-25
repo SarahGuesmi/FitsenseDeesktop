@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox style="-fx-background-color:transparent;"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controllers.ActivityLogController">
+
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
+                style="-fx-background-color:transparent;-fx-background:transparent;-fx-border-color:transparent;">
+        <VBox spacing="16.0">
+            <padding><Insets top="20.0" bottom="32.0" left="24.0" right="24.0"/></padding>
+
+            <!-- Header -->
+            <HBox alignment="CENTER_LEFT" spacing="12.0">
+                <Label style="-fx-text-fill:white;-fx-font-size:20px;-fx-font-weight:900;" text="📊 Activity Log" />
+                <Label fx:id="dateLabel"
+                       style="-fx-text-fill:#6B7280;-fx-font-size:12px;-fx-font-weight:700;" text="" />
+            </HBox>
+
+            <!-- Summary cards -->
+            <HBox fx:id="summaryBox" spacing="12.0" managed="false" visible="false">
+                <VBox style="-fx-background-color:#111827;-fx-border-color:#1F2937;-fx-border-radius:12;-fx-background-radius:12;-fx-padding:14 18;"
+                      alignment="CENTER" minWidth="110">
+                    <Label fx:id="minutesLabel" style="-fx-text-fill:#22C55E;-fx-font-size:24px;-fx-font-weight:900;" text="0" />
+                    <Label style="-fx-text-fill:#6B7280;-fx-font-size:10px;-fx-font-weight:800;" text="MIN ACTIVE" />
+                </VBox>
+                <VBox style="-fx-background-color:#111827;-fx-border-color:#1F2937;-fx-border-radius:12;-fx-background-radius:12;-fx-padding:14 18;"
+                      alignment="CENTER" minWidth="110">
+                    <Label fx:id="exercisesLabel" style="-fx-text-fill:#3B82F6;-fx-font-size:24px;-fx-font-weight:900;" text="0" />
+                    <Label style="-fx-text-fill:#6B7280;-fx-font-size:10px;-fx-font-weight:800;" text="EXERCISES" />
+                </VBox>
+                <VBox style="-fx-background-color:#111827;-fx-border-color:#1F2937;-fx-border-radius:12;-fx-background-radius:12;-fx-padding:14 18;"
+                      alignment="CENTER" minWidth="110">
+                    <Label fx:id="workoutsLabel" style="-fx-text-fill:#F59E0B;-fx-font-size:24px;-fx-font-weight:900;" text="0" />
+                    <Label style="-fx-text-fill:#6B7280;-fx-font-size:10px;-fx-font-weight:800;" text="WORKOUTS" />
+                </VBox>
+            </HBox>
+
+            <!-- Behavior insight -->
+            <Label fx:id="insightLabel" managed="false" visible="false" wrapText="true"
+                   style="-fx-background-color:rgba(59,130,246,0.1);-fx-border-color:rgba(59,130,246,0.3);-fx-border-radius:10;-fx-background-radius:10;-fx-text-fill:#60A5FA;-fx-font-size:13px;-fx-font-weight:600;-fx-padding:12 16;" />
+
+            <!-- Empty state -->
+            <VBox fx:id="emptyBox" alignment="CENTER" spacing="8.0" style="-fx-padding:40 0;">
+                <Label style="-fx-text-fill:#374151;-fx-font-size:36px;" text="📋" />
+                <Label style="-fx-text-fill:#6B7280;-fx-font-size:14px;-fx-font-weight:700;" text="No activity yet" />
+                <Label style="-fx-text-fill:#4B5563;-fx-font-size:12px;" text="Start a workout to see your activity here." wrapText="true" />
+            </VBox>
+
+            <!-- Timeline -->
+            <VBox fx:id="timelineBox" spacing="0.0" managed="false" visible="false" />
+
+        </VBox>
+    </ScrollPane>
+</VBox>

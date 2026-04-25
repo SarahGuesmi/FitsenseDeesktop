@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox styleClass="workout-detail-root" stylesheets="@../css/workout_detail.css"
+      style="-fx-background-color: #070b16;"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controllers.WorkoutDetailController">
+
+    <ScrollPane fitToWidth="true" styleClass="detail-scroll" VBox.vgrow="ALWAYS">
+        <VBox spacing="20.0" maxWidth="900.0">
+            <padding><Insets top="24.0" bottom="32.0" left="32.0" right="32.0" /></padding>
+
+            <!-- Back -->
+            <Button mnemonicParsing="false" onAction="#onBack"
+                    styleClass="btn-back-workouts" text="← Back to My Workouts" />
+
+            <!-- Header -->
+            <VBox spacing="4.0">
+                <Label fx:id="workoutNameLabel" styleClass="detail-workout-name" text="" />
+                <Label fx:id="workoutMetaLabel" styleClass="detail-workout-meta" text="" />
+            </VBox>
+
+            <!-- Description card -->
+            <VBox styleClass="detail-card" spacing="12.0">
+                <padding><Insets top="20.0" bottom="20.0" left="20.0" right="20.0" /></padding>
+                <Label styleClass="detail-section-title" text="Description" />
+                <Label fx:id="workoutDescLabel" styleClass="detail-desc"
+                       wrapText="true" text="" />
+                <FlowPane fx:id="objectivesPane" hgap="8.0" vgap="6.0" />
+            </VBox>
+
+            <!-- Exercises -->
+            <VBox spacing="12.0">
+                <Label fx:id="exercisesTitle" styleClass="detail-section-title"
+                       text="Exercises (0)" />
+                <VBox fx:id="exercisesListBox" spacing="10.0" />
+            </VBox>
+
+            <!-- Progress + action -->
+            <VBox styleClass="detail-card" spacing="14.0">
+                <padding><Insets top="20.0" bottom="20.0" left="20.0" right="20.0" /></padding>
+                <HBox alignment="CENTER_LEFT">
+                    <Label styleClass="detail-desc" text="Progress" HBox.hgrow="ALWAYS" />
+                    <Label fx:id="progressLabel" styleClass="progress-label" text="0 / 0 exercises" />
+                </HBox>
+                <StackPane>
+                    <Region styleClass="progress-bar-bg" maxWidth="Infinity" />
+                    <Region fx:id="progressFill" styleClass="progress-bar-fill"
+                            maxWidth="0.0" StackPane.alignment="CENTER_LEFT" />
+                </StackPane>
+                <Button fx:id="startBtn" mnemonicParsing="false" onAction="#onStartWorkout"
+                        styleClass="btn-start-session" text="🏆  Start Workout" />
+            </VBox>
+
+        </VBox>
+    </ScrollPane>
+</VBox>

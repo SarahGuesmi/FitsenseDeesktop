@@ -165,3 +165,15 @@
     -fx-cursor: hand;
 }
 .btn-modal-delete:hover { -fx-background-color: #DC2626; }
+
+/* YouTube search button */
+.btn-youtube-search {
+    -fx-background-color: #FF0000;
+    -fx-text-fill: white;
+    -fx-font-weight: 800;
+    -fx-font-size: 12px;
+    -fx-background-radius: 8;
+    -fx-padding: 10 18;
+    -fx-cursor: hand;
+}
+.btn-youtube-search:hover { -fx-background-color: #CC0000; }

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+
+<VBox style="-fx-background-color:#0D1117;-fx-border-color:#1F2937;-fx-border-radius:16;-fx-background-radius:16;"
+      prefWidth="700.0" prefHeight="500.0"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controllers.ImagePickerController">
+
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" spacing="12.0"
+          style="-fx-background-color:#111827;-fx-border-color:transparent transparent #1F2937 transparent;-fx-padding:16 20;">
+        <Label style="-fx-text-fill:white;-fx-font-size:15px;-fx-font-weight:800;" text="🖼 Choose an Image" />
+        <Region HBox.hgrow="ALWAYS" />
+        <Button mnemonicParsing="false" onAction="#onClose"
+                style="-fx-background-color:transparent;-fx-text-fill:#6B7280;-fx-font-size:16px;-fx-cursor:hand;" text="✕" />
+    </HBox>
+
+    <!-- Search + Upload -->
+    <HBox spacing="10.0" style="-fx-padding:14 20 10 20;" alignment="CENTER_LEFT">
+        <TextField fx:id="searchField" promptText="Filter images..."
+                   HBox.hgrow="ALWAYS"
+                   style="-fx-background-color:#1F2937;-fx-border-color:#374151;-fx-border-radius:8;-fx-background-radius:8;-fx-text-fill:white;-fx-prompt-text-fill:#6B7280;-fx-padding:8 12;-fx-font-size:13px;"
+                   onKeyReleased="#onSearch" />
+        <Button mnemonicParsing="false" onAction="#onUploadNew"
+                style="-fx-background-color:linear-gradient(to right,#22C55E,#16A34A);-fx-text-fill:black;-fx-font-weight:800;-fx-font-size:12px;-fx-background-radius:8;-fx-padding:8 16;-fx-cursor:hand;"
+                text="+ Upload New" />
+        <Button mnemonicParsing="false" onAction="#onRefresh"
+                style="-fx-background-color:#1F2937;-fx-border-color:#374151;-fx-border-radius:8;-fx-background-radius:8;-fx-text-fill:#9CA3AF;-fx-font-size:12px;-fx-padding:8 12;-fx-cursor:hand;"
+                text="↻ Refresh" />
+    </HBox>
+
+    <!-- Loading -->
+    <Label fx:id="loadingLabel" managed="false" visible="false"
+           style="-fx-text-fill:#6B7280;-fx-font-size:13px;-fx-padding:0 20;" text="⏳ Loading images..." />
+
+    <!-- Image grid -->
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
+                style="-fx-background-color:transparent;-fx-background:transparent;-fx-border-color:transparent;">
+        <FlowPane fx:id="imageGrid" hgap="10.0" vgap="10.0"
+                  style="-fx-background-color:transparent;-fx-padding:0 20 16 20;" />
+    </ScrollPane>
+
+    <!-- Selected preview + confirm -->
+    <HBox fx:id="selectionBar" managed="false" visible="false"
+          spacing="12.0" alignment="CENTER_LEFT"
+          style="-fx-background-color:#111827;-fx-border-color:#22C55E transparent transparent transparent;-fx-padding:12 20;">
+        <ImageView fx:id="selectedPreview" fitWidth="48" fitHeight="48" preserveRatio="true" />
+        <VBox HBox.hgrow="ALWAYS" spacing="2.0">
+            <Label fx:id="selectedNameLabel" style="-fx-text-fill:white;-fx-font-size:13px;-fx-font-weight:700;" text="" />
+            <Label style="-fx-text-fill:#6B7280;-fx-font-size:11px;" text="Selected" />
+        </VBox>
+        <Button mnemonicParsing="false" onAction="#onConfirm"
+                style="-fx-background-color:linear-gradient(to right,#22C55E,#16A34A);-fx-text-fill:black;-fx-font-weight:800;-fx-font-size:13px;-fx-background-radius:10;-fx-padding:10 24;-fx-cursor:hand;"
+                text="✔ Use this image" />
+    </HBox>
+</VBox>

@@ -3,10 +3,13 @@ package models;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class Exercise {
 
     private Integer id;
+    private UUID uuid; // BINARY(16) primary key in DB
+
     private String nom;
     private String type;
     private Integer duree;
@@ -35,6 +38,14 @@ public class Exercise {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 
     public String getNom() {

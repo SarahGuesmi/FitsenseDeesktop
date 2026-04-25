@@ -11,6 +11,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
+import utils.ActivityTracker;
 import utils.WebAssets;
 import models.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -77,6 +78,7 @@ public class SignInController {
             }
 
             AppSession.setCurrentUser(user);
+            ActivityTracker.startSession();
 
             String rolesJson = user.getRolesJson() == null ? "" : user.getRolesJson();
             if (ADMIN_EMAIL.equalsIgnoreCase(user.getEmail()) || rolesJson.contains("ROLE_ADMIN")) {

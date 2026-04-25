@@ -7,24 +7,24 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import models.User;
 import services.UserService;
+import utils.GifProxyServer;
 import java.io.IOException;
 import java.util.Objects;
 
-/**
- * JavaFX entry point for the FitSense desktop client.
- * Run: {@code mvn javafx:run} (see {@code pom.xml}).
- */
 public class FitSenseApp extends Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException {
+        GifProxyServer.start(); // ✅ une seule fois ici
         seedCoach();
 
-        FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(getClass().getResource("/fxml/HomeView.fxml")));
+        FXMLLoader loader = new FXMLLoader(
+                Objects.requireNonNull(getClass().getResource("/fxml/HomeView.fxml")));
         Parent root = loader.load();
 
         Scene scene = new Scene(root, 980, 620);
-        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/css/home.css")).toExternalForm());
+        scene.getStylesheets().add(
+                Objects.requireNonNull(getClass().getResource("/css/home.css")).toExternalForm());
 
         primaryStage.setTitle("FitSense");
         primaryStage.setMinWidth(840);
@@ -33,8 +33,15 @@ public class FitSenseApp extends Application {
         primaryStage.show();
     }
 
+    // ❌ SUPPRIMÉ : GifProxyServer.start(); — ligne orpheline retirée
+
     public static void main(String[] args) {
         launch(args);
+    }
+
+    @Override
+    public void stop() {
+        GifProxyServer.stop(); // ✅ arrêt propre à la fermeture
     }
 
     private void seedCoach() {
@@ -45,7 +52,7 @@ public class FitSenseApp extends Application {
                 coach.setFirstname("Amine");
                 coach.setLastname("Coach");
                 coach.setEmail("coachamine@gmail.com");
-                coach.setPassword("123456"); // will be BCrypt-hashed by createPrepared
+                coach.setPassword("123456");
                 coach.setRolesJson("[\"ROLE_COACH\"]");
                 coach.setAccountStatus("active");
                 userService.createPrepared(coach);

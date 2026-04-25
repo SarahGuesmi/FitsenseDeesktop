@@ -66,7 +66,6 @@
                 <!-- Exercise Image -->
                 <VBox spacing="8.0">
                     <Label styleClass="form-label" text="EXERCISE IMAGE" />
-                    <!-- Current image preview -->
                     <StackPane fx:id="imagePreviewPane" styleClass="image-preview-pane"
                                managed="false" visible="false"
                                maxWidth="160.0" maxHeight="160.0"
@@ -77,17 +76,50 @@
                     </StackPane>
                     <Label fx:id="currentImageLabel" styleClass="exercise-card-desc"
                            text="" managed="false" visible="false" />
-                    <!-- File picker row -->
                     <HBox spacing="12.0" alignment="CENTER_LEFT">
                         <Button mnemonicParsing="false" onAction="#onChooseImage"
                                 styleClass="btn-choose-image" text="Choose a file" />
                         <Label fx:id="selectedFileLabel" styleClass="exercise-card-desc"
                                text="No file chosen" />
                     </HBox>
-                    <!-- Delete current image checkbox -->
                     <CheckBox fx:id="deleteImageCheck" styleClass="objective-checkbox"
                               text="Delete current image"
                               managed="false" visible="false" />
+                </VBox>
+
+                <!-- YouTube Tutorial -->
+                <VBox spacing="8.0">
+                    <HBox spacing="8.0" alignment="CENTER_LEFT">
+                        <Label style="-fx-text-fill:#FF0000;-fx-font-size:16px;" text="▶" />
+                        <Label styleClass="form-label" text="TUTORIAL VIDEO YOUTUBE" />
+                        <Label style="-fx-text-fill:#6B7280;-fx-font-size:12px;" text="(optional)" />
+                    </HBox>
+                    <HBox spacing="8.0">
+                        <Label style="-fx-text-fill:#FF0000;-fx-font-size:14px;-fx-padding:10 0 0 0;" text="▶" />
+                        <TextField fx:id="youtubeSearchField"
+                                   promptText="Rechercher une vidéo... ex: Push Up technique"
+                                   styleClass="form-input" HBox.hgrow="ALWAYS"
+                                   onAction="#onYoutubeSearch" />
+                        <Button mnemonicParsing="false" onAction="#onYoutubeSearch"
+                                styleClass="btn-youtube-search" text="Search" />
+                    </HBox>
+                    <Label fx:id="youtubeError" styleClass="error-label" managed="false" visible="false" text="" />
+                    <!-- Results list -->
+                    <VBox fx:id="youtubeResultsBox" spacing="6.0" managed="false" visible="false" />
+                    <!-- Selected video preview -->
+                    <HBox fx:id="selectedVideoBox" spacing="10.0" alignment="CENTER_LEFT"
+                          managed="false" visible="false"
+                          style="-fx-background-color:#0D1117;-fx-border-color:#22C55E;-fx-border-radius:8;-fx-background-radius:8;-fx-padding:10;">
+                        <ImageView fx:id="selectedVideoThumb" fitWidth="120" fitHeight="68" preserveRatio="true" />
+                        <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                            <Label fx:id="selectedVideoTitle" styleClass="exercise-card-name"
+                                   wrapText="true" style="-fx-font-size:13px;" />
+                            <Label fx:id="selectedVideoChannel" styleClass="exercise-card-desc" />
+                        </VBox>
+                        <Button mnemonicParsing="false" onAction="#onClearVideo"
+                                style="-fx-background-color:transparent;-fx-text-fill:#EF4444;-fx-font-size:16px;-fx-cursor:hand;"
+                                text="✕" />
+                    </HBox>
                 </VBox>
 
                 <Region styleClass="form-divider" maxWidth="Infinity" />

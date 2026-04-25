@@ -9,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import models.Workout;
+import services.ExerciseRatingService;
 import services.WorkoutService;
 
 import java.sql.SQLException;
@@ -23,6 +24,7 @@ public class WorkoutCatalogController {
     @FXML private VBox workoutListBox;
 
     private final WorkoutService workoutService = new WorkoutService();
+    private final ExerciseRatingService ratingService = new ExerciseRatingService();
     private List<Workout> allWorkouts;
     private Workout pendingDelete;
 
@@ -108,7 +110,15 @@ public class WorkoutCatalogController {
         duration.getStyleClass().add("user-email");
         Label exercises = new Label("🏋  " + w.getExercises().size() + " exercise(s)");
         exercises.getStyleClass().add("user-email");
-        info.getChildren().addAll(duration, exercises);
+
+        // Average rating from users
+        double avgRating = w.getUuid() != null ? ratingService.getWorkoutAverageRating(w.getUuid()) : 0;
+        Label ratingLbl = new Label(avgRating > 0
+                ? buildStars(avgRating) + String.format("  %.1f/5", avgRating)
+                : "☆ No ratings yet");
+        ratingLbl.setStyle("-fx-text-fill:#F59E0B;-fx-font-size:13px;-fx-font-weight:700;");
+
+        info.getChildren().addAll(duration, exercises, ratingLbl);
 
         // Description
         Label desc = new Label(safe(w.getDescription()));
@@ -211,6 +221,13 @@ public class WorkoutCatalogController {
         overlay.setManaged(false);
         overlay.setVisible(false);
         pendingDelete = null;
+    }
+
+    private static String buildStars(double avg) {
+        int full = (int) Math.round(avg);
+        StringBuilder sb = new StringBuilder();
+        for (int i = 1; i <= 5; i++) sb.append(i <= full ? "★" : "☆");
+        return sb.toString();
     }
 
     private static String safe(String s) { return s == null ? "" : s; }

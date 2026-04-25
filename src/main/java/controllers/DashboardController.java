@@ -10,6 +10,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import models.User;
+import utils.ActivityTracker;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -34,13 +35,22 @@ public class DashboardController {
     @FXML private VBox dashHomePane;
     @FXML private VBox dashProfilePane;
     @FXML private VBox dashWorkoutsPane;
+    @FXML private VBox dashActivityPane;
+    @FXML private VBox workoutsFragmentPane;
+    @FXML private VBox libraryPane;
     @FXML private Button dashHomeBtn;
     @FXML private Button dashProfileBtn;
     @FXML private Button dashWorkoutsBtn;
     @FXML private ProfileFragmentController dashProfileController;
+    @FXML private ActivityLogController dashActivityController;
+
+    // Singleton reference so child controllers can call back
+    private static DashboardController instance;
+    public static DashboardController getInstance() { return instance; }
 
     @FXML
     private void initialize() {
+        instance = this;
         if (navbarBellBtn != null) {
             navbarBellBtn.setText("\uD83D\uDD14");
         }
@@ -129,12 +139,46 @@ public class DashboardController {
     }
 
     @FXML
+    public void onShowActivityLog() {
+        if (navbarPageTitle != null) navbarPageTitle.setText("Activity Log");
+        if (navbarPageSubtitle != null) navbarPageSubtitle.setText("Your session activity today");
+        dashHomePane.setManaged(false); dashHomePane.setVisible(false);
+        dashProfilePane.setManaged(false); dashProfilePane.setVisible(false);
+        dashWorkoutsPane.setManaged(false); dashWorkoutsPane.setVisible(false);
+        if (dashActivityPane != null) { dashActivityPane.setManaged(true); dashActivityPane.setVisible(true); }
+        if (dashActivityController != null) dashActivityController.refresh();
+        setDashNavActive(null);
+    }
+
+    @FXML
     private void onShowWorkouts() {
         if (navbarPageTitle != null) navbarPageTitle.setText("My Workouts");
         if (navbarPageSubtitle != null) navbarPageSubtitle.setText("Personalized sessions matching your goals");
         dashHomePane.setManaged(false); dashHomePane.setVisible(false);
         dashProfilePane.setManaged(false); dashProfilePane.setVisible(false);
         if (dashWorkoutsPane != null) { dashWorkoutsPane.setManaged(true); dashWorkoutsPane.setVisible(true); }
+        showWorkoutsList();
+        setDashNavActive(dashWorkoutsBtn);
+    }
+
+    public void showWorkoutsList() {
+        if (workoutsFragmentPane != null) { workoutsFragmentPane.setVisible(true); workoutsFragmentPane.setManaged(true); }
+        if (libraryPane != null) { libraryPane.setVisible(false); libraryPane.setManaged(false); libraryPane.getChildren().clear(); }
+    }
+
+    public void showLibraryView(javafx.scene.Node view) {
+        if (navbarPageTitle != null) navbarPageTitle.setText("Exercise Library");
+        if (navbarPageSubtitle != null) navbarPageSubtitle.setText("Browse and discover exercises");
+        dashHomePane.setManaged(false); dashHomePane.setVisible(false);
+        dashProfilePane.setManaged(false); dashProfilePane.setVisible(false);
+        if (dashWorkoutsPane != null) { dashWorkoutsPane.setManaged(true); dashWorkoutsPane.setVisible(true); }
+        if (workoutsFragmentPane != null) { workoutsFragmentPane.setVisible(false); workoutsFragmentPane.setManaged(false); }
+        if (libraryPane != null) {
+            libraryPane.getChildren().setAll(view);
+            javafx.scene.layout.VBox.setVgrow(view, javafx.scene.layout.Priority.ALWAYS);
+            libraryPane.setVisible(true);
+            libraryPane.setManaged(true);
+        }
         setDashNavActive(dashWorkoutsBtn);
     }
 
@@ -165,6 +209,7 @@ public class DashboardController {
         if (dashHomePane != null) { dashHomePane.setManaged(true); dashHomePane.setVisible(true); }
         if (dashProfilePane != null) { dashProfilePane.setManaged(false); dashProfilePane.setVisible(false); }
         if (dashWorkoutsPane != null) { dashWorkoutsPane.setManaged(false); dashWorkoutsPane.setVisible(false); }
+        if (dashActivityPane != null) { dashActivityPane.setManaged(false); dashActivityPane.setVisible(false); }
         setDashNavActive(dashHomeBtn);
     }
 
@@ -179,6 +224,7 @@ public class DashboardController {
 
     @FXML
     private void onLogout() {
+        ActivityTracker.reset();
         AppSession.setCurrentUser(null);
         AppSession.resetOnboarding();
         switchScene("/fxml/SignInView.fxml", "/css/signin.css");

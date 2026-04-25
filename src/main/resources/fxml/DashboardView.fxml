@@ -94,7 +94,22 @@
                         <VBox fx:id="dashWorkoutsPane" managed="false" visible="false"
                               styleClass="dash-content" VBox.vgrow="ALWAYS">
                            <children>
-                              <fx:include fx:id="dashWorkouts" source="UserWorkoutsFragment.fxml" VBox.vgrow="ALWAYS" />
+                              <StackPane fx:id="workoutsStack" VBox.vgrow="ALWAYS">
+                                 <children>
+                                    <VBox fx:id="workoutsFragmentPane" VBox.vgrow="ALWAYS">
+                                       <fx:include fx:id="dashWorkouts" source="UserWorkoutsFragment.fxml" VBox.vgrow="ALWAYS" />
+                                    </VBox>
+                                    <VBox fx:id="libraryPane" managed="false" visible="false" VBox.vgrow="ALWAYS" />
+                                 </children>
+                              </StackPane>
+                           </children>
+                        </VBox>
+
+                        <!-- Activity Log pane -->
+                        <VBox fx:id="dashActivityPane" managed="false" visible="false"
+                              styleClass="dash-content" VBox.vgrow="ALWAYS">
+                           <children>
+                              <fx:include fx:id="dashActivity" source="ActivityLogView.fxml" VBox.vgrow="ALWAYS" />
                            </children>
                         </VBox>
                      </children>

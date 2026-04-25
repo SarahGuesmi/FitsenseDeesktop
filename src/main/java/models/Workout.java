@@ -2,10 +2,13 @@ package models;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class Workout {
 
     private Integer id;
+    private UUID uuid; // BINARY(16) primary key in DB
+    private UUID coachId;
     private String nom;
     private String niveau;
     private Integer duree;
@@ -21,13 +24,14 @@ public class Workout {
 
     // ================= GETTERS & SETTERS =================
 
-    public Integer getId() {
-        return id;
-    }
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+    public UUID getUuid() { return uuid; }
+    public void setUuid(UUID uuid) { this.uuid = uuid; }
+
+    public UUID getCoachId() { return coachId; }
+    public void setCoachId(UUID coachId) { this.coachId = coachId; }
 
     public String getNom() {
         return nom;

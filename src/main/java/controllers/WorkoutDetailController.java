@@ -1,19 +1,27 @@
 package controllers;
 
+import app.AppSession;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import models.Exercise;
 import models.ObjectifSportif;
 import models.Workout;
+import services.ProgressService;
+import utils.ActivityTracker;
+import utils.UuidUtil;
+import utils.WebAssets;
 
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 public class WorkoutDetailController {
 
@@ -29,9 +37,44 @@ public class WorkoutDetailController {
 
     private Workout workout;
     private final Set<Integer> doneExerciseIds = new HashSet<>();
+    private final Set<UUID> doneExerciseUuids = new HashSet<>();
+    private final ProgressService progressService = new ProgressService();
 
     public void setWorkout(Workout w) {
         this.workout = w;
+        ActivityTracker.track(ActivityTracker.EventType.VIEW_WORKOUT,
+                "Viewed: " + (w.getNom() != null ? w.getNom() : "Workout"),
+                w.getExercises().size() + " exercises");
+        loadProgressFromDb();
+        populate();
+    }
+
+    private void loadProgressFromDb() {
+        if (workout == null || AppSession.getCurrentUser() == null) return;
+        UUID userId = AppSession.getCurrentUser().getId();
+        UUID workoutUuid = workout.getUuid();
+        if (userId == null || workoutUuid == null) return;
+
+        Set<UUID> done = progressService.getDoneExerciseUuids(userId, workoutUuid);
+        System.out.println("DEBUG loadProgress: done UUIDs count = " + done.size());
+        doneExerciseUuids.clear();
+        doneExerciseIds.clear();
+        doneExerciseUuids.addAll(done);
+        // Sync integer ids only for exercises actually in done set
+        for (Exercise e : workout.getExercises()) {
+            if (e.getUuid() != null && done.contains(e.getUuid())) {
+                doneExerciseIds.add(e.getId());
+                System.out.println("DEBUG: exercise done = " + e.getNom());
+            }
+        }
+    }
+
+    public void markExerciseDone(int exerciseId) {
+        // legacy — no-op, use markExerciseDoneUuid instead
+    }
+
+    public void markExerciseDoneUuid(UUID exerciseUuid, int exerciseId) {
+        if (exerciseUuid != null) doneExerciseUuids.add(exerciseUuid);
         populate();
     }
 
@@ -53,7 +96,9 @@ public class WorkoutDetailController {
         for (ObjectifSportif o : workout.getObjectifs()) {
             if (o.getName() != null && !o.getName().isBlank()) {
                 Label badge = new Label(o.getName());
-                badge.getStyleClass().add("obj-badge");
+                badge.setStyle("-fx-background-color:rgba(59,130,246,0.1);-fx-border-color:rgba(59,130,246,0.2);"
+                        + "-fx-border-radius:8;-fx-background-radius:8;-fx-text-fill:#60A5FA;"
+                        + "-fx-font-size:11px;-fx-font-weight:800;-fx-padding:3 10;");
                 objectivesPane.getChildren().add(badge);
             }
         }
@@ -65,136 +110,166 @@ public class WorkoutDetailController {
 
         if (total == 0) {
             Label empty = new Label("No exercises added to this workout yet.");
-            empty.getStyleClass().add("detail-desc");
-            empty.setPadding(new Insets(20));
+            empty.setStyle("-fx-text-fill:#6B7280;-fx-font-style:italic;-fx-padding:20;");
             exercisesListBox.getChildren().add(empty);
         } else {
             for (Exercise e : workout.getExercises()) {
-                exercisesListBox.getChildren().add(buildExerciseRow(e));
+                exercisesListBox.getChildren().add(buildExerciseCard(e));
             }
         }
 
-        // Initial state: locked
-        startBtn.setText("🔒  Complete all exercises to unlock (0/" + total + ")");
-        startBtn.getStyleClass().setAll("btn-start-disabled");
-        startBtn.setDisable(true);
         updateProgress();
     }
 
-    private HBox buildExerciseRow(Exercise e) {
-        HBox row = new HBox(14);
-        row.getStyleClass().add("exercise-row");
-        row.setPadding(new Insets(14));
-        row.setAlignment(Pos.CENTER_LEFT);
+    private HBox buildExerciseCard(Exercise e) {
+        // Use UUID-based check only — int id can have hash collisions
+        boolean isDone = e.getUuid() != null && doneExerciseUuids.contains(e.getUuid());
 
-        // Icon
-        Label icon = new Label("🏋");
-        icon.getStyleClass().add("exercise-icon-green");
-        icon.setAlignment(Pos.CENTER);
-        icon.setMinWidth(52); icon.setMinHeight(52);
-        icon.setMaxWidth(52); icon.setMaxHeight(52);
+        HBox card = new HBox(16);
+        card.setPadding(new Insets(18));
+        card.setAlignment(Pos.CENTER_LEFT);
+        card.setCursor(javafx.scene.Cursor.HAND);
 
-        // Info
+        if (isDone) {
+            card.setStyle("-fx-background-color:rgba(34,197,94,0.05);-fx-border-color:rgba(34,197,94,0.3);"
+                    + "-fx-border-radius:16;-fx-background-radius:16;");
+        } else {
+            card.setStyle("-fx-background-color:#111827;-fx-border-color:#1F2937;"
+                    + "-fx-border-radius:16;-fx-background-radius:16;");
+            card.setOnMouseEntered(ev -> card.setStyle(
+                    "-fx-background-color:rgba(255,255,255,0.03);-fx-border-color:rgba(59,130,246,0.3);"
+                    + "-fx-border-radius:16;-fx-background-radius:16;"));
+            card.setOnMouseExited(ev -> card.setStyle(
+                    "-fx-background-color:#111827;-fx-border-color:#1F2937;"
+                    + "-fx-border-radius:16;-fx-background-radius:16;"));
+        }
+
+        card.setOnMouseClicked(ev -> openExerciseDetail(e));
+
+        // ── Image thumbnail with tick overlay ──
+        StackPane thumbPane = new StackPane();
+        thumbPane.setMinWidth(64); thumbPane.setMinHeight(64);
+        thumbPane.setMaxWidth(64); thumbPane.setMaxHeight(64);
+        thumbPane.setStyle("-fx-background-color:#1F2937;-fx-background-radius:12;");
+
+        if (exercise_hasImage(e)) {
+            try {
+                ImageView img = new ImageView(
+                        new Image(WebAssets.assetUrl("uploads/exercises/" + e.getImageName()), 64, 64, false, true, true));
+                img.setFitWidth(64); img.setFitHeight(64);
+                img.setStyle("-fx-opacity:" + (isDone ? "0.5" : "1.0") + ";");
+                img.setStyle(isDone ? "-fx-opacity:0.5;" : "");
+                thumbPane.getChildren().add(img);
+            } catch (Exception ignored) {
+                thumbPane.getChildren().add(defaultIcon());
+            }
+        } else {
+            thumbPane.getChildren().add(defaultIcon());
+        }
+
+        if (isDone) {
+            StackPane overlay = new StackPane();
+            overlay.setStyle("-fx-background-color:rgba(34,197,94,0.3);-fx-background-radius:12;");
+            overlay.setMinWidth(64); overlay.setMinHeight(64);
+            overlay.setMaxWidth(64); overlay.setMaxHeight(64);
+            Label tick = new Label("✔");
+            tick.setStyle("-fx-text-fill:#4ADE80;-fx-font-size:20px;-fx-font-weight:900;");
+            overlay.getChildren().add(tick);
+            thumbPane.getChildren().add(overlay);
+        }
+
+        // ── Info ──
         VBox info = new VBox(4);
         HBox.setHgrow(info, Priority.ALWAYS);
 
         HBox nameRow = new HBox(8);
         nameRow.setAlignment(Pos.CENTER_LEFT);
+
         Label name = new Label(safe(e.getNom()));
-        name.getStyleClass().add("exercise-row-name");
+        name.setStyle("-fx-text-fill:" + (isDone ? "#4ADE80" : "white")
+                + ";-fx-font-size:16px;-fx-font-weight:700;");
+
         nameRow.getChildren().add(name);
 
-        // Done badge (hidden initially)
-        Label doneBadge = new Label("✔ Done");
-        doneBadge.setStyle("-fx-background-color: rgba(34,197,94,0.2); -fx-border-color: rgba(34,197,94,0.3); " +
-                "-fx-border-radius: 20; -fx-background-radius: 20; -fx-text-fill: #4ADE80; " +
-                "-fx-font-size: 11px; -fx-font-weight: 800; -fx-padding: 2 8;");
-        doneBadge.setManaged(false);
-        doneBadge.setVisible(false);
-        nameRow.getChildren().add(doneBadge);
+        if (isDone) {
+            Label doneBadge = new Label("✔ Done");
+            doneBadge.setStyle("-fx-background-color:rgba(34,197,94,0.2);-fx-border-color:rgba(34,197,94,0.3);"
+                    + "-fx-border-radius:999;-fx-background-radius:999;-fx-text-fill:#4ADE80;"
+                    + "-fx-font-size:10px;-fx-font-weight:800;-fx-padding:2 8;");
+            nameRow.getChildren().add(doneBadge);
+        }
 
         String typeStr = safe(e.getType()).toUpperCase();
-        Label typeLbl = new Label(typeStr + (typeStr.isEmpty() ? "" : "  •  ") + "FULL BODY");
-        typeLbl.getStyleClass().add("exercise-row-type");
+        Label typeLbl = new Label(typeStr + (typeStr.isEmpty() ? "FULL BODY" : "  •  FULL BODY"));
+        typeLbl.setStyle("-fx-text-fill:#6B7280;-fx-font-size:11px;-fx-font-weight:700;");
 
         info.getChildren().addAll(nameRow, typeLbl);
 
-        // Right: duration + mark done button
+        // ── Right: duration + chevron ──
         VBox right = new VBox(4);
         right.setAlignment(Pos.CENTER_RIGHT);
 
         String durStr = e.getDuree() != null && e.getDuree() > 0
                 ? e.getDuree() + " secs"
                 : (e.getSets() != null ? e.getSets() + " x " + (e.getReps() != null ? e.getReps() : 12) : "—");
+
         Label dur = new Label(durStr);
-        dur.getStyleClass().add("exercise-row-duration");
+        dur.setStyle("-fx-text-fill:" + (isDone ? "#4ADE80" : "#60A5FA")
+                + ";-fx-font-size:14px;-fx-font-weight:800;");
 
         Label perf = new Label("PERFORMANCE");
-        perf.setStyle("-fx-text-fill: #4B5563; -fx-font-size: 10px; -fx-font-weight: 800;");
+        perf.setStyle("-fx-text-fill:#4B5563;-fx-font-size:10px;-fx-font-weight:800;");
 
-        Button markBtn = new Button("Mark Done");
-        markBtn.setStyle("-fx-background-color: #1F2937; -fx-border-color: #374151; " +
-                "-fx-border-radius: 8; -fx-background-radius: 8; -fx-text-fill: #9CA3AF; " +
-                "-fx-font-size: 11px; -fx-font-weight: 700; -fx-padding: 4 10; -fx-cursor: hand;");
+        Label chevron = new Label(isDone ? "✔" : "›");
+        chevron.setStyle("-fx-text-fill:" + (isDone ? "#22C55E" : "#6B7280")
+                + ";-fx-font-size:" + (isDone ? "14" : "18") + "px;");
 
-        markBtn.setOnAction(ev -> {
-            if (doneExerciseIds.contains(e.getId())) {
-                // Undo
-                doneExerciseIds.remove(e.getId());
-                markBtn.setText("Mark Done");
-                markBtn.setStyle("-fx-background-color: #1F2937; -fx-border-color: #374151; " +
-                        "-fx-border-radius: 8; -fx-background-radius: 8; -fx-text-fill: #9CA3AF; " +
-                        "-fx-font-size: 11px; -fx-font-weight: 700; -fx-padding: 4 10; -fx-cursor: hand;");
-                doneBadge.setManaged(false);
-                doneBadge.setVisible(false);
-                name.setStyle("-fx-text-fill: white;");
-                row.setStyle("-fx-background-color: #111827; -fx-border-color: #1F2937; " +
-                        "-fx-border-radius: 12; -fx-background-radius: 12;");
-                icon.setStyle("-fx-background-color: linear-gradient(to bottom right,#22C55E,#16A34A); " +
-                        "-fx-background-radius: 10; -fx-font-size: 22px;");
-            } else {
-                // Mark done
-                doneExerciseIds.add(e.getId());
-                markBtn.setText("✔ Done");
-                markBtn.setStyle("-fx-background-color: rgba(34,197,94,0.15); -fx-border-color: rgba(34,197,94,0.3); " +
-                        "-fx-border-radius: 8; -fx-background-radius: 8; -fx-text-fill: #4ADE80; " +
-                        "-fx-font-size: 11px; -fx-font-weight: 700; -fx-padding: 4 10; -fx-cursor: hand;");
-                doneBadge.setManaged(true);
-                doneBadge.setVisible(true);
-                name.setStyle("-fx-text-fill: #4ADE80;");
-                row.setStyle("-fx-background-color: rgba(34,197,94,0.05); " +
-                        "-fx-border-color: rgba(34,197,94,0.3); " +
-                        "-fx-border-radius: 12; -fx-background-radius: 12;");
-            }
-            updateProgress();
-        });
+        right.getChildren().addAll(dur, perf, chevron);
 
-        right.getChildren().addAll(dur, perf, markBtn);
-        row.getChildren().addAll(icon, info, right);
-        return row;
+        card.getChildren().addAll(thumbPane, info, right);
+        return card;
+    }
+
+    private Label defaultIcon() {
+        Label icon = new Label("🏃");
+        icon.setStyle("-fx-font-size:22px;");
+        icon.setAlignment(Pos.CENTER);
+        return icon;
+    }
+
+    private boolean exercise_hasImage(Exercise e) {
+        return e.getImageName() != null && !e.getImageName().isBlank();
     }
 
     private void updateProgress() {
         int total = workout.getExercises().size();
-        int done = doneExerciseIds.size();
-        progressLabel.setText(done + " / " + total + " exercises completed");
+        int done = doneExerciseUuids.size();
+        boolean allDone = total > 0 && done == total;
 
-        // Update progress bar width via binding
-        progressFill.sceneProperty().addListener((obs, o, scene) -> {});
+        progressLabel.setText(done + " / " + total + " exercises completed");
+        progressLabel.setStyle("-fx-font-size:13px;-fx-font-weight:700;-fx-text-fill:"
+                + (allDone ? "#4ADE80" : "#60A5FA") + ";");
+
         if (total > 0) {
             double pct = (double) done / total;
+            progressFill.prefWidthProperty().unbind();
             progressFill.prefWidthProperty().bind(
                     ((StackPane) progressFill.getParent()).widthProperty().multiply(pct));
+            progressFill.setStyle("-fx-background-color:" + (allDone ? "#22C55E" : "#3B82F6")
+                    + ";-fx-background-radius:6;-fx-pref-height:10;-fx-max-height:10;");
         }
 
-        boolean allDone = total > 0 && done == total;
         if (allDone) {
             startBtn.setText("🏆  Mark Workout Done");
-            startBtn.getStyleClass().setAll("btn-start-session");
+            startBtn.setStyle("-fx-background-color:linear-gradient(to right,#22C55E,#16A34A);"
+                    + "-fx-text-fill:black;-fx-font-weight:900;-fx-font-size:14px;"
+                    + "-fx-background-radius:12;-fx-padding:14 0;-fx-max-width:Infinity;-fx-cursor:hand;");
             startBtn.setDisable(false);
         } else {
             startBtn.setText("🔒  Complete all exercises to unlock (" + done + "/" + total + ")");
-            startBtn.getStyleClass().setAll("btn-start-disabled");
+            startBtn.setStyle("-fx-background-color:#1F2937;-fx-text-fill:#4B5563;"
+                    + "-fx-font-weight:900;-fx-font-size:14px;"
+                    + "-fx-background-radius:12;-fx-padding:14 0;-fx-max-width:Infinity;");
             startBtn.setDisable(true);
         }
     }
@@ -203,9 +278,9 @@ public class WorkoutDetailController {
     private void onStartWorkout() {
         startBtn.setText("✅  Workout Completed! 🎉");
         startBtn.setDisable(true);
-        startBtn.setStyle("-fx-background-color: rgba(34,197,94,0.2); -fx-border-color: rgba(34,197,94,0.3); " +
-                "-fx-text-fill: #4ADE80; -fx-font-weight: 800; -fx-font-size: 14px; " +
-                "-fx-background-radius: 12; -fx-padding: 14 0; -fx-max-width: Infinity;");
+        startBtn.setStyle("-fx-background-color:rgba(34,197,94,0.2);-fx-border-color:rgba(34,197,94,0.3);"
+                + "-fx-text-fill:#4ADE80;-fx-font-weight:800;-fx-font-size:14px;"
+                + "-fx-background-radius:12;-fx-padding:14 0;-fx-max-width:Infinity;");
     }
 
     @FXML
@@ -214,9 +289,23 @@ public class WorkoutDetailController {
             Parent root = FXMLLoader.load(
                     Objects.requireNonNull(getClass().getResource("/fxml/DashboardView.fxml")));
             workoutNameLabel.getScene().setRoot(root);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        } catch (Exception ex) { ex.printStackTrace(); }
+    }
+
+    private void openExerciseDetail(Exercise e) {
+        ActivityTracker.track(ActivityTracker.EventType.START_EXERCISE,
+                "Started: " + safe(e.getNom()), safe(e.getType()) + " • " + (e.getDuree() != null ? e.getDuree() + "s" : ""));
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    Objects.requireNonNull(getClass().getResource("/fxml/ExerciseDetailView.fxml")));
+            Parent root = loader.load();
+            ExerciseDetailController ctrl = loader.getController();
+            ctrl.setExercise(e, workout, done -> {
+                doneExerciseIds.add(done.getId());
+                if (done.getUuid() != null) doneExerciseUuids.add(done.getUuid());
+            });
+            workoutNameLabel.getScene().setRoot(root);
+        } catch (Exception ex) { ex.printStackTrace(); }
     }
 
     private static String safe(String s) { return s == null ? "" : s; }

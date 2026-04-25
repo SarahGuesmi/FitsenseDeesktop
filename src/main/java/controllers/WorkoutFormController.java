@@ -196,7 +196,7 @@ public class WorkoutFormController {
                 w.setExercises(selectedExercises);
 
                 workoutService.createPrepared(w);
-                workoutService.syncObjectifs(w.getId(), selectedObjectives);
+                workoutService.syncObjectifs(w.getUuid(), selectedObjectives);
 
             } else {
                 editingWorkout.setNom(name);
@@ -206,7 +206,7 @@ public class WorkoutFormController {
                 editingWorkout.setExercises(selectedExercises);
 
                 workoutService.update(editingWorkout);
-                workoutService.syncObjectifs(editingWorkout.getId(), selectedObjectives);
+                workoutService.syncObjectifs(editingWorkout.getUuid(), selectedObjectives);
             }
 
             goBackToCatalog();

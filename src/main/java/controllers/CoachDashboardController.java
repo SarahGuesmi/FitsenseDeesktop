@@ -7,19 +7,28 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.PieChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.VBox;
+import models.Exercise;
 import models.User;
+import models.Workout;
+import services.ExerciseService;
 import services.UserService;
+import services.WorkoutService;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -77,28 +86,24 @@ public class CoachDashboardController {
     @FXML
     private Label navbarAvatar;
 
-    @FXML
-    private Label totalAthletesLabel;
-    @FXML
-    private Label activeAthletesLabel;
-    @FXML
-    private Label sessionsLabel;
+    @FXML private Label totalAthletesLabel;
+    @FXML private Label activeAthletesLabel;
+    @FXML private Label sessionsLabel;
+    @FXML private BarChart<String, Number> exerciseBarChart;
+    @FXML private PieChart goalPieChart;
+    @FXML private PieChart levelPieChart;
 
-    @FXML
-    private TableView<User> athletesTable;
-    @FXML
-    private TableColumn<User, String> nameCol;
-    @FXML
-    private TableColumn<User, String> roleCol;
-    @FXML
-    private TableColumn<User, String> statusCol;
-    @FXML
-    private TableColumn<User, String> dateCol;
+    @FXML private TableView<User> athletesTable;
+    @FXML private TableColumn<User, String> nameCol;
+    @FXML private TableColumn<User, String> roleCol;
+    @FXML private TableColumn<User, String> statusCol;
+    @FXML private TableColumn<User, String> dateCol;
 
-    @FXML
-    private ProfileFragmentController coachProfileController;
+    @FXML private ProfileFragmentController coachProfileController;
 
     private final UserService userService = new UserService();
+    private final WorkoutService workoutService = new WorkoutService();
+    private final ExerciseService exerciseService = new ExerciseService();
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy");
 
     @FXML
@@ -118,7 +123,7 @@ public class CoachDashboardController {
         coachDashboardPane.setVisible(true);
         setNavbarText("Coach dashboard", "Train and support your athletes");
         setActiveSidebar(coachHomeBtn);
-        refreshStats();
+        refreshStats(); // always refresh on navigate
     }
 
     @FXML
@@ -343,15 +348,105 @@ public class CoachDashboardController {
         long active = roster.stream()
                 .filter(u -> "active".equalsIgnoreCase(safe(u.getAccountStatus())))
                 .count();
-        if (totalAthletesLabel != null) {
-            totalAthletesLabel.setText(String.valueOf(roster.size()));
+        if (totalAthletesLabel != null) totalAthletesLabel.setText(String.valueOf(roster.size()));
+        if (activeAthletesLabel != null) activeAthletesLabel.setText(String.valueOf(active));
+
+        try {
+            List<Workout> workouts = workoutService.readWithExercises();
+
+            // AVG duration
+            double avg = workouts.stream()
+                    .filter(w -> w.getDuree() != null)
+                    .mapToInt(Workout::getDuree)
+                    .average().orElse(0);
+            if (sessionsLabel != null) sessionsLabel.setText(String.format("%.1f min", avg));
+
+            // ── Bar chart: Most Used Exercises ──
+            Map<String, Integer> exerciseUsage = new LinkedHashMap<>();
+            for (Workout w : workouts) {
+                for (Exercise e : w.getExercises()) {
+                    String name = e.getNom() != null ? e.getNom() : "Unknown";
+                    exerciseUsage.merge(name, 1, Integer::sum);
+                }
+            }
+            // Sort by usage desc, take top 8
+            List<Map.Entry<String, Integer>> top = exerciseUsage.entrySet().stream()
+                    .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+                    .limit(8).toList();
+
+            if (exerciseBarChart != null) {
+                exerciseBarChart.getData().clear();
+                XYChart.Series<String, Number> series = new XYChart.Series<>();
+                series.setName("Uses");
+                for (Map.Entry<String, Integer> entry : top) {
+                    series.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
+                }
+                exerciseBarChart.getData().add(series);
+                // Apply color per bar after rendering
+                javafx.application.Platform.runLater(() -> {
+                    String[] colors = {"#22C55E","#3B82F6","#EC4899","#F59E0B","#8B5CF6","#EF4444","#06B6D4","#10B981"};
+                    var bars = exerciseBarChart.lookupAll(".chart-bar");
+                    int i = 0;
+                    for (javafx.scene.Node bar : bars) {
+                        bar.setStyle("-fx-bar-fill:" + colors[i % colors.length] + ";");
+                        i++;
+                    }
+                });
+            }
+
+            // ── Pie chart: Workouts by Goal ──
+            Map<String, Integer> goalDist = new LinkedHashMap<>();
+            for (Workout w : workouts) {
+                if (w.getObjectifs().isEmpty()) {
+                    goalDist.merge("Unknown", 1, Integer::sum);
+                } else {
+                    for (var obj : w.getObjectifs()) {
+                        String name = obj.getName() != null ? obj.getName() : "Unknown";
+                        goalDist.merge(name, 1, Integer::sum);
+                    }
+                }
+            }
+            if (goalPieChart != null) {
+                goalPieChart.getData().clear();
+                goalDist.forEach((k, v) ->
+                        goalPieChart.getData().add(new PieChart.Data(k + " (" + v + ")", v)));
+                goalPieChart.setLabelsVisible(false);
+                // Add tooltips
+                javafx.application.Platform.runLater(() -> {
+                    for (PieChart.Data d : goalPieChart.getData()) {
+                        javafx.scene.control.Tooltip.install(d.getNode(),
+                                new javafx.scene.control.Tooltip(d.getName() + ": " + (int)d.getPieValue()));
+                    }
+                });
+            }
+
+            // ── Pie chart: Workouts by Level ──
+            Map<String, Integer> levelDist = new LinkedHashMap<>();
+            for (Workout w : workouts) {
+                String level = w.getNiveau() != null ? capitalize(w.getNiveau()) : "Unknown";
+                levelDist.merge(level, 1, Integer::sum);
+            }
+            if (levelPieChart != null) {
+                levelPieChart.getData().clear();
+                levelDist.forEach((k, v) ->
+                        levelPieChart.getData().add(new PieChart.Data(k + " (" + v + ")", v)));
+                levelPieChart.setLabelsVisible(false);
+                javafx.application.Platform.runLater(() -> {
+                    for (PieChart.Data d : levelPieChart.getData()) {
+                        javafx.scene.control.Tooltip.install(d.getNode(),
+                                new javafx.scene.control.Tooltip(d.getName() + ": " + (int)d.getPieValue()));
+                    }
+                });
+            }
+
+        } catch (SQLException e) {
+            System.err.println("CoachDashboard refreshStats error: " + e.getMessage());
         }
-        if (activeAthletesLabel != null) {
-            activeAthletesLabel.setText(String.valueOf(active));
-        }
-        if (sessionsLabel != null) {
-            sessionsLabel.setText("—");
-        }
+    }
+
+    private static String capitalize(String s) {
+        if (s == null || s.isBlank()) return s;
+        return Character.toUpperCase(s.charAt(0)) + s.substring(1).toLowerCase();
     }
 
     private void refreshAthletesTable() {

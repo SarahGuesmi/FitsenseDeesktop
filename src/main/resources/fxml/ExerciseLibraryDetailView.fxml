@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.web.WebView?>
+
+<VBox style="-fx-background-color:#070b16;"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controllers.ExerciseLibraryDetailController">
+
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
+                style="-fx-background-color:#070b16;-fx-background:#070b16;-fx-border-color:transparent;">
+        <VBox spacing="16.0" maxWidth="900.0">
+            <padding><Insets top="24.0" bottom="40.0" left="32.0" right="32.0"/></padding>
+
+            <Button mnemonicParsing="false" onAction="#onBack"
+                    style="-fx-background-color:transparent;-fx-text-fill:#6B7280;-fx-font-size:13px;-fx-font-weight:600;-fx-cursor:hand;-fx-padding:4 0;"
+                    text="← Back to Library" />
+
+            <!-- GIF + Info side by side -->
+            <HBox spacing="24.0" alignment="TOP_LEFT">
+                <!-- GIF via WebView -->
+                <VBox style="-fx-background-color:#111827;-fx-background-radius:16;-fx-border-color:#1F2937;-fx-border-radius:16;-fx-overflow:hidden;"
+                      minWidth="320" maxWidth="320">
+                    <WebView fx:id="gifWebView" prefWidth="320" prefHeight="320" />
+                </VBox>
+
+                <!-- Info -->
+                <VBox spacing="14.0" HBox.hgrow="ALWAYS">
+                    <Label fx:id="nameLabel"
+                           style="-fx-text-fill:white;-fx-font-size:22px;-fx-font-weight:900;" wrapText="true" text="" />
+
+                    <!-- Badges -->
+                    <HBox spacing="8.0" alignment="CENTER_LEFT">
+                        <Label fx:id="bodyPartBadge"
+                               style="-fx-background-color:rgba(59,130,246,0.2);-fx-border-color:rgba(59,130,246,0.4);-fx-border-radius:999;-fx-background-radius:999;-fx-text-fill:#60A5FA;-fx-font-size:11px;-fx-font-weight:800;-fx-padding:4 12;" text="" />
+                        <Label fx:id="targetBadge"
+                               style="-fx-background-color:rgba(16,185,129,0.2);-fx-border-color:rgba(16,185,129,0.4);-fx-border-radius:999;-fx-background-radius:999;-fx-text-fill:#34D399;-fx-font-size:11px;-fx-font-weight:800;-fx-padding:4 12;" text="" />
+                        <Label fx:id="equipBadge"
+                               style="-fx-background-color:rgba(139,92,246,0.2);-fx-border-color:rgba(139,92,246,0.4);-fx-border-radius:999;-fx-background-radius:999;-fx-text-fill:#A78BFA;-fx-font-size:11px;-fx-font-weight:800;-fx-padding:4 12;" text="" />
+                    </HBox>
+
+                    <!-- Stats row -->
+                    <HBox spacing="12.0">
+                        <VBox fx:id="stepsBox" managed="false" visible="false"
+                              style="-fx-background-color:#111827;-fx-border-color:#1F2937;-fx-border-radius:12;-fx-background-radius:12;-fx-padding:14 20;"
+                              alignment="CENTER" minWidth="100">
+                            <Label fx:id="stepsCount" style="-fx-text-fill:white;-fx-font-size:22px;-fx-font-weight:900;" text="0" />
+                            <Label style="-fx-text-fill:#6B7280;-fx-font-size:11px;-fx-font-weight:700;" text="STEPS" />
+                        </VBox>
+                        <VBox fx:id="musclesBox" managed="false" visible="false"
+                              style="-fx-background-color:#111827;-fx-border-color:#1F2937;-fx-border-radius:12;-fx-background-radius:12;-fx-padding:14 20;"
+                              alignment="CENTER" minWidth="100">
+                            <Label fx:id="musclesCount" style="-fx-text-fill:white;-fx-font-size:22px;-fx-font-weight:900;" text="0" />
+                            <Label style="-fx-text-fill:#6B7280;-fx-font-size:11px;-fx-font-weight:700;" text="MUSCLES" />
+                        </VBox>
+                        <VBox style="-fx-background-color:#111827;-fx-border-color:#1F2937;-fx-border-radius:12;-fx-background-radius:12;-fx-padding:14 20;"
+                              alignment="CENTER" minWidth="120">
+                            <Label fx:id="equipLabel" style="-fx-text-fill:white;-fx-font-size:14px;-fx-font-weight:900;" text="" />
+                            <Label style="-fx-text-fill:#6B7280;-fx-font-size:11px;-fx-font-weight:700;" text="EQUIPMENT" />
+                        </VBox>
+                    </HBox>
+
+                    <!-- Secondary muscles -->
+                    <VBox fx:id="secondaryBox" spacing="8.0" managed="false" visible="false">
+                        <Label style="-fx-text-fill:#6B7280;-fx-font-size:11px;-fx-font-weight:800;-fx-letter-spacing:1;" text="SECONDARY MUSCLES" />
+                        <FlowPane fx:id="secondaryPane" hgap="6.0" vgap="4.0" />
+                    </VBox>
+                </VBox>
+            </HBox>
+
+            <!-- Instructions -->
+            <VBox fx:id="instructionsBox" spacing="12.0" managed="false" visible="false"
+                  style="-fx-background-color:#111827;-fx-border-color:#1F2937;-fx-border-radius:16;-fx-background-radius:16;-fx-padding:20;">
+                <HBox spacing="8.0" alignment="CENTER_LEFT">
+                    <Label style="-fx-text-fill:#3B82F6;-fx-font-size:16px;" text="≡" />
+                    <Label style="-fx-text-fill:#6B7280;-fx-font-size:11px;-fx-font-weight:800;" text="EXECUTION STEPS" />
+                </HBox>
+                <VBox fx:id="instructionsList" spacing="10.0" />
+            </VBox>
+
+        </VBox>
+    </ScrollPane>
+</VBox>

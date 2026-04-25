@@ -233,4 +233,25 @@ public class UserWorkoutsController {
             ex.printStackTrace();
         }
     }
+
+    @FXML
+    private void onOpenActivityLog() {
+        DashboardController dash = DashboardController.getInstance();
+        if (dash != null) dash.onShowActivityLog();
+    }
+
+    @FXML
+    private void onOpenExerciseLibrary() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    Objects.requireNonNull(getClass().getResource("/fxml/ExerciseLibraryView.fxml")));
+            javafx.scene.Node view = loader.load();
+            DashboardController dash = DashboardController.getInstance();
+            if (dash != null) {
+                dash.showLibraryView(view);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
 }

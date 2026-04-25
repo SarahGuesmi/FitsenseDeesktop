@@ -9,6 +9,16 @@
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="controllers.UserWorkoutsController">
 
+    <!-- Exercises Library button -->
+    <HBox style="-fx-padding:0 0 4 0;" spacing="10.0">
+        <Button mnemonicParsing="false" onAction="#onOpenExerciseLibrary"
+                style="-fx-background-color:linear-gradient(to right,#3B82F6,#6366F1);-fx-text-fill:white;-fx-font-weight:800;-fx-font-size:13px;-fx-background-radius:12;-fx-padding:10 20;-fx-cursor:hand;"
+                text="⚡  Exercises Library" />
+        <Button mnemonicParsing="false" onAction="#onOpenActivityLog"
+                style="-fx-background-color:#1F2937;-fx-border-color:#374151;-fx-border-radius:12;-fx-background-radius:12;-fx-text-fill:#9CA3AF;-fx-font-weight:700;-fx-font-size:13px;-fx-padding:10 20;-fx-cursor:hand;"
+                text="🕐  Activity Log" />
+    </HBox>
+
     <!-- Objective pills -->
     <FlowPane fx:id="objectivePillsPane" hgap="8.0" vgap="8.0" />
 

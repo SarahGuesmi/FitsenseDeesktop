@@ -3,6 +3,8 @@ package utils;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
+// AppConfig reads from config.properties
+
 /**
  * Loads images from the Symfony web app over HTTP (Option B).
  * <p>
@@ -28,18 +30,20 @@ public final class WebAssets {
     public static final String HOME_GYM_VIDEO = "assets/images/gym-video.mp4";
 
     public static String baseUrl() {
-        String p = System.getProperty("fitsense.web.url");
-        if (p != null && !p.isBlank()) {
-            return p.endsWith("/") ? p.substring(0, p.length() - 1) : p;
-        }
-        return DEFAULT_BASE;
+        return AppConfig.get("fitsense.web.url", DEFAULT_BASE).replaceAll("/+$", "");
     }
 
     /**
      * @param pathUnderPublic no leading slash, e.g. {@code assets/images/sport-hero.png}
+     *                        For exercise images use {@code uploads/exercises/filename.jpg}
      */
     public static String assetUrl(String pathUnderPublic) {
         String path = pathUnderPublic == null ? "" : pathUnderPublic.replaceFirst("^/+", "");
+        // Exercise images are stored in XAMPP pidevassets
+        if (path.startsWith("uploads/exercises/")) {
+            String filename = path.replace("uploads/exercises/", "");
+            return "http://localhost/pidevassets/" + filename;
+        }
         return baseUrl() + "/" + path;
     }
 

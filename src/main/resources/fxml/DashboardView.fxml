@@ -23,7 +23,6 @@
                   <Button mnemonicParsing="false" styleClass="dash-side-link" text="◉  Mental Health" />
                   <Button mnemonicParsing="false" styleClass="dash-side-link" text="◇  Nutrition" />
                   <Button mnemonicParsing="false" styleClass="dash-side-link" text="💬  Chatroom" />
-                  <Button mnemonicParsing="false" onAction="#onTestFeedback" styleClass="dash-side-link" text="🧪  Test Feedback" />
                   <Region VBox.vgrow="ALWAYS" />
                   <Button mnemonicParsing="false" onAction="#onLogout" styleClass="dash-side-link" text="⏻  Sign Out" />
                </children>

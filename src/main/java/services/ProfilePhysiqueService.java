@@ -2,7 +2,6 @@ package services;
 
 import models.ProfilePhysique;
 import utils.DbConnection;
-import utils.ResultSetColumns;
 import utils.UuidUtil;
 
 import java.sql.*;
@@ -19,22 +18,20 @@ public class ProfilePhysiqueService implements CRUD<ProfilePhysique> {
     }
 
     private static ProfilePhysique mapRow(ResultSet rs) throws SQLException {
+        UUID id = UuidUtil.fromResultSet(rs, "id");
+        UUID userId = UuidUtil.fromResultSet(rs, "user_id");
         float w = rs.getFloat("weight");
         Float weight = rs.wasNull() ? null : w;
         float h = rs.getFloat("height");
         Float height = rs.wasNull() ? null : h;
-        Object genderObj = ResultSetColumns.getFirstObject(rs, "gender");
-        String gender = ResultSetColumns.normalizeGenderDbValue(genderObj);
-        // id and user_id are int in DB — wrap as UUID for model compatibility
-        UUID id = new UUID(0, rs.getInt("id"));
-        UUID userId = new UUID(0, rs.getInt("user_id"));
+        String gender = rs.getString("gender");
         return new ProfilePhysique(id, weight, height, gender, userId);
     }
 
     public List<ProfilePhysique> findByUserId(UUID userId) throws SQLException {
         String sql = "SELECT * FROM `profile_physique` WHERE `user_id` = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
-            stmt.setInt(1, (int) userId.getLeastSignificantBits());
+            stmt.setBytes(1, UuidUtil.toBytes16(userId));
             try (ResultSet rs = stmt.executeQuery()) {
                 List<ProfilePhysique> list = new ArrayList<>();
                 while (rs.next()) list.add(mapRow(rs));
@@ -44,21 +41,16 @@ public class ProfilePhysiqueService implements CRUD<ProfilePhysique> {
     }
 
     public String findGenderByUserEmail(String email) throws SQLException {
-        if (email == null || email.isBlank()) return null;
-        String sql = "SELECT p.* FROM `profile_physique` p "
-                + "INNER JOIN `user` u ON u.`id` = p.`user_id` "
-                + "WHERE u.`email` = ?";
+        String sql = "SELECT p.* FROM `profile_physique` p " +
+                "INNER JOIN `app_user` u ON u.`id` = p.`user_id` " +
+                "WHERE u.`email_email` = ?";
         try (PreparedStatement ps = cnx.prepareStatement(sql)) {
-            ps.setString(1, email.trim());
+            ps.setString(1, email);
             try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    Object g = ResultSetColumns.getFirstObject(rs, "gender");
-                    String n = ResultSetColumns.normalizeGenderDbValue(g);
-                    if (n != null && !n.isBlank()) return n;
-                }
-                return null;
+                if (rs.next()) return rs.getString("gender");
             }
         }
+        return null;
     }
 
     @Override
@@ -76,59 +68,40 @@ public class ProfilePhysiqueService implements CRUD<ProfilePhysique> {
 
     @Override
     public void update(ProfilePhysique p) throws SQLException {
-        String sql = "UPDATE `profile_physique` SET `weight` = ?, `height` = ?, `gender` = ? WHERE `id` = ?";
+        String sql = "UPDATE `profile_physique` SET `weight`=?, `height`=?, `gender`=? WHERE `id`=?";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
-            int i = 1;
-            if (p.getWeight() != null) {
-                stmt.setFloat(i++, p.getWeight());
-            } else {
-                stmt.setNull(i++, Types.FLOAT);
-            }
-            if (p.getHeight() != null) {
-                stmt.setFloat(i++, p.getHeight());
-            } else {
-                stmt.setNull(i++, Types.FLOAT);
-            }
-            stmt.setString(i++, p.getGender());
-            stmt.setInt(i, (int) p.getId().getLeastSignificantBits());
+            if (p.getWeight() != null) stmt.setFloat(1, p.getWeight());
+            else stmt.setNull(1, Types.FLOAT);
+            if (p.getHeight() != null) stmt.setFloat(2, p.getHeight());
+            else stmt.setNull(2, Types.FLOAT);
+            stmt.setString(3, p.getGender());
+            stmt.setBytes(4, UuidUtil.toBytes16(p.getId()));
             stmt.executeUpdate();
         }
     }
 
     @Override
     public void delete(ProfilePhysique p) throws SQLException {
-        String sql = "DELETE FROM `profile_physique` WHERE `id` = ?";
+        String sql = "DELETE FROM `profile_physique` WHERE `id`=?";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
-            stmt.setInt(1, (int) p.getId().getLeastSignificantBits());
+            stmt.setBytes(1, UuidUtil.toBytes16(p.getId()));
             stmt.executeUpdate();
         }
     }
 
     @Override
-    public void createPrepared(ProfilePhysique profilePhysique) throws SQLException {
-        // id is auto_increment, don't insert it
-        String sql = "INSERT INTO `profile_physique` (`weight`, `height`, `gender`, `user_id`) "
-                + "VALUES (?, ?, ?, ?)";
-        try (PreparedStatement stmt = cnx.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            int i = 1;
-            if (profilePhysique.getWeight() != null) {
-                stmt.setFloat(i++, profilePhysique.getWeight());
-            } else {
-                stmt.setNull(i++, Types.FLOAT);
-            }
-            if (profilePhysique.getHeight() != null) {
-                stmt.setFloat(i++, profilePhysique.getHeight());
-            } else {
-                stmt.setNull(i++, Types.FLOAT);
-            }
-            stmt.setString(i++, profilePhysique.getGender());
-            stmt.setInt(i, (int) profilePhysique.getUserId().getLeastSignificantBits());
+    public void createPrepared(ProfilePhysique p) throws SQLException {
+        if (p.getId() == null) p.setId(UUID.randomUUID());
+        String sql = "INSERT INTO `profile_physique` (`id`, `user_id`, `weight`, `height`, `gender`) VALUES (?,?,?,?,?)";
+        try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
+            stmt.setBytes(1, UuidUtil.toBytes16(p.getId()));
+            stmt.setBytes(2, UuidUtil.toBytes16(p.getUserId()));
+            if (p.getWeight() != null) stmt.setFloat(3, p.getWeight());
+            else stmt.setNull(3, Types.FLOAT);
+            if (p.getHeight() != null) stmt.setFloat(4, p.getHeight());
+            else stmt.setNull(4, Types.FLOAT);
+            stmt.setString(5, p.getGender());
             stmt.executeUpdate();
-            try (ResultSet keys = stmt.getGeneratedKeys()) {
-                if (keys.next()) {
-                    profilePhysique.setId(new java.util.UUID(0, keys.getInt(1)));
-                }
-            }
         }
     }
 }

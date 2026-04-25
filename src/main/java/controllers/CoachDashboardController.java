@@ -633,7 +633,9 @@ public class CoachDashboardController {
             if (keywords != null && !keywords.isBlank()) {
                 HBox kwBox = new HBox(6);
                 kwBox.setAlignment(Pos.CENTER_LEFT);
-                for (String kw : keywords.split(",")) {
+                // Strip JSON brackets and quotes
+                String cleaned = keywords.replaceAll("[\\[\\]\"]", "");
+                for (String kw : cleaned.split(",")) {
                     String k = kw.trim();
                     if (!k.isEmpty()) {
                         Label kwLbl = new Label("# " + k);

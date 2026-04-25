@@ -19,17 +19,14 @@ public class ExerciseService implements CRUD<Exercise> {
         cnx = DbConnection.getInstance().getCnx();
     }
 
-    // Mapping ResultSet → Exercise
     private Exercise mapRow(ResultSet rs) throws SQLException {
         Exercise e = new Exercise();
-        // id is BINARY(16) UUID
         UUID uuid = UuidUtil.fromResultSet(rs, "id");
         e.setUuid(uuid);
-        // keep Integer id as hashCode for legacy references
-        e.setId(uuid != null ? (int)(uuid.getLeastSignificantBits() & 0x7fffffffL) : 0);
+        e.setId(uuid != null ? Math.abs(uuid.hashCode()) : 0);
         e.setNom(rs.getString("nom"));
         e.setType(rs.getString("type"));
-        e.setDuree(rs.getInt("duree"));
+        e.setDuree(rs.getObject("duree") != null ? rs.getInt("duree") : null);
         e.setDescription(rs.getString("description"));
         e.setSets(rs.getObject("sets") != null ? rs.getInt("sets") : null);
         e.setReps(rs.getObject("reps") != null ? rs.getInt("reps") : null);
@@ -40,16 +37,8 @@ public class ExerciseService implements CRUD<Exercise> {
         return e;
     }
 
-    // Find exercises by workout UUID (ManyToMany relation)
-    public List<Exercise> findByWorkoutId(int workoutId) throws SQLException {
-        // legacy — not used with new UUID schema
-        return new ArrayList<>();
-    }
-
     public List<Exercise> findByWorkoutUuid(UUID workoutUuid) throws SQLException {
-        String sql = "SELECT e.* FROM exercise e " +
-                "JOIN workout_exercise ew ON e.id = ew.exercise_id " +
-                "WHERE ew.workout_id = ?";
+        String sql = "SELECT e.* FROM exercise e JOIN workout_exercise we ON e.id = we.exercise_id WHERE we.workout_id = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
             stmt.setBytes(1, UuidUtil.toBytes16(workoutUuid));
             try (ResultSet rs = stmt.executeQuery()) {
@@ -60,18 +49,27 @@ public class ExerciseService implements CRUD<Exercise> {
         }
     }
 
-    // ================= CRUD =================
+    public List<Exercise> findByWorkoutId(int workoutId) throws SQLException {
+        return new ArrayList<>(); // use findByWorkoutUuid instead
+    }
 
     @Override
-    public void create(Exercise e) throws SQLException {
-        createPrepared(e);
+    public List<Exercise> read() throws SQLException {
+        String sql = "SELECT * FROM exercise ORDER BY nom";
+        try (Statement stmt = cnx.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+            List<Exercise> list = new ArrayList<>();
+            while (rs.next()) list.add(mapRow(rs));
+            return list;
+        }
     }
+
+    @Override
+    public void create(Exercise e) throws SQLException { createPrepared(e); }
 
     @Override
     public void createPrepared(Exercise e) throws SQLException {
         if (e.getUuid() == null) e.setUuid(UUID.randomUUID());
-        String sql = "INSERT INTO exercise (id, nom, type, duree, description, sets, reps, image_name, updated_at, youtube_video_id) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO exercise (id, nom, type, duree, description, sets, reps, image_name, updated_at, youtube_video_id) VALUES (?,?,?,?,?,?,?,?,?,?)";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
             stmt.setBytes(1, UuidUtil.toBytes16(e.getUuid()));
             stmt.setString(2, e.getNom());
@@ -81,7 +79,7 @@ public class ExerciseService implements CRUD<Exercise> {
             stmt.setObject(6, e.getSets(), Types.INTEGER);
             stmt.setObject(7, e.getReps(), Types.INTEGER);
             stmt.setString(8, e.getImageName());
-            stmt.setTimestamp(9, e.getUpdatedAt() != null ? Timestamp.valueOf(e.getUpdatedAt()) : Timestamp.valueOf(LocalDateTime.now()));
+            stmt.setTimestamp(9, Timestamp.valueOf(LocalDateTime.now()));
             stmt.setString(10, e.getYoutubeVideoId());
             stmt.executeUpdate();
         }
@@ -91,39 +89,17 @@ public class ExerciseService implements CRUD<Exercise> {
     }
 
     private void linkWorkout(UUID exerciseId, UUID workoutId) throws SQLException {
-        String sql = "INSERT IGNORE INTO workout_exercise (exercise_id, workout_id) VALUES (?, ?)";
+        String sql = "INSERT IGNORE INTO workout_exercise (exercise_id, workout_id) VALUES (?,?)";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
             stmt.setBytes(1, UuidUtil.toBytes16(exerciseId));
             stmt.setBytes(2, UuidUtil.toBytes16(workoutId));
             stmt.executeUpdate();
-        }
-    }
-
-    private void unlinkWorkout(UUID exerciseId, UUID workoutId) throws SQLException {
-        String sql = "DELETE FROM workout_exercise WHERE exercise_id = ? AND workout_id = ?";
-        try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
-            stmt.setBytes(1, UuidUtil.toBytes16(exerciseId));
-            stmt.setBytes(2, UuidUtil.toBytes16(workoutId));
-            stmt.executeUpdate();
-        }
-    }
-
-    @Override
-    public List<Exercise> read() throws SQLException {
-        String sql = "SELECT * FROM exercise";
-        try (Statement stmt = cnx.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
-            List<Exercise> list = new ArrayList<>();
-            while (rs.next()) {
-                list.add(mapRow(rs));
-            }
-            return list;
         }
     }
 
     @Override
     public void update(Exercise e) throws SQLException {
-        String sql = "UPDATE exercise SET nom = ?, type = ?, duree = ?, description = ?, sets = ?, reps = ?, image_name = ?, updated_at = ?, youtube_video_id = ? " +
-                "WHERE id = ?";
+        String sql = "UPDATE exercise SET nom=?, type=?, duree=?, description=?, sets=?, reps=?, image_name=?, updated_at=?, youtube_video_id=? WHERE id=?";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
             stmt.setString(1, e.getNom());
             stmt.setString(2, e.getType());
@@ -132,30 +108,20 @@ public class ExerciseService implements CRUD<Exercise> {
             stmt.setObject(5, e.getSets(), Types.INTEGER);
             stmt.setObject(6, e.getReps(), Types.INTEGER);
             stmt.setString(7, e.getImageName());
-            stmt.setTimestamp(8, e.getUpdatedAt() != null ? Timestamp.valueOf(e.getUpdatedAt()) : Timestamp.valueOf(LocalDateTime.now()));
+            stmt.setTimestamp(8, Timestamp.valueOf(LocalDateTime.now()));
             stmt.setString(9, e.getYoutubeVideoId());
             stmt.setBytes(10, UuidUtil.toBytes16(e.getUuid()));
             stmt.executeUpdate();
-        }
-        String sqlDelete = "DELETE FROM workout_exercise WHERE exercise_id = ?";
-        try (PreparedStatement stmt = cnx.prepareStatement(sqlDelete)) {
-            stmt.setBytes(1, UuidUtil.toBytes16(e.getUuid()));
-            stmt.executeUpdate();
-        }
-        for (Workout w : e.getWorkouts()) {
-            if (w.getUuid() != null) linkWorkout(e.getUuid(), w.getUuid());
         }
     }
 
     @Override
     public void delete(Exercise e) throws SQLException {
-        String sqlDeleteLinks = "DELETE FROM workout_exercise WHERE exercise_id = ?";
-        try (PreparedStatement stmt = cnx.prepareStatement(sqlDeleteLinks)) {
+        try (PreparedStatement stmt = cnx.prepareStatement("DELETE FROM workout_exercise WHERE exercise_id=?")) {
             stmt.setBytes(1, UuidUtil.toBytes16(e.getUuid()));
             stmt.executeUpdate();
         }
-        String sql = "DELETE FROM exercise WHERE id = ?";
-        try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
+        try (PreparedStatement stmt = cnx.prepareStatement("DELETE FROM exercise WHERE id=?")) {
             stmt.setBytes(1, UuidUtil.toBytes16(e.getUuid()));
             stmt.executeUpdate();
         }

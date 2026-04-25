@@ -44,7 +44,9 @@ public class WorkoutFeedbackController {
         if (currentWorkout == null) return;
         try {
             FeedbackService service = new FeedbackService(DbConnection.getInstance().getCnx());
-            template = service.findTemplateByWorkoutId(currentWorkout.getId());
+            template = currentWorkout.getUuid() != null
+                    ? service.findTemplateByWorkoutUuid(currentWorkout.getUuid())
+                    : service.findTemplateByWorkoutId(currentWorkout.getId());
             if (template == null) {
                 submitBtn.setDisable(true);
                 optionsGrid.getChildren().add(new Label("No feedback questionnaire assigned to this workout."));

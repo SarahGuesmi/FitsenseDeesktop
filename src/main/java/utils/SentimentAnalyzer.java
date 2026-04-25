@@ -100,10 +100,11 @@ public class SentimentAnalyzer {
     private static AnalysisResult fallback(String comment) {
         String lower = comment.toLowerCase();
         String sentiment;
-        if (lower.matches(".*(great|good|excellent|love|amazing|like|enjoy|best|super|bien|j.aime|parfait|top|cool|fantastic).*"))
-            sentiment = "positive";
-        else if (lower.matches(".*(bad|poor|terrible|hate|awful|worst|boring|difficult|no|nul|mauvais|horrible|don.t like|pas bien|trop dur).*"))
+        // Check negative first (includes negations like "don't like", "not good")
+        if (lower.matches(".*(don.t like|not good|not great|bad|poor|terrible|hate|awful|worst|boring|difficult|no |nul|mauvais|horrible|pas bien|trop dur|i dont|don't|cannot|can't).*"))
             sentiment = "negative";
+        else if (lower.matches(".*(great|good|excellent|love|amazing|like|enjoy|best|super|bien|j.aime|parfait|top|cool|fantastic|awesome).*"))
+            sentiment = "positive";
         else
             sentiment = "neutral";
 

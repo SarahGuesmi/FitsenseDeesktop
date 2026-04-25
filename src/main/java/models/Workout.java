@@ -32,7 +32,7 @@ public class Workout {
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
 
-    public UUID getUuid() { return uuid != null ? uuid : new java.util.UUID(0, id != null ? id : 0); }
+    public UUID getUuid() { return uuid; }
     public void setUuid(UUID uuid) { this.uuid = uuid; }
 
     public User getCoach() { return coach; }

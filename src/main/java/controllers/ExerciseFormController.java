@@ -350,8 +350,8 @@ public class ExerciseFormController {
             goBack();
 
         } catch (SQLException ex) {
-            ex.printStackTrace(); // 🔥 IMPORTANT
-            showError(nameError, "Database error!");
+            ex.printStackTrace();
+            showError(nameError, "Database error: " + ex.getMessage());
         }
     }
 

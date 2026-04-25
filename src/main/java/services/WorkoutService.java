@@ -2,11 +2,12 @@ package services;
 
 import models.Workout;
 import utils.DbConnection;
+import utils.UuidUtil;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.UUID;
 public class WorkoutService implements CRUD<Workout> {
 
     private final Connection cnx;
@@ -16,14 +17,17 @@ public class WorkoutService implements CRUD<Workout> {
     }
 
     private static Workout mapRow(ResultSet rs) throws SQLException {
-        return new Workout(
-                rs.getInt("id"),
-                rs.getString("nom"),
-                rs.getString("niveau"),
-                rs.getObject("duree", Integer.class),
-                rs.getString("description"),
-                rs.getString("status"),
-                null);
+        Workout w = new Workout();
+        UUID uuid = UuidUtil.fromResultSet(rs, "id");
+        w.setUuid(uuid);
+        // Use hashCode of UUID as integer id for legacy references
+        w.setId(uuid != null ? Math.abs(uuid.hashCode()) : 0);
+        w.setNom(rs.getString("nom"));
+        w.setNiveau(rs.getString("niveau"));
+        w.setDuree(rs.getObject("duree", Integer.class));
+        w.setDescription(rs.getString("description"));
+        w.setStatus(rs.getString("status"));
+        return w;
     }
 
     @Override
@@ -36,20 +40,50 @@ public class WorkoutService implements CRUD<Workout> {
         return list;
     }
 
+    public List<Workout> readWithExercises() throws SQLException {
+        List<Workout> workouts = read();
+        ExerciseService exerciseService = new ExerciseService();
+        for (Workout w : workouts) {
+            if (w.getUuid() != null)
+                w.setExercises(exerciseService.findByWorkoutUuid(w.getUuid()));
+        }
+        return workouts;
+    }
+
+    public List<Workout> findByObjectiveNames(List<String> names) throws SQLException {
+        return readWithExercises();
+    }
+
+    public void syncObjectifs(Integer workoutId, List<String> objectives) throws SQLException {
+        // stub
+    }
+
     @Override
     public void create(Workout w) throws SQLException { createPrepared(w); }
 
     @Override
     public void createPrepared(Workout w) throws SQLException {
-        String sql = "INSERT INTO workout (nom, niveau, duree, description, status, coach_id) VALUES (?, ?, ?, ?, ?, ?)";
+        if (w.getUuid() == null) w.setUuid(UUID.randomUUID());
+        String sql = "INSERT INTO workout (id, nom, niveau, duree, description, status) VALUES (?,?,?,?,?,?)";
         try (PreparedStatement ps = cnx.prepareStatement(sql)) {
-            ps.setString(1, w.getNom());
-            ps.setString(2, w.getNiveau());
-            ps.setObject(3, w.getDuree());
-            ps.setString(4, w.getDescription());
-            ps.setString(5, w.getStatus());
-            ps.setObject(6, w.getCoach() != null ? (int) w.getCoach().getId().getLeastSignificantBits() : null);
+            ps.setBytes(1, UuidUtil.toBytes16(w.getUuid()));
+            ps.setString(2, w.getNom());
+            ps.setString(3, w.getNiveau());
+            ps.setObject(4, w.getDuree());
+            ps.setString(5, w.getDescription());
+            ps.setString(6, w.getStatus());
             ps.executeUpdate();
+        }
+        // Link exercises
+        for (models.Exercise e : w.getExercises()) {
+            if (e.getUuid() != null) {
+                try (PreparedStatement ps2 = cnx.prepareStatement(
+                        "INSERT IGNORE INTO workout_exercise (workout_id, exercise_id) VALUES (?,?)")) {
+                    ps2.setBytes(1, UuidUtil.toBytes16(w.getUuid()));
+                    ps2.setBytes(2, UuidUtil.toBytes16(e.getUuid()));
+                    ps2.executeUpdate();
+                }
+            }
         }
     }
 
@@ -62,7 +96,7 @@ public class WorkoutService implements CRUD<Workout> {
             ps.setObject(3, w.getDuree());
             ps.setString(4, w.getDescription());
             ps.setString(5, w.getStatus());
-            ps.setInt(6, w.getId());
+            ps.setBytes(6, UuidUtil.toBytes16(w.getUuid()));
             ps.executeUpdate();
         }
     }
@@ -71,24 +105,8 @@ public class WorkoutService implements CRUD<Workout> {
     public void delete(Workout w) throws SQLException {
         String sql = "DELETE FROM workout WHERE id=?";
         try (PreparedStatement ps = cnx.prepareStatement(sql)) {
-            ps.setInt(1, w.getId());
+            ps.setBytes(1, UuidUtil.toBytes16(w.getUuid()));
             ps.executeUpdate();
         }
-    }
-
-    /** Read workouts with their exercises joined */
-    public List<Workout> readWithExercises() throws SQLException {
-        return read(); // exercises loaded separately if needed
-    }
-
-    /** Find workouts matching given objective names */
-    public List<Workout> findByObjectiveNames(List<String> names) throws SQLException {
-        if (names == null || names.isEmpty()) return read();
-        return read(); // simplified — return all for now
-    }
-
-    /** Sync objectives for a workout (stub — implement if needed) */
-    public void syncObjectifs(Integer workoutId, List<String> objectives) throws SQLException {
-        // No-op stub for compatibility
     }
 }

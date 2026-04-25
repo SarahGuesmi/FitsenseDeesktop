@@ -75,6 +75,7 @@ public class WorkoutDetailController {
 
     public void markExerciseDoneUuid(UUID exerciseUuid, int exerciseId) {
         if (exerciseUuid != null) doneExerciseUuids.add(exerciseUuid);
+        doneExerciseIds.add(exerciseId);
         populate();
     }
 
@@ -122,8 +123,7 @@ public class WorkoutDetailController {
     }
 
     private HBox buildExerciseCard(Exercise e) {
-        // Use UUID-based check only — int id can have hash collisions
-        boolean isDone = e.getId() != null && doneExerciseUuids.contains(e.getId());
+        boolean isDone = e.getId() != null && doneExerciseIds.contains(e.getId());
 
         HBox card = new HBox(16);
         card.setPadding(new Insets(18));
@@ -243,7 +243,7 @@ public class WorkoutDetailController {
 
     private void updateProgress() {
         int total = workout.getExercises().size();
-        int done = doneExerciseUuids.size();
+        int done = doneExerciseIds.size();
         boolean allDone = total > 0 && done == total;
 
         progressLabel.setText(done + " / " + total + " exercises completed");
@@ -281,6 +281,16 @@ public class WorkoutDetailController {
         startBtn.setStyle("-fx-background-color:rgba(34,197,94,0.2);-fx-border-color:rgba(34,197,94,0.3);"
                 + "-fx-text-fill:#4ADE80;-fx-font-weight:800;-fx-font-size:14px;"
                 + "-fx-background-radius:12;-fx-padding:14 0;-fx-max-width:Infinity;");
+
+        // Open feedback popup
+        utils.FeedbackLauncher.show(workout, () -> {
+            // Navigate back to dashboard after feedback
+            try {
+                Parent root = javafx.fxml.FXMLLoader.load(
+                        java.util.Objects.requireNonNull(getClass().getResource("/fxml/DashboardView.fxml")));
+                workoutNameLabel.getScene().setRoot(root);
+            } catch (Exception ex) { ex.printStackTrace(); }
+        });
     }
 
     @FXML
@@ -302,7 +312,7 @@ public class WorkoutDetailController {
             ExerciseDetailController ctrl = loader.getController();
             ctrl.setExercise(e, workout, done -> {
                 doneExerciseIds.add(done.getId());
-                if (done.getUuid() != null) doneExerciseUuids.add(done.getUuid());
+                javafx.application.Platform.runLater(this::populate);
             });
             workoutNameLabel.getScene().setRoot(root);
         } catch (Exception ex) { ex.printStackTrace(); }

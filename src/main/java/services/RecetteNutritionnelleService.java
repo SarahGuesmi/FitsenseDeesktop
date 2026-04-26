@@ -2,13 +2,14 @@ package services;
 
 import models.RecetteNutritionnelle;
 import utils.DbConnection;
-
+import java.util.UUID;
+import java.nio.ByteBuffer;
+import java.sql.PreparedStatement;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class RecetteNutritionnelleService implements CRUD<RecetteNutritionnelle> {
 
@@ -182,6 +183,85 @@ public class RecetteNutritionnelleService implements CRUD<RecetteNutritionnelle>
             recette.setId(generatedId);
         }
     }
+    public List<RecetteNutritionnelle> getByUserObjectifs(List<String> userObjectifs) throws SQLException {
+        List<RecetteNutritionnelle> allRecipes = read();
+        List<RecetteNutritionnelle> filtered = new ArrayList<>();
+
+        if (userObjectifs == null || userObjectifs.isEmpty()) {
+            return allRecipes;
+        }
+
+        for (RecetteNutritionnelle recette : allRecipes) {
+            if (recette.getObjectifs() == null) continue;
+
+            for (String obj : userObjectifs) {
+                if (recette.getObjectifs().contains(obj)) {
+                    filtered.add(recette);
+                    break;
+                }
+            }
+        }
+
+        return filtered;
+    }
+    public void markAsDone(String userId, RecetteNutritionnelle recette) {
+        try {
+            String sql = """
+        INSERT INTO recette_consommee
+        (id, user_id, recette_id, date_consommation, kcal, proteins)
+        VALUES (?, ?, ?, NOW(), ?, ?)
+        """;
+
+            PreparedStatement ps = cnx.prepareStatement(sql);
+
+            ps.setBytes(1, uuidToBytes(UUID.randomUUID().toString()));
+            ps.setBytes(2, uuidToBytes(userId));
+            ps.setBytes(3, uuidToBytes(recette.getId().toString()));
+            ps.setInt(4, recette.getKcal() == null ? 0 : recette.getKcal());
+            ps.setInt(5, recette.getProteins() == null ? 0 : recette.getProteins());
+
+            ps.executeUpdate();
+
+            System.out.println("✔ Recipe saved as consumed");
+
+            // 🔥 AJOUT IMPORTANT
+            NutritionService nutritionService = new NutritionService();
+            nutritionService.addCalories(userId, recette.getKcal() == null ? 0 : recette.getKcal());
+
+            System.out.println("🔥 Calories updated in daily_nutrition");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public void addCustomCalories(String userId, String foodName, int calories) throws SQLException {
+        NutritionService nutritionService = new NutritionService();
+        nutritionService.addCalories(userId, calories);
+
+        System.out.println("🔥 Custom food calories added to daily_nutrition: " + calories);
+    }    public List<RecetteNutritionnelle> getAll() throws SQLException {
+
+        List<RecetteNutritionnelle> list = new ArrayList<>();
+
+        String sql = "SELECT * FROM recette_nutritionnelle";
+        Statement st = cnx.createStatement();
+        ResultSet rs = st.executeQuery(sql);
+
+        while (rs.next()) {
+            RecetteNutritionnelle r = new RecetteNutritionnelle();
+
+            r.setId(bytesToUUID(rs.getBytes("id")));
+            r.setTitle(rs.getString("title"));
+            r.setDescription(rs.getString("description"));
+            r.setKcal(rs.getInt("kcal"));
+            r.setProteins(rs.getInt("proteins"));
+            r.setImage(rs.getString("image"));
+
+            list.add(r);
+        }
+
+        return list;
+    }
 
     @Override
     public List<RecetteNutritionnelle> read() throws SQLException {
@@ -259,4 +339,5 @@ public class RecetteNutritionnelleService implements CRUD<RecetteNutritionnelle>
             stmt.executeUpdate();
         }
     }
+
 }

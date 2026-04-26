@@ -1,5 +1,6 @@
 package controllers;
-
+import javafx.collections.ObservableList;
+import javafx.scene.chart.PieChart;
 import app.AppSession;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -12,17 +13,25 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.image.Image;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import models.RecetteNutritionnelle;
 import models.User;
+import services.RecetteFavoriService;
 import services.UserService;
-
+import java.util.Map;
+import javafx.scene.image.ImageView;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
 /**
  * Coach workspace: same shell as the admin dashboard (sidebar + navbar), with read-only athlete list.
  */
@@ -46,7 +55,14 @@ public class CoachDashboardController {
     private VBox nutritionPane;
     @FXML
     private VBox profilePane;
+    @FXML
+    private Canvas objectiveCanvas;
 
+    @FXML
+    private VBox objectiveLegendBox;
+
+    @FXML
+    private Label totalClientsLabel;
     @FXML
     private Button coachHomeBtn;
     @FXML
@@ -64,6 +80,9 @@ public class CoachDashboardController {
     @FXML
     private Button profileBtn;
 
+
+    @FXML
+    private PieChart objectiveChart;
     @FXML
     private Label navbarPageTitle;
     @FXML
@@ -119,6 +138,9 @@ public class CoachDashboardController {
         setNavbarText("Coach dashboard", "Train and support your athletes");
         setActiveSidebar(coachHomeBtn);
         refreshStats();
+        loadTopRecipes();
+        loadObjectiveChart();
+
     }
 
     @FXML
@@ -130,7 +152,129 @@ public class CoachDashboardController {
         setActiveSidebar(athletesBtn);
         refreshAthletesTable();
     }
+    @FXML
+    private HBox topRecipesBox;
+    private void loadObjectiveChart() {
+        if (objectiveCanvas == null || objectiveLegendBox == null || totalClientsLabel == null) return;
 
+        Map<String, Integer> data = favoriService.getObjectiveDistribution();
+
+        int total = data.values().stream().mapToInt(Integer::intValue).sum();
+        totalClientsLabel.setText(String.valueOf(total));
+
+        objectiveLegendBox.getChildren().clear();
+
+        Color[] colors = {
+                Color.web("#35c46b"),
+                Color.web("#2f73df"),
+                Color.web("#f5a21a"),
+                Color.web("#8b5cf6")
+        };
+
+        GraphicsContext gc = objectiveCanvas.getGraphicsContext2D();
+        gc.clearRect(0, 0, 130, 130);
+
+        double startAngle = 90;
+        int index = 0;
+
+        for (Map.Entry<String, Integer> entry : data.entrySet()) {
+            int value = entry.getValue();
+            double percent = total == 0 ? 0 : (value * 100.0 / total);
+            double angle = total == 0 ? 0 : (value * 360.0 / total);
+
+            gc.setFill(colors[index]);
+            gc.fillArc(5, 5, 120, 120, startAngle, -angle, javafx.scene.shape.ArcType.ROUND);
+
+            startAngle -= angle;
+            index++;
+        }
+
+        gc.setFill(Color.web("#0f172a"));
+        gc.fillOval(40, 40, 50, 50);
+
+        index = 0;
+        for (Map.Entry<String, Integer> entry : data.entrySet()) {
+            int value = entry.getValue();
+            int percent = total == 0 ? 0 : (int) Math.round(value * 100.0 / total);
+
+            HBox line = new HBox(8);
+            line.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+            line.setPrefWidth(160); // 👈 AUGMENTE largeur
+            Region dot = new Region();
+            dot.setPrefSize(10, 10);
+            dot.setStyle("-fx-background-color: " + toRgb(colors[index]) + "; -fx-background-radius: 50;");
+
+            Label name = new Label(entry.getKey());
+            name.setStyle("-fx-text-fill: white; -fx-font-size: 13;");
+            name.setWrapText(true); // 👈 IMPORTANT
+            name.setMaxWidth(Double.MAX_VALUE); // 👈 IMPORTANT
+            HBox.setHgrow(name, javafx.scene.layout.Priority.ALWAYS); // 👈 IMPORTANT            name.setStyle("-fx-text-fill: white; -fx-font-size: 13;");
+
+            Label pct = new Label(percent + "%");
+            pct.setStyle("-fx-text-fill: #cbd5e1; -fx-font-size: 13;");
+            HBox.setHgrow(name, javafx.scene.layout.Priority.ALWAYS);
+
+            line.getChildren().addAll(dot, name, pct);
+            objectiveLegendBox.getChildren().add(line);
+
+            index++;
+        }
+    }
+
+    @FXML
+    private NutritionController dashNutritionController;
+    private String toRgb(Color color) {
+        return String.format(
+                "rgb(%d,%d,%d)",
+                (int) (color.getRed() * 255),
+                (int) (color.getGreen() * 255),
+                (int) (color.getBlue() * 255)
+        );
+    }    private final RecetteFavoriService favoriService = new RecetteFavoriService();
+    private void loadTopRecipes() {
+        if (topRecipesBox == null) return;
+
+        topRecipesBox.getChildren().clear();
+
+        Map<RecetteNutritionnelle, Integer> topRecipes = favoriService.getTop5FavoriteRecipes();
+
+        for (Map.Entry<RecetteNutritionnelle, Integer> entry : topRecipes.entrySet()) {
+            RecetteNutritionnelle r = entry.getKey();
+            int likes = entry.getValue();
+
+            VBox card = new VBox(6);
+            card.getStyleClass().add("top-recipe-card");
+            card.setPrefWidth(105);
+
+            ImageView img = new ImageView();
+
+            String imageUrl = (r.getImage() == null || r.getImage().isBlank())
+                    ? "https://via.placeholder.com/150"
+                    : r.getImage();
+
+            img.setImage(new Image(imageUrl, true));
+            img.setFitWidth(105);
+            img.setFitHeight(75);
+            img.setPreserveRatio(false);
+
+            Label title = new Label(r.getTitle());
+            title.getStyleClass().add("top-recipe-title");
+            title.setWrapText(true);
+
+            HBox info = new HBox(8);
+
+            Label likesLabel = new Label("❤ " + likes);
+            likesLabel.getStyleClass().add("top-recipe-info");
+
+            Label kcalLabel = new Label(r.getKcal() + " kcal");
+            kcalLabel.getStyleClass().add("top-recipe-info");
+
+            info.getChildren().addAll(likesLabel, kcalLabel);
+
+            card.getChildren().addAll(img, title, info);
+            topRecipesBox.getChildren().add(card);
+        }
+    }
     @FXML
     private void onShowChatroom() {
         hideAllContent();

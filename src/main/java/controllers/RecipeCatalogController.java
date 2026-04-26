@@ -1,5 +1,7 @@
 package controllers;
-
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -9,15 +11,15 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import models.RecetteNutritionnelle;
 import models.User;
+import services.RecetteFavoriService;
 import services.RecetteNutritionnelleService;
 import utils.SessionManager;
-
+import javafx.scene.layout.Region;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +44,8 @@ public class RecipeCatalogController {
     @FXML
     private Label imageFileLabel;
     @FXML
+    private ImageView formImagePreview;
+    @FXML
     private TextArea descriptionArea;
     @FXML
     private TextArea ingredientsArea;
@@ -55,10 +59,22 @@ public class RecipeCatalogController {
     private VBox enduranceCard;
     @FXML
     private VBox wellBeingCard;
-
+    @FXML private CheckBox peanutsCB;
+    @FXML private CheckBox treeNutsCB;
+    @FXML private CheckBox milkCB;
+    @FXML private CheckBox eggsCB;
+    @FXML private CheckBox glutenCB;
+    @FXML private CheckBox soyCB;
+    @FXML private CheckBox fishCB;
+    @FXML private CheckBox shellfishCB;
+    @FXML private CheckBox sesameCB;
+    @FXML private CheckBox mustardCB;
+    @FXML private CheckBox celeryCB;
+    @FXML private CheckBox sulfitesCB;
     private final RecetteNutritionnelleService recetteService = new RecetteNutritionnelleService();
 
     private File selectedImageFile;
+    private String selectedImageUrl = null;
     private boolean weightLossSelected = false;
     private boolean muscleGainSelected = false;
     private boolean enduranceSelected = false;
@@ -82,26 +98,220 @@ public class RecipeCatalogController {
         formPane.setManaged(show);
     }
 
+    private static final String IMAGES_BASE_URL = "http://localhost/images/";
+    private static final String IMAGES_LOCAL_DIR = "C:/wamp64/www/images/";
+
+    /**
+     * Convertit une URL stockée (http://localhost/images/x ou file:///... )
+     * en URL utilisable par JavaFX ImageView (file:/// local).
+     * Si le fichier local n'existe pas, retourne DEFAULT_IMAGE_URL.
+     */
+    private String toDisplayUrl(String stored) {
+        if (stored == null || stored.isBlank()) return DEFAULT_IMAGE_URL;
+
+        // Déjà un file:// URI
+        if (stored.startsWith("file:")) return stored;
+
+        // http://localhost/images/fichier  →  file:///C:/wamp64/www/images/fichier
+        if (stored.startsWith(IMAGES_BASE_URL)) {
+            String fileName = stored.substring(IMAGES_BASE_URL.length())
+                    .replace("%20", " ");
+            File f = new File(IMAGES_LOCAL_DIR + fileName);
+            if (f.exists()) return f.toURI().toString();
+            return DEFAULT_IMAGE_URL;
+        }
+
+        // Chemin absolu Windows (ex: C:/wamp64/...)
+        File f = new File(stored);
+        if (f.exists()) return f.toURI().toString();
+
+        return DEFAULT_IMAGE_URL;
+    }
+
     @FXML
     private void onChooseImage() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Choisir une image");
-        fileChooser.getExtensionFilters().add(
-                new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg", "*.webp")
+        String chosen = openImagePickerDialog(
+                formPane != null && formPane.getScene() != null ? formPane.getScene().getWindow() : null,
+                null
         );
-
-        Window window = formPane != null && formPane.getScene() != null
-                ? formPane.getScene().getWindow()
-                : null;
-
-        File file = fileChooser.showOpenDialog(window);
-
-        if (file != null) {
-            selectedImageFile = file;
-            if (imageFileLabel != null) {
-                imageFileLabel.setText(file.getName());
+        if (chosen != null) {
+            selectedImageUrl = chosen;
+            selectedImageFile = null;
+            String fileName = chosen.substring(chosen.lastIndexOf('/') + 1);
+            if (imageFileLabel != null) imageFileLabel.setText(fileName);
+            if (formImagePreview != null) {
+                formImagePreview.setImage(new Image(toDisplayUrl(chosen), true));
+                formImagePreview.setVisible(true);
+                formImagePreview.setManaged(true);
             }
         }
+    }
+
+    /**
+     * Ouvre une fenêtre modale qui liste les images de localhost/images/
+     * et retourne l'URL http://localhost/images/<fichier> de l'image choisie, ou null.
+     */
+    private String openImagePickerDialog(Window owner, Stage parentStage) {
+        Stage dialog = new Stage();
+        if (owner != null) dialog.initOwner(owner);
+        else if (parentStage != null) dialog.initOwner(parentStage);
+        dialog.initModality(Modality.APPLICATION_MODAL);
+        dialog.setTitle("Choisir une image");
+        dialog.setResizable(true);
+
+        final String[] result = {null};
+
+        // ── Header ──────────────────────────────────────────────────────────
+        Label title = new Label("🖼 Choose an Image");
+        title.setStyle("-fx-text-fill:white;-fx-font-size:18;-fx-font-weight:bold;");
+
+        Button closeBtn = new Button("✕");
+        closeBtn.setStyle("-fx-background-color:transparent;-fx-text-fill:#94a3b8;-fx-font-size:16;-fx-cursor:hand;");
+        closeBtn.setOnAction(e -> dialog.close());
+
+        Region headerSpacer = new Region();
+        HBox.setHgrow(headerSpacer, Priority.ALWAYS);
+
+        HBox header = new HBox(12, title, headerSpacer, closeBtn);
+        header.setAlignment(Pos.CENTER_LEFT);
+        header.setPadding(new Insets(0, 0, 12, 0));
+
+        // ── Toolbar ─────────────────────────────────────────────────────────
+        TextField filterField = new TextField();
+        filterField.setPromptText("Filter images...");
+        filterField.setStyle("-fx-background-color:#1e293b;-fx-text-fill:white;-fx-prompt-text-fill:#64748b;-fx-border-color:#334155;-fx-border-radius:6;-fx-background-radius:6;-fx-padding:8 12;");
+        HBox.setHgrow(filterField, Priority.ALWAYS);
+
+        Button uploadBtn = new Button("+ Upload New");
+        uploadBtn.setStyle("-fx-background-color:#22c55e;-fx-text-fill:white;-fx-font-weight:bold;-fx-background-radius:6;-fx-padding:8 16;-fx-cursor:hand;");
+
+        Button refreshBtn = new Button("↻ Refresh");
+        refreshBtn.setStyle("-fx-background-color:#1e293b;-fx-text-fill:#94a3b8;-fx-border-color:#334155;-fx-border-radius:6;-fx-background-radius:6;-fx-padding:8 14;-fx-cursor:hand;");
+
+        HBox toolbar = new HBox(10, filterField, uploadBtn, refreshBtn);
+        toolbar.setAlignment(Pos.CENTER_LEFT);
+
+        // ── Images grid ─────────────────────────────────────────────────────
+        TilePane grid = new TilePane();
+        grid.setHgap(12);
+        grid.setVgap(12);
+        grid.setPrefColumns(4);
+        grid.setPadding(new Insets(10, 0, 10, 0));
+
+        ScrollPane scrollPane = new ScrollPane(grid);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setStyle("-fx-background-color:transparent;-fx-background:#0f172a;");
+        scrollPane.setPrefHeight(420);
+        VBox.setVgrow(scrollPane, Priority.ALWAYS);
+
+        // Charger les images depuis le dossier local
+        Runnable loadImages = () -> {
+            grid.getChildren().clear();
+            File dir = new File(IMAGES_LOCAL_DIR);
+            String filter = filterField.getText() == null ? "" : filterField.getText().trim().toLowerCase();
+
+            if (!dir.exists() || !dir.isDirectory()) {
+                Label noDir = new Label("Dossier introuvable : " + IMAGES_LOCAL_DIR);
+                noDir.setStyle("-fx-text-fill:#ef4444;");
+                grid.getChildren().add(noDir);
+                return;
+            }
+
+            File[] files = dir.listFiles(f -> {
+                String n = f.getName().toLowerCase();
+                boolean isImage = n.endsWith(".jpg") || n.endsWith(".jpeg")
+                        || n.endsWith(".png") || n.endsWith(".webp") || n.endsWith(".gif");
+                boolean matchFilter = filter.isEmpty() || n.contains(filter);
+                return f.isFile() && isImage && matchFilter;
+            });
+
+            if (files == null || files.length == 0) {
+                Label empty = new Label("Aucune image trouvée.");
+                empty.setStyle("-fx-text-fill:#94a3b8;-fx-font-size:14;");
+                grid.getChildren().add(empty);
+                return;
+            }
+
+            for (File imgFile : files) {
+                String url = IMAGES_BASE_URL + imgFile.getName().replace(" ", "%20");
+                String localUrl = imgFile.toURI().toString(); // file:/// pour affichage JavaFX
+
+                ImageView iv = new ImageView();
+                try {
+                    iv.setImage(new Image(localUrl, 140, 100, false, true, true));
+                } catch (Exception ex) {
+                    iv.setImage(new Image(DEFAULT_IMAGE_URL, 140, 100, false, true, true));
+                }
+                iv.setFitWidth(140);
+                iv.setFitHeight(100);
+                iv.setPreserveRatio(false);
+                iv.setSmooth(true);
+                iv.setStyle("-fx-effect:dropshadow(gaussian,rgba(0,0,0,0.5),6,0,0,2);");
+
+                Label nameLabel = new Label(imgFile.getName());
+                nameLabel.setStyle("-fx-text-fill:#94a3b8;-fx-font-size:10;-fx-max-width:140;");
+                nameLabel.setMaxWidth(140);
+                nameLabel.setWrapText(false);
+                nameLabel.setEllipsisString("…");
+
+                VBox card = new VBox(6, iv, nameLabel);
+                card.setAlignment(Pos.CENTER);
+                card.setPadding(new Insets(8));
+                card.setStyle("-fx-background-color:#1e293b;-fx-background-radius:8;-fx-cursor:hand;");
+
+                // Hover effect
+                card.setOnMouseEntered(e ->
+                        card.setStyle("-fx-background-color:#334155;-fx-background-radius:8;-fx-cursor:hand;"));
+                card.setOnMouseExited(e ->
+                        card.setStyle("-fx-background-color:#1e293b;-fx-background-radius:8;-fx-cursor:hand;"));
+
+                card.setOnMouseClicked(e -> {
+                    result[0] = url;
+                    dialog.close();
+                });
+
+                grid.getChildren().add(card);
+            }
+        };
+
+        loadImages.run();
+
+        filterField.textProperty().addListener((obs, o, n) -> loadImages.run());
+        refreshBtn.setOnAction(e -> loadImages.run());
+
+        // Upload : ouvre le FileChooser système pour copier une image dans le dossier
+        uploadBtn.setOnAction(e -> {
+            javafx.stage.FileChooser fc = new javafx.stage.FileChooser();
+            fc.setTitle("Uploader une image");
+            fc.getExtensionFilters().add(
+                    new javafx.stage.FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg", "*.webp"));
+            File chosen = fc.showOpenDialog(dialog);
+            if (chosen != null) {
+                try {
+                    Files.createDirectories(Path.of(IMAGES_LOCAL_DIR));
+                    String cleanName = chosen.getName().replaceAll("\\s+", "_");
+                    Path dest = Path.of(IMAGES_LOCAL_DIR, cleanName);
+                    Files.copy(chosen.toPath(), dest, StandardCopyOption.REPLACE_EXISTING);
+                    loadImages.run();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+        // ── Layout ──────────────────────────────────────────────────────────
+        VBox root = new VBox(16, header, toolbar, scrollPane);
+        root.setPadding(new Insets(24));
+        root.setStyle("-fx-background-color:#0f172a;");
+
+        Scene scene = new Scene(root, 720, 560);
+        scene.setFill(Color.web("#0f172a"));
+        dialog.setScene(scene);
+        dialog.showAndWait();
+
+        return result[0];
     }
 
     @FXML
@@ -140,29 +350,38 @@ public class RecipeCatalogController {
             String kcalText = getText(kcalField);
             String proteinsText = getText(proteinsField);
 
+            List<String> objectifs = getSelectedObjectifs();
+
+            // 1) Vérifier les champs vides d'abord
+            if (title.isBlank() || description.isBlank() || ingredients.isBlank()
+                    || preparation.isBlank() || typeMeal == null
+                    || kcalText.isBlank() || proteinsText.isBlank()
+                    || objectifs.isEmpty()) {
+                showAlert(Alert.AlertType.WARNING, "Validation",
+                        "Veuillez remplir tous les champs obligatoires.");
+                return;
+            }
+
+            // 2) Vérifier que kcal et proteins sont des entiers
             Integer kcal = parseInteger(kcalText);
             Integer proteins = parseInteger(proteinsText);
 
-// 🔴 validation spéciale nombres
             if (kcal == null) {
-                showAlert(Alert.AlertType.ERROR, "Erreur", "Calories doit être un nombre entier !");
+                showAlert(Alert.AlertType.ERROR, "Valeur invalide",
+                        "Le champ Calories doit contenir un nombre entier.");
                 return;
             }
 
             if (proteins == null) {
-                showAlert(Alert.AlertType.ERROR, "Erreur", "Proteins doit être un nombre entier !");
-                return;
-            }
-            List<String> objectifs = getSelectedObjectifs();
-
-            if (title.isBlank() || description.isBlank() || ingredients.isBlank()
-                    || preparation.isBlank() || typeMeal == null
-                    || kcal == null || proteins == null || objectifs.isEmpty()) {
-                showAlert(Alert.AlertType.WARNING, "Validation",
-                        "Merci de remplir tous les champs obligatoires.");
+                showAlert(Alert.AlertType.ERROR, "Valeur invalide",
+                        "Le champ Protéines doit contenir un nombre entier.");
                 return;
             }
 
+            List<String> selectedAllergens = getSelectedAllergens();
+            if (!selectedAllergens.isEmpty()) {
+                ingredients = ingredients + "\n\nALLERGENS: " + String.join(", ", selectedAllergens);
+            }
             User currentUser = SessionManager.getCurrentUser();
             if (currentUser == null || currentUser.getId() == null) {
                 showAlert(Alert.AlertType.ERROR, "Session", "Aucun coach connecté.");
@@ -181,7 +400,10 @@ public class RecipeCatalogController {
             recette.setCoachId(currentUser.getId().toString());
 
             if (selectedImageFile != null) {
-                recette.setImage(selectedImageFile.toURI().toString());
+                String imageUrl = saveImageToWamp(selectedImageFile);
+                recette.setImage(imageUrl);
+            } else if (selectedImageUrl != null && !selectedImageUrl.isBlank()) {
+                recette.setImage(selectedImageUrl);
             } else {
                 recette.setImage(null);
             }
@@ -193,14 +415,25 @@ public class RecipeCatalogController {
 
             clearForm();
             refreshRecipesGrid();
+            clearAllergenCheckboxes();
 
         } catch (Exception e) {
             e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Database Error",
-                    "Impossible d'enregistrer la recette dans la base.");
+            showAlert(Alert.AlertType.ERROR, "Erreur",
+                    "Impossible d'enregistrer la recette.");
         }
     }
+    private void clearAllergenCheckboxes() {
+        CheckBox[] boxes = {
+                peanutsCB, treeNutsCB, milkCB, eggsCB,
+                glutenCB, soyCB, fishCB, shellfishCB,
+                sesameCB, mustardCB, celeryCB, sulfitesCB
+        };
 
+        for (CheckBox box : boxes) {
+            if (box != null) box.setSelected(false);
+        }
+    }
     private void refreshObjectiveCards() {
         setCardSelected(weightLossCard, weightLossSelected);
         setCardSelected(muscleGainCard, muscleGainSelected);
@@ -239,27 +472,80 @@ public class RecipeCatalogController {
             e.printStackTrace();
         }
     }
-
     private VBox createRecipeCard(RecetteNutritionnelle recipe) {
+
         VBox card = new VBox(12);
         card.getStyleClass().add("recipe-card");
         card.setPrefWidth(300);
 
+        ImageView imageView = new ImageView();
+
         String imageUrl = (recipe.getImage() == null || recipe.getImage().isBlank())
                 ? DEFAULT_IMAGE_URL
-                : recipe.getImage();
+                : toDisplayUrl(recipe.getImage());
 
-        ImageView imageView = new ImageView();
-        try {
-            imageView.setImage(new Image(imageUrl, true));
-        } catch (Exception e) {
-            imageView.setImage(new Image(DEFAULT_IMAGE_URL, true));
+        Image img = new Image(imageUrl, false);
+
+        if (img.isError()) {
+            img = new Image(DEFAULT_IMAGE_URL, false);
         }
 
+        imageView.setImage(img);
         imageView.setFitWidth(300);
         imageView.setFitHeight(170);
         imageView.setPreserveRatio(false);
         imageView.setSmooth(true);
+
+        StackPane imageContainer = new StackPane(imageView);
+
+        User currentUser = SessionManager.getCurrentUser();
+
+        if (currentUser != null
+                && currentUser.getRolesJson() != null
+                && currentUser.getRolesJson().contains("ROLE_USER")) {
+
+            RecetteFavoriService favoriService = new RecetteFavoriService();
+
+            // Vérifier l'état initial du favori
+            boolean isFav = false;
+            try {
+                isFav = favoriService.isFavorite(
+                        currentUser.getId().toString(),
+                        recipe.getId().toString()
+                );
+            } catch (Exception ignored) {}
+
+            Button heartBtn = new Button(isFav ? "♥" : "♡");
+            heartBtn.getStyleClass().add("heart-btn");
+            if (isFav) heartBtn.getStyleClass().add("heart-btn-liked");
+
+            StackPane.setAlignment(heartBtn, Pos.TOP_RIGHT);
+            StackPane.setMargin(heartBtn, new Insets(10));
+
+            heartBtn.setOnAction(e -> {
+                e.consume();
+                try {
+                    favoriService.toggleFavorite(
+                            currentUser.getId().toString(),
+                            recipe.getId().toString()
+                    );
+                    if ("♡".equals(heartBtn.getText())) {
+                        heartBtn.setText("♥");
+                        heartBtn.getStyleClass().add("heart-btn-liked");
+                    } else {
+                        heartBtn.setText("♡");
+                        heartBtn.getStyleClass().remove("heart-btn-liked");
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            });
+
+            // Empêcher le clic sur le cœur d'ouvrir les détails
+            heartBtn.setOnMouseClicked(e -> e.consume());
+
+            imageContainer.getChildren().add(heartBtn);
+        }
 
         Label typeBadge = new Label(
                 recipe.getTypeMeal() == null || recipe.getTypeMeal().isBlank()
@@ -281,6 +567,7 @@ public class RecipeCatalogController {
         descLabel.getStyleClass().add("recipe-card-desc");
 
         HBox statsBox = new HBox(10);
+
         Label kcalLabel = new Label("🔥 " + recipe.getKcal() + " KCAL");
         kcalLabel.getStyleClass().add("recipe-kcal-chip");
 
@@ -293,12 +580,15 @@ public class RecipeCatalogController {
         contentBox.setPadding(new Insets(0, 14, 14, 14));
         contentBox.getChildren().addAll(typeBadge, titleLabel, descLabel, statsBox);
 
-        card.getChildren().addAll(imageView, contentBox);
-        card.setOnMouseClicked(event -> openRecipeDetails(recipe));
+        card.getChildren().addAll(imageContainer, contentBox);
+        card.setOnMouseClicked(event -> {
+            // Ne pas ouvrir les détails si le clic vient du bouton cœur
+            if (event.getTarget() instanceof Button) return;
+            openRecipeDetails(recipe);
+        });
 
         return card;
-    }
-    @FXML
+    }    @FXML
     private TextField searchField;
     @FXML
     private void onSearchRecipes() {
@@ -311,6 +601,17 @@ public class RecipeCatalogController {
             searchField.clear();
         }
         refreshRecipesGrid();
+    }
+    private String extractAllergens(String ingredients) {
+        if (ingredients == null) return "";
+
+        for (String line : ingredients.split("\\n")) {
+            if (line.startsWith("ALLERGENS:")) {
+                return line.replace("ALLERGENS:", "").trim();
+            }
+        }
+
+        return "";
     }
 
     private void filterRecipesByName() {
@@ -357,6 +658,7 @@ public class RecipeCatalogController {
 
         Label title = new Label(safe(recipe.getTitle()));
         title.getStyleClass().add("recipe-modal-title");
+        title.setWrapText(true);
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -383,6 +685,25 @@ public class RecipeCatalogController {
             }
         }
 
+        String allergens = extractAllergens(recipe.getIngredients());
+
+        VBox allergyBox = new VBox(6);
+        if (!allergens.isEmpty()) {
+            allergyBox.getStyleClass().add("allergy-box");
+
+            Label allergyTitle = new Label("⚠ Allergy Warning");
+            allergyTitle.getStyleClass().add("allergy-title");
+
+            Label allergyText = new Label(
+                    "This recipe is not recommended if you are allergic to: " + allergens
+            );
+            allergyText.setWrapText(true);
+            allergyText.setMaxWidth(860);
+            allergyText.getStyleClass().add("allergy-text");
+
+            allergyBox.getChildren().addAll(allergyTitle, allergyText);
+        }
+
         HBox content = new HBox(35);
         content.setAlignment(Pos.TOP_LEFT);
 
@@ -392,8 +713,9 @@ public class RecipeCatalogController {
         } catch (Exception e) {
             imageView.setImage(new Image(DEFAULT_IMAGE_URL, true));
         }
-        imageView.setFitWidth(320);
-        imageView.setFitHeight(240);
+
+        imageView.setFitWidth(360);
+        imageView.setFitHeight(260);
         imageView.setPreserveRatio(false);
         imageView.setSmooth(true);
         imageView.getStyleClass().add("recipe-modal-image");
@@ -403,12 +725,18 @@ public class RecipeCatalogController {
 
         Label descTitle = sectionTitle("DESCRIPTION");
         Label descValue = sectionText(safe(recipe.getDescription()));
+        descValue.setMaxWidth(520);
+        descValue.setWrapText(true);
 
         Label ingTitle = sectionTitle("📋 Ingredients");
-        Label ingValue = sectionText(formatMultiline(recipe.getIngredients()));
+        Label ingValue = sectionText(cleanIngredientsForDetails(recipe.getIngredients()));
+        ingValue.setMaxWidth(520);
+        ingValue.setWrapText(true);
 
         Label prepTitle = sectionTitle("👨‍🍳 Preparation");
-        Label prepValue = sectionText(formatMultiline(recipe.getPreparation()));
+        Label prepValue = sectionText(safe(recipe.getPreparation()));
+        prepValue.setMaxWidth(520);
+        prepValue.setWrapText(true);
 
         rightContent.getChildren().addAll(
                 descTitle, descValue,
@@ -447,9 +775,29 @@ public class RecipeCatalogController {
 
         footer.getChildren().addAll(editBtn, deleteBtn);
 
-        root.getChildren().addAll(header, badges, objectifsBox, content, pushFooter, footer);
+        root.getChildren().addAll(
+                header,
+                badges,
+                objectifsBox,
+                allergyBox,
+                content,
+                pushFooter,
+                footer
+        );
     }
+    private String cleanIngredientsForDetails(String ingredients) {
+        if (ingredients == null || ingredients.isBlank()) return "";
 
+        StringBuilder clean = new StringBuilder();
+
+        for (String line : ingredients.split("\\n")) {
+            if (!line.trim().startsWith("ALLERGENS:")) {
+                clean.append(line).append("\n");
+            }
+        }
+
+        return clean.toString().trim();
+    }
     private void switchToEditMode(VBox root, Stage modal, RecetteNutritionnelle recipe) {
         root.getChildren().clear();
 
@@ -520,6 +868,7 @@ public class RecipeCatalogController {
         } catch (Exception e) {
             imageView.setImage(new Image(DEFAULT_IMAGE_URL, true));
         }
+
         imageView.setFitWidth(300);
         imageView.setFitHeight(240);
         imageView.setPreserveRatio(false);
@@ -536,20 +885,18 @@ public class RecipeCatalogController {
         );
         imageLabel.getStyleClass().add("recipe-file-label");
 
-        final File[] editImageFile = new File[1];
+        final String[] editImageUrl = {
+                recipe.getImage() == null || recipe.getImage().isBlank() ? null : recipe.getImage()
+        };
 
         chooseImageBtn.setOnAction(e -> {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Choisir une image");
-            fileChooser.getExtensionFilters().add(
-                    new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg", "*.webp")
-            );
-            File file = fileChooser.showOpenDialog(modal);
-            if (file != null) {
-                editImageFile[0] = file;
-                imageLabel.setText(file.getName());
+            String chosen = openImagePickerDialog(null, modal);
+            if (chosen != null) {
+                editImageUrl[0] = chosen;
+                String fileName = chosen.substring(chosen.lastIndexOf('/') + 1);
+                imageLabel.setText(fileName);
                 try {
-                    imageView.setImage(new Image(file.toURI().toString(), true));
+                    imageView.setImage(new Image(toDisplayUrl(chosen), true));
                 } catch (Exception ignored) {
                 }
             }
@@ -562,7 +909,7 @@ public class RecipeCatalogController {
         descEdit.setPrefHeight(110);
         descEdit.getStyleClass().add("recipe-modal-textarea");
 
-        TextArea ingEdit = new TextArea(safe(recipe.getIngredients()));
+        TextArea ingEdit = new TextArea(cleanIngredientsForDetails(recipe.getIngredients()));
         ingEdit.setWrapText(true);
         ingEdit.setPrefHeight(120);
         ingEdit.getStyleClass().add("recipe-modal-textarea");
@@ -572,10 +919,44 @@ public class RecipeCatalogController {
         prepEdit.setPrefHeight(120);
         prepEdit.getStyleClass().add("recipe-modal-textarea");
 
+        String currentAllergens = extractAllergens(recipe.getIngredients());
+
+        CheckBox editPeanutsCB = new CheckBox("🥜 Peanuts");
+        CheckBox editTreeNutsCB = new CheckBox("🌰 Tree nuts");
+        CheckBox editMilkCB = new CheckBox("🥛 Milk");
+        CheckBox editEggsCB = new CheckBox("🥚 Eggs");
+        CheckBox editGlutenCB = new CheckBox("🌾 Wheat / Gluten");
+        CheckBox editSoyCB = new CheckBox("🟢 Soy");
+        CheckBox editFishCB = new CheckBox("🐟 Fish");
+        CheckBox editShellfishCB = new CheckBox("🦐 Shellfish");
+        CheckBox editSesameCB = new CheckBox("🌱 Sesame");
+        CheckBox editMustardCB = new CheckBox("🧂 Mustard");
+        CheckBox editCeleryCB = new CheckBox("🥬 Celery");
+        CheckBox editSulfitesCB = new CheckBox("⚗ Sulfites");
+
+        CheckBox[] editAllergenBoxes = {
+                editPeanutsCB, editTreeNutsCB, editMilkCB, editEggsCB,
+                editGlutenCB, editSoyCB, editFishCB, editShellfishCB,
+                editSesameCB, editMustardCB, editCeleryCB, editSulfitesCB
+        };
+
+        for (CheckBox cb : editAllergenBoxes) {
+            cb.getStyleClass().add("allergen-checkbox");
+            String label = cb.getText().replaceAll("^[^A-Za-z]+", "").trim();
+            cb.setSelected(currentAllergens.contains(label));
+        }
+
+        TilePane editAllergensPane = new TilePane();
+        editAllergensPane.setHgap(12);
+        editAllergensPane.setVgap(12);
+        editAllergensPane.setPrefColumns(3);
+        editAllergensPane.getChildren().addAll(editAllergenBoxes);
+
         VBox rightBox = new VBox(14,
                 sectionTitle("DESCRIPTION"), descEdit,
                 sectionTitle("📋 Ingredients"), ingEdit,
-                sectionTitle("👨‍🍳 Preparation"), prepEdit
+                sectionTitle("👨‍🍳 Preparation"), prepEdit,
+                sectionTitle("⚠ Allergens"), editAllergensPane
         );
         HBox.setHgrow(rightBox, Priority.ALWAYS);
 
@@ -616,16 +997,29 @@ public class RecipeCatalogController {
                 int kcalInt = Integer.parseInt(kcalValue);
                 int proteinsInt = proteinsValue.isEmpty() ? 0 : Integer.parseInt(proteinsValue);
 
+                String cleanIngredients = cleanIngredientsForDetails(ingEdit.getText());
+
+                List<String> selectedAllergens = new ArrayList<>();
+                for (CheckBox cb : editAllergenBoxes) {
+                    if (cb.isSelected()) {
+                        selectedAllergens.add(cb.getText().replaceAll("^[^A-Za-z]+", "").trim());
+                    }
+                }
+
+                if (!selectedAllergens.isEmpty()) {
+                    cleanIngredients += "\n\nALLERGENS: " + String.join(", ", selectedAllergens);
+                }
+
                 recipe.setTitle(titleValue);
                 recipe.setKcal(kcalInt);
                 recipe.setProteins(proteinsInt);
                 recipe.setTypeMeal(mealTypeValue);
                 recipe.setDescription(descEdit.getText());
-                recipe.setIngredients(ingEdit.getText());
+                recipe.setIngredients(cleanIngredients);
                 recipe.setPreparation(prepEdit.getText());
 
-                if (editImageFile[0] != null) {
-                    recipe.setImage(editImageFile[0].toURI().toString());
+                if (editImageUrl[0] != null) {
+                    recipe.setImage(editImageUrl[0]);
                 }
 
                 recetteService.update(recipe);
@@ -660,7 +1054,6 @@ public class RecipeCatalogController {
 
         root.getChildren().addAll(header, topForm, badges, content, pushFooter, footer);
     }
-
     private VBox formField(String labelText, Control field) {
         Label label = new Label(labelText);
         label.getStyleClass().add("recipe-field-label");
@@ -699,16 +1092,15 @@ public class RecipeCatalogController {
     }
 
     private void showModal(Stage modal, VBox content) {
-        content.setMaxWidth(820);
-        content.setPrefWidth(820);
-        content.setMaxHeight(600);
+        content.setMaxWidth(980);
+        content.setPrefWidth(980);
+        content.setMaxHeight(Region.USE_COMPUTED_SIZE);
 
         ScrollPane scroll = new ScrollPane(content);
         scroll.setFitToWidth(true);
         scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scroll.getStyleClass().add("recipe-modal-scroll");
-        scroll.setMaxWidth(980);
         scroll.setPrefViewportWidth(980);
         scroll.setPrefViewportHeight(720);
 
@@ -717,8 +1109,7 @@ public class RecipeCatalogController {
         wrapper.setAlignment(Pos.CENTER);
         wrapper.setPadding(new Insets(30));
 
-        Scene scene = new Scene(wrapper, 1000, 680);
-        content.setMaxWidth(980);
+        Scene scene = new Scene(wrapper, 1100, 820);
         scene.setFill(Color.TRANSPARENT);
 
         String css = getClass().getResource("/css/recette.css").toExternalForm();
@@ -728,16 +1119,13 @@ public class RecipeCatalogController {
         modal.setScene(scene);
         modal.showAndWait();
     }
-
     private String resolveImage(RecetteNutritionnelle recipe) {
-        return (recipe.getImage() == null || recipe.getImage().isBlank())
-                ? DEFAULT_IMAGE_URL
-                : recipe.getImage();
+        return toDisplayUrl(recipe.getImage());
     }
 
     private String formatMultiline(String text) {
         if (text == null || text.isBlank()) return "";
-        return text.replace(",", "\n");
+        return text;
     }
 
     private void clearForm() {
@@ -750,6 +1138,13 @@ public class RecipeCatalogController {
         if (preparationArea != null) preparationArea.clear();
 
         selectedImageFile = null;
+        selectedImageUrl = null;
+
+        if (formImagePreview != null) {
+            formImagePreview.setImage(null);
+            formImagePreview.setVisible(false);
+            formImagePreview.setManaged(false);
+        }
 
         if (imageFileLabel != null) {
             imageFileLabel.setText("Aucun fichier n’a été sélectionné");
@@ -796,5 +1191,34 @@ public class RecipeCatalogController {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+    private List<String> getSelectedAllergens() {
+        List<String> allergens = new ArrayList<>();
+
+        if (peanutsCB != null && peanutsCB.isSelected()) allergens.add("Peanuts");
+        if (treeNutsCB != null && treeNutsCB.isSelected()) allergens.add("Tree nuts");
+        if (milkCB != null && milkCB.isSelected()) allergens.add("Milk");
+        if (eggsCB != null && eggsCB.isSelected()) allergens.add("Eggs");
+        if (glutenCB != null && glutenCB.isSelected()) allergens.add("Wheat / Gluten");
+        if (soyCB != null && soyCB.isSelected()) allergens.add("Soy");
+        if (fishCB != null && fishCB.isSelected()) allergens.add("Fish");
+        if (shellfishCB != null && shellfishCB.isSelected()) allergens.add("Shellfish");
+        if (sesameCB != null && sesameCB.isSelected()) allergens.add("Sesame");
+        if (mustardCB != null && mustardCB.isSelected()) allergens.add("Mustard");
+        if (celeryCB != null && celeryCB.isSelected()) allergens.add("Celery");
+        if (sulfitesCB != null && sulfitesCB.isSelected()) allergens.add("Sulfites");
+
+        return allergens;
+    }
+
+
+    private String saveImageToWamp(File file) throws Exception {
+        String uploadDir = "C:/wamp64/www/images/";
+        Files.createDirectories(Path.of(uploadDir));
+        String cleanName = file.getName().replaceAll("\\s+", "_");
+        String fileName = System.currentTimeMillis() + "_" + cleanName;
+        Path destination = Path.of(uploadDir, fileName);
+        Files.copy(file.toPath(), destination, StandardCopyOption.REPLACE_EXISTING);
+        return IMAGES_BASE_URL + fileName;
     }
 }

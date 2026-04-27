@@ -56,15 +56,16 @@ public class WorkoutDetailController {
         if (userId == null || workoutUuid == null) return;
 
         Set<UUID> done = progressService.getDoneExerciseUuids(userId, workoutUuid);
-        System.out.println("DEBUG loadProgress: done UUIDs count = " + done.size());
+        System.out.println("loadProgressFromDb: " + done.size() + " done exercises");
+
         doneExerciseUuids.clear();
         doneExerciseIds.clear();
         doneExerciseUuids.addAll(done);
-        // Sync integer ids only for exercises actually in done set
+
         for (Exercise e : workout.getExercises()) {
-            if (e.getId() != null && done.contains(e.getId())) {
+            if (e.getUuid() != null && done.contains(e.getUuid())) {
                 doneExerciseIds.add(e.getId());
-                System.out.println("DEBUG: exercise done = " + e.getNom());
+                System.out.println("  done: " + e.getNom());
             }
         }
     }

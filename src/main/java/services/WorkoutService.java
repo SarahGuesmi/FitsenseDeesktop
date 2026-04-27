@@ -44,10 +44,33 @@ public class WorkoutService implements CRUD<Workout> {
         List<Workout> workouts = read();
         ExerciseService exerciseService = new ExerciseService();
         for (Workout w : workouts) {
-            if (w.getUuid() != null)
+            if (w.getUuid() != null) {
                 w.setExercises(exerciseService.findByWorkoutUuid(w.getUuid()));
+                w.setObjectifs(findObjectifsByWorkoutUuid(w.getUuid()));
+            }
         }
         return workouts;
+    }
+
+    private List<models.ObjectifSportif> findObjectifsByWorkoutUuid(UUID workoutUuid) {
+        List<models.ObjectifSportif> list = new ArrayList<>();
+        // Column name in workout_objectif is 'objectiftf_sportif_id' (note double 'f')
+        String sql = "SELECT o.`id`, o.`name` FROM `objectif_sportif` o "
+                + "INNER JOIN `workout_objectif` wo ON wo.`objectif_sportif_id` = o.`id` "
+                + "WHERE wo.`workout_id` = ?";
+        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+            ps.setBytes(1, UuidUtil.toBytes16(workoutUuid));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    UUID id = UuidUtil.fromResultSet(rs, "id");
+                    String name = rs.getString("name");
+                    list.add(new models.ObjectifSportif(id, name, null));
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("findObjectifsByWorkoutUuid error: " + e.getMessage());
+        }
+        return list;
     }
 
     public List<Workout> findByObjectiveNames(List<String> names) throws SQLException {
@@ -55,7 +78,36 @@ public class WorkoutService implements CRUD<Workout> {
     }
 
     public void syncObjectifs(Integer workoutId, List<String> objectives) throws SQLException {
-        // stub
+        // stub — use UUID version
+    }
+
+    public void syncObjectifs(UUID workoutUuid, List<String> objectiveNames) throws SQLException {
+        // Delete existing links
+        try (PreparedStatement ps = cnx.prepareStatement(
+                "DELETE FROM `workout_objectif` WHERE `workout_id` = ?")) {
+            ps.setBytes(1, UuidUtil.toBytes16(workoutUuid));
+            ps.executeUpdate();
+        }
+        if (objectiveNames == null || objectiveNames.isEmpty()) return;
+
+        String findSql = "SELECT `id` FROM `objectif_sportif` WHERE `name` = ? LIMIT 1";
+        String insertSql = "INSERT IGNORE INTO `workout_objectif` (`workout_id`, `objectif_sportif_id`) VALUES (?, ?)";
+        try (PreparedStatement find = cnx.prepareStatement(findSql);
+             PreparedStatement insert = cnx.prepareStatement(insertSql)) {
+            for (String name : objectiveNames) {
+                find.setString(1, name.trim());
+                try (ResultSet rs = find.executeQuery()) {
+                    if (rs.next()) {
+                        UUID objId = UuidUtil.fromResultSet(rs, "id");
+                        if (objId != null) {
+                            insert.setBytes(1, UuidUtil.toBytes16(workoutUuid));
+                            insert.setBytes(2, UuidUtil.toBytes16(objId));
+                            insert.executeUpdate();
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -98,6 +150,25 @@ public class WorkoutService implements CRUD<Workout> {
             ps.setString(5, w.getStatus());
             ps.setBytes(6, UuidUtil.toBytes16(w.getUuid()));
             ps.executeUpdate();
+        }
+
+        // Delete old exercise links
+        try (PreparedStatement ps = cnx.prepareStatement(
+                "DELETE FROM `workout_exercise` WHERE `workout_id` = ?")) {
+            ps.setBytes(1, UuidUtil.toBytes16(w.getUuid()));
+            ps.executeUpdate();
+        }
+
+        // Re-insert new exercise links
+        for (models.Exercise e : w.getExercises()) {
+            if (e.getUuid() != null) {
+                try (PreparedStatement ps = cnx.prepareStatement(
+                        "INSERT IGNORE INTO `workout_exercise` (`workout_id`, `exercise_id`) VALUES (?, ?)")) {
+                    ps.setBytes(1, UuidUtil.toBytes16(w.getUuid()));
+                    ps.setBytes(2, UuidUtil.toBytes16(e.getUuid()));
+                    ps.executeUpdate();
+                }
+            }
         }
     }
 

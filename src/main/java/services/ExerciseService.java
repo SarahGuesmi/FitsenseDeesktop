@@ -117,9 +117,15 @@ public class ExerciseService implements CRUD<Exercise> {
 
     @Override
     public void delete(Exercise e) throws SQLException {
-        try (PreparedStatement stmt = cnx.prepareStatement("DELETE FROM workout_exercise WHERE exercise_id=?")) {
-            stmt.setBytes(1, UuidUtil.toBytes16(e.getUuid()));
-            stmt.executeUpdate();
+        // Delete from all tables that reference exercise_id
+        for (String table : new String[]{"workout_exercise", "user_exercise_progression"}) {
+            try (PreparedStatement stmt = cnx.prepareStatement(
+                    "DELETE FROM `" + table + "` WHERE `exercise_id` = ?")) {
+                stmt.setBytes(1, UuidUtil.toBytes16(e.getUuid()));
+                stmt.executeUpdate();
+            } catch (SQLException ex) {
+                System.err.println("Delete from " + table + " error: " + ex.getMessage());
+            }
         }
         try (PreparedStatement stmt = cnx.prepareStatement("DELETE FROM exercise WHERE id=?")) {
             stmt.setBytes(1, UuidUtil.toBytes16(e.getUuid()));

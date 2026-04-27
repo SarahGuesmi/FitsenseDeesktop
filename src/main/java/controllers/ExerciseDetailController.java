@@ -152,11 +152,10 @@ public class ExerciseDetailController {
         // Check if already done in DB
         UUID userId = AppSession.getCurrentUser() != null ? AppSession.getCurrentUser().getId() : null;
         if (userId != null && exercise.getUuid() != null) {
-            int saved = progressService.getElapsedTime(userId, exercise.getUuid());
-            if (saved > 0) {
+            if (progressService.isExerciseDone(userId, exercise.getUuid())) {
                 completed = true;
-                elapsedSeconds = saved;
-                showCompletion(saved);
+                elapsedSeconds = progressService.getElapsedTime(userId, exercise.getUuid());
+                showCompletion(elapsedSeconds);
             }
         }
 

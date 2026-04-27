@@ -53,6 +53,7 @@ public class ProgressService {
     public Set<UUID> getDoneExerciseUuids(UUID userId, UUID workoutUuid) {
         Set<UUID> done = new HashSet<>();
         try {
+            // Get all exercises for this workout
             String sql = "SELECT uep.exercise_id FROM `user_exercise_progression` uep "
                     + "INNER JOIN `workout_exercise` we ON we.exercise_id = uep.exercise_id "
                     + "WHERE uep.user_id = ? AND we.workout_id = ? AND uep.status = 'done'";
@@ -66,6 +67,7 @@ public class ProgressService {
                     }
                 }
             }
+            System.out.println("getDoneExerciseUuids: found " + done.size() + " done exercises for workout " + workoutUuid);
         } catch (SQLException e) {
             System.err.println("ProgressService.getDoneExerciseUuids error: " + e.getMessage());
         }
@@ -83,13 +85,30 @@ public class ProgressService {
                 ps.setBytes(1, UuidUtil.toBytes16(userId));
                 ps.setBytes(2, UuidUtil.toBytes16(exerciseId));
                 try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) return rs.getInt("elapsed_time");
+                    if (rs.next()) return Math.max(rs.getInt("elapsed_time"), 1); // return at least 1 to indicate done
                 }
             }
         } catch (SQLException e) {
             System.err.println("ProgressService.getElapsedTime error: " + e.getMessage());
         }
         return 0;
+    }
+
+    public boolean isExerciseDone(UUID userId, UUID exerciseId) {
+        try {
+            String sql = "SELECT COUNT(*) FROM `user_exercise_progression` "
+                    + "WHERE user_id = ? AND exercise_id = ? AND status = 'done'";
+            try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+                ps.setBytes(1, UuidUtil.toBytes16(userId));
+                ps.setBytes(2, UuidUtil.toBytes16(exerciseId));
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("ProgressService.isExerciseDone error: " + e.getMessage());
+        }
+        return false;
     }
 
     // ── Workout progress ───────────────────────────────────

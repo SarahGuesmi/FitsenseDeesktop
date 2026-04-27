@@ -40,6 +40,7 @@ public class UserService implements CRUD<User> {
     }
 
     public User findByEmail(String email) throws SQLException {
+        if (cnx == null) throw new SQLException("Database connection is not available. Check config.properties.");
         String sql = "SELECT * FROM `app_user` WHERE `email_email` = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
             stmt.setString(1, email);

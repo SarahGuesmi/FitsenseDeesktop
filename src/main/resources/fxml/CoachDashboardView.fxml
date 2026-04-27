@@ -21,15 +21,15 @@
                   <Label styleClass="admin-brand" text="FITSENSE" />
                   <Label styleClass="admin-side-sub" text="COACH PANEL" />
 
-                  <Button fx:id="coachHomeBtn" text="Ôùê  Dashboard" styleClass="side-link" onAction="#onShowDashboard" />
-                  <Button fx:id="athletesBtn" text="ÔùÄ  Athletes" styleClass="side-link" onAction="#onShowAthletes" />
-                  <Button fx:id="chatroomBtn" text="­ƒÆ¼  Chatroom" styleClass="side-link" onAction="#onShowChatroom" />
-                  <Button fx:id="workoutCatalogBtn" text="­ƒÅï  Workout catalog" styleClass="side-link" onAction="#onShowWorkoutCatalog" />
-                  <Button fx:id="feedbackBtn" text="Ô£ë  Feedback management" styleClass="side-link" onAction="#onShowFeedback" />
-                  <Button fx:id="mentalWellnessBtn" text="­ƒºá  Mental wellness" styleClass="side-link" onAction="#onShowMentalWellness" />
-                  <Button fx:id="nutritionBtn" text="­ƒÑù  Nutrition plan" styleClass="side-link" onAction="#onShowNutrition" />
-                  <Button fx:id="profileBtn" text="Ôÿ║  Profile" styleClass="side-link" onAction="#onShowProfile" />
-                  <Button text="ÔÅ╗  Sign Out" styleClass="side-link" onAction="#onLogout" />
+                  <Button fx:id="coachHomeBtn" text="&#x25C8;  Dashboard" styleClass="side-link" onAction="#onShowDashboard" />
+                  <Button fx:id="athletesBtn" text="&#x25CE;  Athletes" styleClass="side-link" onAction="#onShowAthletes" />
+                  <Button fx:id="chatroomBtn" text="&#x1F4AC;  Chatroom" styleClass="side-link" onAction="#onShowChatroom" />
+                  <Button fx:id="workoutCatalogBtn" text="&#x1F3CB;  Workout catalog" styleClass="side-link" onAction="#onShowWorkoutCatalog" />
+                  <Button fx:id="feedbackBtn" text="&#x2709;  Feedback management" styleClass="side-link" onAction="#onShowFeedback" />
+                  <Button fx:id="mentalWellnessBtn" text="&#x1F9E0;  Mental wellness" styleClass="side-link" onAction="#onShowMentalWellness" />
+                  <Button fx:id="nutritionBtn" text="&#x1F957;  Nutrition plan" styleClass="side-link" onAction="#onShowNutrition" />
+                  <Button fx:id="profileBtn" text="&#x263A;  Profile" styleClass="side-link" onAction="#onShowProfile" />
+                  <Button text="&#x23FB;  Sign Out" styleClass="side-link" onAction="#onLogout" />
                </children>
                <padding>
                   <Insets top="22" right="18" bottom="22" left="18" />
@@ -56,7 +56,7 @@
                            <children>
                               <VBox alignment="CENTER_LEFT" spacing="2">
                                  <children>
-                                    <Label fx:id="navbarUserName" styleClass="navbar-user-name" text="ÔÇö" />
+                                    <Label fx:id="navbarUserName" styleClass="navbar-user-name" text="&#x2014;" />
                                     <Label fx:id="navbarUserRole" styleClass="navbar-user-role" text="Coach" />
                                  </children>
                               </VBox>
@@ -82,7 +82,7 @@
                                        <children>
                                           <VBox spacing="8">
                                              <children>
-                                                <Label text="Good morning Coach ! ­ƒæï" styleClass="hero-title" />
+                                                <Label text="Good morning Coach ! &#x1F44B;" styleClass="hero-title" />
                                                 <Label text="Here is an overview of your athletes' nutrition and training today."
                                                        styleClass="hero-subtitle"
                                                        wrapText="true" />
@@ -118,7 +118,7 @@
                                     <VBox styleClass="stat-card" GridPane.columnIndex="2">
                                        <children>
                                           <Label styleClass="stat-title" text="SESSIONS" />
-                                          <Label fx:id="sessionsLabel" styleClass="stat-value" text="ÔÇö" />
+                                          <Label fx:id="sessionsLabel" styleClass="stat-value" text="&#x2014;" />
                                        </children>
                                        <padding>
                                           <Insets top="12" right="14" bottom="12" left="14" />
@@ -135,7 +135,7 @@
                                           <children>
                                              <Label text="Top Recipes"
                                                     style="-fx-text-fill: white; -fx-font-size: 18; -fx-font-weight: bold;" />
-                                             <Label text="Les plus populaires aupr├¿s de vos clients"
+                                             <Label text="Les plus populaires aupres de vos clients"
                                                     style="-fx-text-fill: #94a3b8; -fx-font-size: 11;" />
                                           </children>
                                        </VBox>
@@ -218,14 +218,10 @@
                            </padding>
                         </VBox>
 
-                        <VBox fx:id="workoutCatalogPane" managed="false" visible="false" spacing="12" styleClass="admin-content">
+                        <VBox fx:id="workoutCatalogPane" managed="false" visible="false" spacing="0" styleClass="admin-content" VBox.vgrow="ALWAYS">
                            <children>
-                              <Label styleClass="page-title" text="Workout catalog" />
-                              <Label styleClass="users-subtitle" text="Browse and assign workouts to athletes." wrapText="true" />
+                              <fx:include fx:id="workoutCatalog" source="WorkoutCatalogFragment.fxml" VBox.vgrow="ALWAYS" />
                            </children>
-                           <padding>
-                              <Insets top="18" right="18" bottom="18" left="18" />
-                           </padding>
                         </VBox>
 
                         <VBox fx:id="feedbackPane" managed="false" visible="false" spacing="12" styleClass="admin-content">

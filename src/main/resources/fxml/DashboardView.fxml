@@ -22,16 +22,16 @@
                   <Label styleClass="dash-brand" text="FITSENSE" />
                   <Label styleClass="dash-side-sub" text="YOUR SPACE" />
 
-                  <Button fx:id="dashHomeBtn" onAction="#onShowDashboard" styleClass="dash-side-link" text="Ôùê  Dashboard" />
-                  <Button fx:id="dashProfileBtn" onAction="#onShowProfile" styleClass="dash-side-link" text="Ôÿ║  Profile" />
-                  <Button styleClass="dash-side-link" text="Ôûú  My Workouts" />
-                  <Button styleClass="dash-side-link" text="Ôùë  Mental Health" />
-                  <Button fx:id="dashNutritionBtn" onAction="#onShowNutrition" styleClass="dash-side-link" text="Ôùç  Nutrition" />
-                  <Button styleClass="dash-side-link" text="­ƒÆ¼  Chatroom" />
+                  <Button fx:id="dashHomeBtn" onAction="#onShowDashboard" styleClass="dash-side-link" text="&#x25C8;  Dashboard" />
+                  <Button fx:id="dashProfileBtn" onAction="#onShowProfile" styleClass="dash-side-link" text="&#x263A;  Profile" />
+                  <Button fx:id="dashWorkoutsBtn" onAction="#onShowWorkouts" styleClass="dash-side-link" text="&#x1F3CB;  My Workouts" />
+                  <Button styleClass="dash-side-link" text="&#x1F9E0;  Mental Health" />
+                  <Button fx:id="dashNutritionBtn" onAction="#onShowNutrition" styleClass="dash-side-link" text="&#x1F957;  Nutrition" />
+                  <Button styleClass="dash-side-link" text="&#x1F4AC;  Chatroom" />
 
                   <Region VBox.vgrow="ALWAYS" />
 
-                  <Button onAction="#onLogout" styleClass="dash-side-link" text="ÔÅ╗  Sign Out" />
+                  <Button onAction="#onLogout" styleClass="dash-side-link" text="&#x23FB;  Sign Out" />
                </children>
 
                <padding>
@@ -58,7 +58,7 @@
                                    focusTraversable="false"
                                    onAction="#onShowNotifications"
                                    styleClass="dash-navbar-bell"
-                                   text="­ƒöö" />
+                                   text="&#x1F514;" />
 
                            <Label fx:id="notificationBadge"
                                   text="1"
@@ -72,7 +72,7 @@
                            <children>
                               <VBox alignment="CENTER_LEFT" spacing="2">
                                  <children>
-                                    <Label fx:id="navbarUserName" styleClass="dash-navbar-user-name" text="ÔÇö" />
+                                    <Label fx:id="navbarUserName" styleClass="dash-navbar-user-name" text="&#x2014;" />
                                     <Label fx:id="navbarUserRole" styleClass="dash-navbar-user-role" text="User" />
                                  </children>
                               </VBox>
@@ -153,6 +153,33 @@
                                  <padding>
                                     <Insets bottom="22" left="22" right="22" top="22" />
                                  </padding>
+                              </VBox>
+
+                              <VBox fx:id="dashWorkoutsPane"
+                                    managed="false"
+                                    visible="false"
+                                    spacing="0"
+                                    styleClass="dash-content"
+                                    VBox.vgrow="ALWAYS">
+                                 <children>
+                                    <VBox fx:id="workoutsFragmentPane" VBox.vgrow="ALWAYS">
+                                       <children>
+                                          <fx:include fx:id="dashWorkouts" source="WorkoutCatalogFragment.fxml" VBox.vgrow="ALWAYS" />
+                                       </children>
+                                    </VBox>
+                                    <VBox fx:id="libraryPane" managed="false" visible="false" VBox.vgrow="ALWAYS" />
+                                 </children>
+                              </VBox>
+
+                              <VBox fx:id="dashActivityPane"
+                                    managed="false"
+                                    visible="false"
+                                    spacing="0"
+                                    styleClass="dash-content"
+                                    VBox.vgrow="ALWAYS">
+                                 <children>
+                                    <fx:include fx:id="dashActivity" source="ActivityLogView.fxml" VBox.vgrow="ALWAYS" />
+                                 </children>
                               </VBox>
 
                            </children>

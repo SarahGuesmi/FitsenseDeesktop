@@ -3,7 +3,7 @@
     -fx-font-family: "Segoe UI", "Montserrat", "Roboto", sans-serif;
 }
 
-/* Sidebar — aligned with admin panel */
+/* Sidebar ÔÇö aligned with admin panel */
 .dash-sidebar {
     -fx-background-color: linear-gradient(to bottom, #111a2f, #0e1627);
     -fx-border-color: transparent rgba(152, 176, 255, 0.22) transparent transparent;
@@ -162,7 +162,7 @@
     -fx-padding: 10 16;
 }
 
-/* ComboBox dropdown popup — dark theme */
+/* ComboBox dropdown popup ÔÇö dark theme */
 .combo-box-popup > .list-view {
     -fx-background-color: #151b2e;
     -fx-background-insets: 0;

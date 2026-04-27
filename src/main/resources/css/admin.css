@@ -183,52 +183,22 @@
     -fx-border-color: rgba(140, 166, 255, 0.28);
     -fx-border-radius: 14px;
     -fx-border-width: 1px;
-    -fx-padding: 10px 14px 10px 14px;
+    -fx-padding: 6px;
 }
 
-.users-table .column-header-background {
-    -fx-background-color: transparent;
+.users-header {
+    -fx-background-color: linear-gradient(to right, rgba(17, 30, 56, 0.95), rgba(13, 24, 47, 0.95));
+    -fx-background-radius: 14px;
+    -fx-border-color: rgba(160, 181, 255, 0.32);
+    -fx-border-radius: 14px;
+    -fx-padding: 12 14;
+    -fx-min-height: 112px;
 }
 
-.users-table .column-header,
-.users-table .filler {
-    -fx-background-color: transparent;
-}
-
-.users-table .column-header .label {
-    -fx-text-fill: #a8bce8;
-    -fx-font-size: 15px;
-    -fx-font-weight: 700;
-    -fx-alignment: CENTER_LEFT;
-    -fx-padding: 0 0 0 12px;
-}
-
-.users-table .table-row-cell {
-    -fx-background-color: #121c33;
-    -fx-text-fill: #e4e8f2;
-    -fx-border-color: transparent transparent rgba(255,255,255,0.03) transparent;
-    -fx-padding: 0;
-}
-
-.users-table .table-row-cell:odd {
-    -fx-background-color: #14203a;
-}
-
-.users-table .table-row-cell:hover {
-    -fx-background-color: linear-gradient(to right, rgba(73, 106, 207, 0.22), rgba(94, 69, 191, 0.22));
-}
-
-.users-table .table-cell {
-    -fx-text-fill: #e4e8f2;
-    -fx-alignment: CENTER_LEFT;
-    -fx-border-color: transparent;
-    -fx-font-size: 14px;
-    -fx-padding: 14px 12px 14px 12px;
-}
-
-.users-table .virtual-flow .scroll-bar:vertical,
-.users-table .virtual-flow .scroll-bar:horizontal {
-    -fx-background-color: transparent;
+.users-title {
+    -fx-text-fill: #b7c9f8;
+    -fx-font-size: 40px;
+    -fx-font-weight: 800;
 }
 
 .users-subtitle {
@@ -248,6 +218,48 @@
 
 .add-coach-btn:hover {
     -fx-effect: dropshadow(gaussian, rgba(94, 146, 255, 0.55), 14, 0.25, 0, 1);
+}
+
+.users-table .column-header-background {
+    -fx-background-color: transparent;
+}
+
+.users-table .column-header,
+.users-table .filler {
+    -fx-background-color: transparent;
+}
+
+.users-table .column-header .label {
+    -fx-text-fill: #a8bce8;
+    -fx-font-size: 15px;
+    -fx-font-weight: 700;
+}
+
+.users-table .table-row-cell {
+    -fx-background-color: #121c33;
+    -fx-text-fill: #e4e8f2;
+    -fx-border-color: transparent transparent rgba(255,255,255,0.03) transparent;
+    -fx-padding: 8 0;
+}
+
+.users-table .table-row-cell:odd {
+    -fx-background-color: #14203a;
+}
+
+.users-table .table-row-cell:hover {
+    -fx-background-color: linear-gradient(to right, rgba(73, 106, 207, 0.22), rgba(94, 69, 191, 0.22));
+}
+
+.users-table .table-cell {
+    -fx-text-fill: #e4e8f2;
+    -fx-alignment: center-left;
+    -fx-border-color: transparent;
+    -fx-font-size: 14px;
+}
+
+.users-table .virtual-flow .scroll-bar:vertical,
+.users-table .virtual-flow .scroll-bar:horizontal {
+    -fx-background-color: transparent;
 }
 
 .user-cell {
@@ -312,10 +324,21 @@
     -fx-cursor: hand;
 }
 
-.icon-edit   { -fx-text-fill: #8eb3ff; }
-.icon-delete { -fx-text-fill: #ff8f9a; }
-.icon-activate   { -fx-text-fill: #78efc1; }
-.icon-deactivate { -fx-text-fill: #ffc17f; }
+.icon-edit {
+    -fx-text-fill: #8eb3ff;
+}
+
+.icon-delete {
+    -fx-text-fill: #ff8f9a;
+}
+
+.icon-activate {
+    -fx-text-fill: #78efc1;
+}
+
+.icon-deactivate {
+    -fx-text-fill: #ffc17f;
+}
 
 .modal-overlay {
     -fx-background-color: rgba(4, 8, 18, 0.7);
@@ -330,7 +353,9 @@
     -fx-effect: dropshadow(gaussian, rgba(7, 12, 22, 0.85), 24, 0.35, 0, 6);
 }
 
-.modal-card-compact { -fx-padding: 12 16; }
+.modal-card-compact {
+    -fx-padding: 12 16;
+}
 
 .modal-scroll {
     -fx-background-color: transparent;
@@ -338,7 +363,9 @@
     -fx-padding: 0;
 }
 
-.modal-scroll .viewport { -fx-background-color: transparent; }
+.modal-scroll .viewport {
+    -fx-background-color: transparent;
+}
 
 .modal-scroll .scroll-bar:vertical {
     -fx-background-color: rgba(20, 30, 52, 0.85);
@@ -364,11 +391,19 @@
     -fx-font-size: 14px;
 }
 
-.field-label {
-    -fx-text-fill: #7fb2ff;
+.field-label-blue,
+.field-label-red,
+.field-label-green,
+.field-label-gold {
     -fx-font-size: 12px;
     -fx-font-weight: 700;
+    -fx-letter-spacing: 1px;
 }
+
+.field-label-blue { -fx-text-fill: #7fb2ff; }
+.field-label-red { -fx-text-fill: #ff8a92; }
+.field-label-green { -fx-text-fill: #67e0a8; }
+.field-label-gold { -fx-text-fill: #f0d075; }
 
 .modal-field,
 .modal-combo {
@@ -419,14 +454,7 @@
     -fx-border-width: 2px;
 }
 
-.field-error-label {
-    -fx-text-fill: #ff7f8b;
-    -fx-font-size: 12px;
-    -fx-font-weight: 700;
-    -fx-padding: 4 0 0 0;
-}
-
-/* ComboBox dropdown popup â€” dark theme (popup uses scene stylesheets, not nested ScrollPane sheets) */
+/* ComboBox dropdown popup ÔÇö dark theme (popup uses scene stylesheets, not nested ScrollPane sheets) */
 .combo-box-popup > .list-view {
     -fx-background-color: #151b2e;
     -fx-background-insets: 0;
@@ -454,9 +482,13 @@
     -fx-text-fill: #ffffff;
 }
 
-.combo-box-popup > .list-view .list-cell:empty { -fx-background-color: transparent; }
+.combo-box-popup > .list-view .list-cell:empty {
+    -fx-background-color: transparent;
+}
 
-.combo-box-popup > .list-view > .virtual-flow > .corner { -fx-background-color: #151b2e; }
+.combo-box-popup > .list-view > .virtual-flow > .corner {
+    -fx-background-color: #151b2e;
+}
 
 .combo-box-popup > .list-view .scroll-bar:vertical,
 .combo-box-popup > .list-view .scroll-bar:horizontal {
@@ -467,6 +499,57 @@
     -fx-background-color: rgba(176, 196, 246, 0.35);
     -fx-background-radius: 6px;
 }
+.dashboard-panel {
+    -fx-background-color: #0f172a;
+    -fx-background-radius: 14;
+    -fx-border-color: #1e293b;
+    -fx-border-radius: 14;
+    -fx-padding: 12;
+}
+
+.see-all-btn {
+    -fx-background-color: transparent;
+    -fx-border-color: #7c3aed;
+    -fx-text-fill: #d8b4fe;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-font-size: 11px;
+}
+
+.top-recipe-card {
+    -fx-background-color: #111827;
+    -fx-background-radius: 10;
+    -fx-padding: 8;
+    -fx-pref-width: 105;
+}
+
+.top-recipe-title {
+    -fx-text-fill: white;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.top-recipe-info {
+    -fx-text-fill: #cbd5e1;
+    -fx-font-size: 10px;
+}
+
+.chart {
+    -fx-background-color: transparent;
+}
+
+.chart-legend {
+    -fx-background-color: transparent;
+}
+
+.chart-legend-item {
+    -fx-text-fill: white;
+}
+
+.chart-pie-label {
+    -fx-fill: white;
+}
+
 
 /* Feedback modal styles */
 .btn-add-primary {
@@ -529,7 +612,7 @@
     -fx-padding: 0;
 }
 
-/* â”€â”€ Response cards â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ÔöÇÔöÇ Response cards ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ */
 .responses-badge {
     -fx-background-color: rgba(99,179,100,0.18);
     -fx-text-fill: #63b364;
@@ -643,53 +726,4 @@
 .scroll-pane .scroll-bar:vertical,
 .scroll-pane .scroll-bar:horizontal {
     -fx-background-color: #0f1117;
-.dashboard-panel {
-    -fx-background-color: #0f172a;
-    -fx-background-radius: 14;
-    -fx-border-color: #1e293b;
-    -fx-border-radius: 14;
-    -fx-padding: 12;
-}
-
-.see-all-btn {
-    -fx-background-color: transparent;
-    -fx-border-color: #7c3aed;
-    -fx-text-fill: #d8b4fe;
-    -fx-border-radius: 8;
-    -fx-background-radius: 8;
-    -fx-font-size: 11px;
-}
-
-.top-recipe-card {
-    -fx-background-color: #111827;
-    -fx-background-radius: 10;
-    -fx-padding: 8;
-    -fx-pref-width: 105;
-}
-
-.top-recipe-title {
-    -fx-text-fill: white;
-    -fx-font-size: 11px;
-    -fx-font-weight: bold;
-}
-
-.top-recipe-info {
-    -fx-text-fill: #cbd5e1;
-    -fx-font-size: 10px;
-}
-
-.chart {
-    -fx-background-color: transparent;
-}
-
-.chart-legend {
-    -fx-background-color: transparent;
-}
-
-.chart-legend-item {
-    -fx-text-fill: white;
-}
-
-.chart-pie-label {
-    -fx-fill: white;
 }

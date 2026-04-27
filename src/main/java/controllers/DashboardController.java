@@ -27,11 +27,8 @@ public class DashboardController {
     private Label welcomeLabel;
     @FXML
     private Label navbarPageTitle;
-    @FXML private VBox dashNutritionPane;
-    @FXML private Button dashNutritionBtn;
     @FXML
     private Label navbarPageSubtitle;
-    @FXML private Label notificationBadge;
     @FXML
     private Button navbarBellBtn;
     @FXML

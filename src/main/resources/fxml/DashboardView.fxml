@@ -164,7 +164,7 @@
                                  <children>
                                     <VBox fx:id="workoutsFragmentPane" VBox.vgrow="ALWAYS">
                                        <children>
-                                          <fx:include fx:id="dashWorkouts" source="WorkoutCatalogFragment.fxml" VBox.vgrow="ALWAYS" />
+                                          <fx:include fx:id="dashWorkouts" source="UserWorkoutsFragment.fxml" VBox.vgrow="ALWAYS" />
                                        </children>
                                     </VBox>
                                     <VBox fx:id="libraryPane" managed="false" visible="false" VBox.vgrow="ALWAYS" />

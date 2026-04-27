@@ -4,6 +4,10 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
 
 <StackPane prefHeight="700.0" prefWidth="1100.0"
            styleClass="admin-root"
@@ -72,113 +76,139 @@
                   <StackPane styleClass="admin-center-stack" VBox.vgrow="ALWAYS">
                      <children>
 
-                        <VBox fx:id="coachDashboardPane" spacing="14" styleClass="admin-content">
+                        <VBox fx:id="coachDashboardPane" spacing="0" styleClass="admin-content" VBox.vgrow="ALWAYS">
                            <children>
+                              <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+                                          styleClass="coach-dash-scroll" VBox.vgrow="ALWAYS">
+                                 <VBox spacing="16">
+                                    <padding><Insets top="18" right="18" bottom="24" left="18" /></padding>
 
-                              <StackPane styleClass="hero-card">
-                                 <children>
-                                    <Pane styleClass="hero-overlay" />
-                                    <HBox alignment="CENTER_LEFT" spacing="20">
+                                    <!-- Hero -->
+                                    <StackPane styleClass="hero-card">
                                        <children>
-                                          <VBox spacing="8">
-                                             <children>
+                                          <Pane styleClass="hero-overlay" />
+                                          <HBox alignment="CENTER_LEFT" spacing="20">
+                                             <padding><Insets top="18" right="20" bottom="18" left="20" /></padding>
+                                             <VBox spacing="6" HBox.hgrow="ALWAYS">
                                                 <Label text="Good morning Coach ! &#x1F44B;" styleClass="hero-title" />
                                                 <Label text="Here is an overview of your athletes' nutrition and training today."
-                                                       styleClass="hero-subtitle"
-                                                       wrapText="true" />
-                                             </children>
-                                          </VBox>
+                                                       styleClass="hero-subtitle" wrapText="true" />
+                                             </VBox>
+                                          </HBox>
                                        </children>
-                                    </HBox>
-                                 </children>
-                              </StackPane>
+                                    </StackPane>
 
-                              <GridPane hgap="12" vgap="12">
-                                 <children>
-                                    <VBox styleClass="stat-card">
-                                       <children>
+                                    <!-- Stats row -->
+                                    <HBox spacing="12">
+                                       <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                                          <padding><Insets top="14" right="16" bottom="14" left="16" /></padding>
                                           <Label styleClass="stat-title" text="ATHLETES IN ROSTER" />
                                           <Label fx:id="totalAthletesLabel" styleClass="stat-value" text="0" />
-                                       </children>
-                                       <padding>
-                                          <Insets top="12" right="14" bottom="12" left="14" />
-                                       </padding>
-                                    </VBox>
-
-                                    <VBox styleClass="stat-card" GridPane.columnIndex="1">
-                                       <children>
+                                       </VBox>
+                                       <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                                          <padding><Insets top="14" right="16" bottom="14" left="16" /></padding>
                                           <Label styleClass="stat-title" text="ACTIVE ATHLETES" />
                                           <Label fx:id="activeAthletesLabel" styleClass="stat-value" text="0" />
-                                       </children>
-                                       <padding>
-                                          <Insets top="12" right="14" bottom="12" left="14" />
-                                       </padding>
-                                    </VBox>
-
-                                    <VBox styleClass="stat-card" GridPane.columnIndex="2">
-                                       <children>
-                                          <Label styleClass="stat-title" text="SESSIONS" />
+                                       </VBox>
+                                       <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                                          <padding><Insets top="14" right="16" bottom="14" left="16" /></padding>
+                                          <Label styleClass="stat-title" text="AVG DURATION" />
                                           <Label fx:id="sessionsLabel" styleClass="stat-value" text="&#x2014;" />
-                                       </children>
-                                       <padding>
-                                          <Insets top="12" right="14" bottom="12" left="14" />
-                                       </padding>
-                                    </VBox>
-                                 </children>
-                              </GridPane>
+                                       </VBox>
+                                       <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                                          <padding><Insets top="14" right="16" bottom="14" left="16" /></padding>
+                                          <Label styleClass="stat-title" text="TOTAL FEEDBACKS" />
+                                          <Label fx:id="totalFeedbacksLabel" styleClass="stat-value" text="&#x2014;" />
+                                       </VBox>
+                                       <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                                          <padding><Insets top="14" right="16" bottom="14" left="16" /></padding>
+                                          <Label styleClass="stat-title" text="POSITIVE SENTIMENT" />
+                                          <Label fx:id="positiveSentimentLabel" styleClass="stat-value" text="&#x2014;" />
+                                       </VBox>
+                                    </HBox>
 
-                              <HBox spacing="14">
-
-                                 <VBox spacing="10" HBox.hgrow="ALWAYS" styleClass="dashboard-panel">
-                                    <children>
-                                       <VBox>
-                                          <children>
-                                             <Label text="Top Recipes"
-                                                    style="-fx-text-fill: white; -fx-font-size: 18; -fx-font-weight: bold;" />
-                                             <Label text="Les plus populaires aupres de vos clients"
-                                                    style="-fx-text-fill: #94a3b8; -fx-font-size: 11;" />
-                                          </children>
+                                    <!-- Top Recipes + Goal Distribution -->
+                                    <HBox spacing="14">
+                                       <VBox spacing="10" HBox.hgrow="ALWAYS" styleClass="dashboard-panel">
+                                          <Label text="Top Recipes"
+                                                 style="-fx-text-fill:white;-fx-font-size:16px;-fx-font-weight:bold;" />
+                                          <Label text="Les plus populaires auprès de vos clients"
+                                                 style="-fx-text-fill:#94a3b8;-fx-font-size:11px;" />
+                                          <FlowPane fx:id="topRecipesBox" hgap="12" vgap="12"
+                                                    style="-fx-background-color:transparent;" />
                                        </VBox>
 
-                                       <HBox fx:id="topRecipesBox" spacing="12" />
-                                    </children>
-                                 </VBox>
-
-                                 <VBox spacing="10" prefWidth="360" styleClass="dashboard-panel">
-                                    <children>
-                                       <Label text="GOAL DISTRIBUTION"
-                                              style="-fx-text-fill: white; -fx-font-size: 14; -fx-font-weight: bold;" />
-
-                                       <HBox alignment="CENTER_LEFT" spacing="18">
-                                          <children>
+                                       <VBox spacing="10" prefWidth="340" styleClass="dashboard-panel">
+                                          <Label text="GOAL DISTRIBUTION"
+                                                 style="-fx-text-fill:white;-fx-font-size:14px;-fx-font-weight:bold;" />
+                                          <HBox alignment="CENTER_LEFT" spacing="18">
                                              <StackPane prefWidth="130" prefHeight="130">
-                                                <children>
-                                                   <Canvas fx:id="objectiveCanvas" width="130" height="130" />
-
-                                                   <VBox alignment="CENTER">
-                                                      <children>
-                                                         <Label fx:id="totalClientsLabel"
-                                                                text="0"
-                                                                style="-fx-text-fill: white; -fx-font-size: 28; -fx-font-weight: bold;" />
-                                                         <Label text="Clients"
-                                                                style="-fx-text-fill: white; -fx-font-size: 12;" />
-                                                      </children>
-                                                   </VBox>
-                                                </children>
+                                                <Canvas fx:id="objectiveCanvas" width="130" height="130" />
+                                                <VBox alignment="CENTER">
+                                                   <Label fx:id="totalClientsLabel" text="0"
+                                                          style="-fx-text-fill:white;-fx-font-size:28px;-fx-font-weight:bold;" />
+                                                   <Label text="Clients"
+                                                          style="-fx-text-fill:#94a3b8;-fx-font-size:12px;" />
+                                                </VBox>
                                              </StackPane>
+                                             <VBox fx:id="objectiveLegendBox" spacing="10" />
+                                          </HBox>
+                                       </VBox>
+                                    </HBox>
 
-                                             <VBox fx:id="objectiveLegendBox" spacing="12" />
-                                          </children>
-                                       </HBox>
-                                    </children>
+                                    <!-- Analytics title -->
+                                    <Label text="Analytics Overview"
+                                           style="-fx-text-fill:white;-fx-font-size:26px;-fx-font-weight:800;-fx-padding:8 0 0 0;" />
+
+                                    <!-- Charts row 1: Most Used Exercises + Workouts by Goal -->
+                                    <HBox spacing="14">
+                                       <VBox spacing="8" HBox.hgrow="ALWAYS" styleClass="dashboard-panel">
+                                          <Label text="Most Used Exercises"
+                                                 style="-fx-text-fill:#94a3b8;-fx-font-size:12px;-fx-font-weight:700;" />
+                                          <BarChart fx:id="exerciseBarChart" legendVisible="false"
+                                                    prefHeight="220" animated="false"
+                                                    style="-fx-background-color:transparent;">
+                                             <xAxis><CategoryAxis /></xAxis>
+                                             <yAxis><NumberAxis /></yAxis>
+                                          </BarChart>
+                                       </VBox>
+
+                                       <VBox spacing="8" prefWidth="280" styleClass="dashboard-panel">
+                                          <Label text="Workouts by Goal"
+                                                 style="-fx-text-fill:#94a3b8;-fx-font-size:12px;-fx-font-weight:700;" />
+                                          <PieChart fx:id="goalPieChart" legendVisible="true"
+                                                    prefHeight="220" animated="false"
+                                                    style="-fx-background-color:transparent;" />
+                                       </VBox>
+                                    </HBox>
+
+                                    <!-- Charts row 2: Workouts by Level + Feedback Satisfaction -->
+                                    <HBox spacing="14">
+                                       <VBox spacing="8" prefWidth="280" styleClass="dashboard-panel">
+                                          <Label text="Workouts by Level"
+                                                 style="-fx-text-fill:#94a3b8;-fx-font-size:12px;-fx-font-weight:700;" />
+                                          <PieChart fx:id="levelPieChart" legendVisible="true"
+                                                    prefHeight="220" animated="false"
+                                                    style="-fx-background-color:transparent;" />
+                                       </VBox>
+
+                                       <VBox spacing="8" HBox.hgrow="ALWAYS" styleClass="dashboard-panel">
+                                          <Label text="Feedback Satisfaction"
+                                                 style="-fx-text-fill:#94a3b8;-fx-font-size:12px;-fx-font-weight:700;" />
+                                          <VBox fx:id="ratingChartContainer" VBox.vgrow="ALWAYS" />
+                                       </VBox>
+                                    </HBox>
+
+                                    <!-- Feedback Sentiment -->
+                                    <VBox spacing="8" styleClass="dashboard-panel">
+                                       <Label text="Feedback Sentiment"
+                                              style="-fx-text-fill:#94a3b8;-fx-font-size:12px;-fx-font-weight:700;" />
+                                       <VBox fx:id="sentimentChartContainer" />
+                                    </VBox>
+
                                  </VBox>
-
-                              </HBox>
-
+                              </ScrollPane>
                            </children>
-                           <padding>
-                              <Insets top="18" right="18" bottom="18" left="18" />
-                           </padding>
                         </VBox>
 
                         <VBox fx:id="athletesPane" managed="false" visible="false" spacing="14" styleClass="admin-content">

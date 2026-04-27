@@ -17,6 +17,7 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.image.Image;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import models.Exercise;
@@ -131,7 +132,7 @@ public class CoachDashboardController {
         refreshAthletesTable();
     }
     @FXML
-    private HBox topRecipesBox;
+    private FlowPane topRecipesBox;
     private void loadObjectiveChart() {
         if (objectiveCanvas == null || objectiveLegendBox == null || totalClientsLabel == null) return;
 
@@ -216,40 +217,86 @@ public class CoachDashboardController {
 
         Map<RecetteNutritionnelle, Integer> topRecipes = favoriService.getTop5FavoriteRecipes();
 
+        if (topRecipes.isEmpty()) {
+            Label empty = new Label("No recipes favorited yet.");
+            empty.setStyle("-fx-text-fill:#6B7280;-fx-font-size:13px;-fx-font-style:italic;");
+            topRecipesBox.getChildren().add(empty);
+            return;
+        }
+
         for (Map.Entry<RecetteNutritionnelle, Integer> entry : topRecipes.entrySet()) {
             RecetteNutritionnelle r = entry.getKey();
             int likes = entry.getValue();
 
-            VBox card = new VBox(6);
+            VBox card = new VBox(0);
             card.getStyleClass().add("top-recipe-card");
-            card.setPrefWidth(105);
+            card.setPrefWidth(150);
+            card.setMaxWidth(150);
+            card.setStyle("-fx-background-color:#111827;-fx-background-radius:12;"
+                    + "-fx-border-color:#1F2937;-fx-border-radius:12;"
+                    + "-fx-effect:dropshadow(gaussian,rgba(0,0,0,0.35),8,0,0,2);-fx-cursor:hand;");
 
-            ImageView img = new ImageView();
+            // Image
+            javafx.scene.layout.StackPane imgPane = new javafx.scene.layout.StackPane();
+            imgPane.setStyle("-fx-background-color:#1F2937;-fx-background-radius:12 12 0 0;");
+            imgPane.setMinHeight(100);
+            imgPane.setMaxHeight(100);
 
             String imageUrl = (r.getImage() == null || r.getImage().isBlank())
-                    ? "https://via.placeholder.com/150"
-                    : r.getImage();
+                    ? null : r.getImage();
 
-            img.setImage(new Image(imageUrl, true));
-            img.setFitWidth(105);
-            img.setFitHeight(75);
-            img.setPreserveRatio(false);
+            if (imageUrl != null) {
+                try {
+                    ImageView img = new ImageView(new Image(imageUrl, 150, 100, false, true, true));
+                    img.setFitWidth(150);
+                    img.setFitHeight(100);
+                    img.setPreserveRatio(false);
+                    img.setStyle("-fx-background-radius:12 12 0 0;");
+                    imgPane.getChildren().add(img);
+                } catch (Exception ignored) {
+                    Label placeholder = new Label("🍽");
+                    placeholder.setStyle("-fx-font-size:28px;-fx-opacity:0.4;");
+                    imgPane.getChildren().add(placeholder);
+                }
+            } else {
+                Label placeholder = new Label("🍽");
+                placeholder.setStyle("-fx-font-size:28px;-fx-opacity:0.4;");
+                imgPane.getChildren().add(placeholder);
+            }
 
-            Label title = new Label(r.getTitle());
+            // Content
+            VBox content = new VBox(6);
+            content.setStyle("-fx-padding:10 10 10 10;");
+
+            Label title = new Label(r.getTitle() != null ? r.getTitle() : "Recipe");
             title.getStyleClass().add("top-recipe-title");
             title.setWrapText(true);
+            title.setMaxWidth(130);
+            title.setStyle("-fx-text-fill:white;-fx-font-size:12px;-fx-font-weight:bold;");
 
             HBox info = new HBox(8);
+            info.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
 
             Label likesLabel = new Label("❤ " + likes);
-            likesLabel.getStyleClass().add("top-recipe-info");
+            likesLabel.setStyle("-fx-text-fill:#f87171;-fx-font-size:11px;-fx-font-weight:700;");
 
             Label kcalLabel = new Label(r.getKcal() + " kcal");
-            kcalLabel.getStyleClass().add("top-recipe-info");
+            kcalLabel.setStyle("-fx-text-fill:#94a3b8;-fx-font-size:11px;");
 
             info.getChildren().addAll(likesLabel, kcalLabel);
+            content.getChildren().addAll(title, info);
+            card.getChildren().addAll(imgPane, content);
 
-            card.getChildren().addAll(img, title, info);
+            // Hover effect
+            card.setOnMouseEntered(e -> card.setStyle(
+                    "-fx-background-color:#1a2235;-fx-background-radius:12;"
+                    + "-fx-border-color:#3B82F6;-fx-border-radius:12;"
+                    + "-fx-effect:dropshadow(gaussian,rgba(59,130,246,0.2),12,0,0,3);-fx-cursor:hand;"));
+            card.setOnMouseExited(e -> card.setStyle(
+                    "-fx-background-color:#111827;-fx-background-radius:12;"
+                    + "-fx-border-color:#1F2937;-fx-border-radius:12;"
+                    + "-fx-effect:dropshadow(gaussian,rgba(0,0,0,0.35),8,0,0,2);-fx-cursor:hand;"));
+
             topRecipesBox.getChildren().add(card);
         }
     }

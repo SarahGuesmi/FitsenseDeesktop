@@ -9,7 +9,7 @@
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="controllers.UserWorkoutsController">
 
-    <!-- Exercises Library button -->
+    <!-- Action buttons -->
     <HBox style="-fx-padding:0 0 4 0;" spacing="10.0">
         <Button mnemonicParsing="false" onAction="#onOpenExerciseLibrary"
                 style="-fx-background-color:linear-gradient(to right,#3B82F6,#6366F1);-fx-text-fill:white;-fx-font-weight:800;-fx-font-size:13px;-fx-background-radius:12;-fx-padding:10 20;-fx-cursor:hand;"

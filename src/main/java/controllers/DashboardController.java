@@ -47,9 +47,12 @@ public class DashboardController {
     @FXML private VBox dashActivityPane;
     @FXML private VBox workoutsFragmentPane;
     @FXML private VBox libraryPane;
+    @FXML private VBox dashNutritionPane;
     @FXML private Button dashHomeBtn;
     @FXML private Button dashProfileBtn;
     @FXML private Button dashWorkoutsBtn;
+    @FXML private Button dashNutritionBtn;
+    @FXML private Label notificationBadge;
     @FXML private ProfileFragmentController dashProfileController;
     @FXML private ActivityLogController dashActivityController;
     @FXML private NutritionFragmentController dashNutritionStatsController;
@@ -104,26 +107,27 @@ public class DashboardController {
         }
     }
 
-    public void refreshNotificationBadge(){
-        int unreadCount = 1; // après on le lit depuis la DB
-
+    public void refreshNotificationBadge() {
+        if (notificationBadge == null) return;
+        int unreadCount = 1;
         notificationBadge.setText(String.valueOf(unreadCount));
         notificationBadge.setVisible(unreadCount > 0);
         notificationBadge.setManaged(unreadCount > 0);
     }
 
     private void showOnly(VBox paneToShow) {
-        dashHomePane.setVisible(false);
-        dashHomePane.setManaged(false);
-        dashNutritionPane.setVisible(false);
-        dashNutritionPane.setManaged(false);
-        dashProfilePane.setVisible(false);
-        dashProfilePane.setManaged(false);
-
-
-
-        paneToShow.setVisible(true);
-        paneToShow.setManaged(true);
+        VBox[] allPanes = {dashHomePane, dashProfilePane, dashWorkoutsPane,
+                dashActivityPane, dashNutritionPane};
+        for (VBox p : allPanes) {
+            if (p != null) {
+                p.setVisible(false);
+                p.setManaged(false);
+            }
+        }
+        if (paneToShow != null) {
+            paneToShow.setVisible(true);
+            paneToShow.setManaged(true);
+        }
     }
 
     private void setDashboardNavbarTitles() {
@@ -206,10 +210,7 @@ public class DashboardController {
     public void onShowActivityLog() {
         if (navbarPageTitle != null) navbarPageTitle.setText("Activity Log");
         if (navbarPageSubtitle != null) navbarPageSubtitle.setText("Your session activity today");
-        dashHomePane.setManaged(false); dashHomePane.setVisible(false);
-        dashProfilePane.setManaged(false); dashProfilePane.setVisible(false);
-        dashWorkoutsPane.setManaged(false); dashWorkoutsPane.setVisible(false);
-        if (dashActivityPane != null) { dashActivityPane.setManaged(true); dashActivityPane.setVisible(true); }
+        showOnly(dashActivityPane);
         if (dashActivityController != null) dashActivityController.refresh();
         setDashNavActive(null);
     }
@@ -218,9 +219,7 @@ public class DashboardController {
     private void onShowWorkouts() {
         if (navbarPageTitle != null) navbarPageTitle.setText("My Workouts");
         if (navbarPageSubtitle != null) navbarPageSubtitle.setText("Personalized sessions matching your goals");
-        dashHomePane.setManaged(false); dashHomePane.setVisible(false);
-        dashProfilePane.setManaged(false); dashProfilePane.setVisible(false);
-        if (dashWorkoutsPane != null) { dashWorkoutsPane.setManaged(true); dashWorkoutsPane.setVisible(true); }
+        showOnly(dashWorkoutsPane);
         showWorkoutsList();
         setDashNavActive(dashWorkoutsBtn);
     }
@@ -233,9 +232,7 @@ public class DashboardController {
     public void showLibraryView(javafx.scene.Node view) {
         if (navbarPageTitle != null) navbarPageTitle.setText("Exercise Library");
         if (navbarPageSubtitle != null) navbarPageSubtitle.setText("Browse and discover exercises");
-        dashHomePane.setManaged(false); dashHomePane.setVisible(false);
-        dashProfilePane.setManaged(false); dashProfilePane.setVisible(false);
-        if (dashWorkoutsPane != null) { dashWorkoutsPane.setManaged(true); dashWorkoutsPane.setVisible(true); }
+        showOnly(dashWorkoutsPane);
         if (workoutsFragmentPane != null) { workoutsFragmentPane.setVisible(false); workoutsFragmentPane.setManaged(false); }
         if (libraryPane != null) {
             libraryPane.getChildren().setAll(view);

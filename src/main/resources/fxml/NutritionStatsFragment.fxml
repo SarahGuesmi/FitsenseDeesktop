@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.StackPane?>
+
+<VBox spacing="26"
+      stylesheets="@../css/nutrition.css"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controllers.NutritionFragmentController">
+
+    <children>
+
+        <VBox spacing="6" styleClass="nutrition-card">
+            <Label text="Daily Nutrition Tracker" styleClass="nutrition-main-title"/>
+            <Label text="Track your nutrition daily. Stay with your progress and stay within your goal."
+                   styleClass="nutrition-main-subtitle"/>
+
+            <HBox spacing="26" styleClass="nutrition-row">
+
+                <HBox spacing="26" styleClass="tracker-card">
+                    <StackPane prefWidth="150" prefHeight="150">
+                        <ProgressIndicator fx:id="caloriesProgress"
+                                           prefWidth="150"
+                                           prefHeight="150"
+                                           styleClass="calories-circle"/>
+                        <VBox alignment="CENTER">
+                            <Label fx:id="caloriesValueLabel" text="0" styleClass="circle-number"/>
+                            <Label text="kcal" styleClass="circle-unit"/>
+                            <Label fx:id="caloriesPercentLabel" text="0%" styleClass="circle-percent"/>
+                        </VBox>
+                    </StackPane>
+
+                    <VBox spacing="8" alignment="CENTER_LEFT">
+                        <Label text="CALORIES" styleClass="card-title"/>
+
+                        <Label fx:id="caloriesGoalLabel"
+                               styleClass="tracker-value"/>
+
+                        <Label fx:id="caloriesRemainingLabel"
+                               text="Remaining: 0 kcal"
+                               styleClass="remaining-text"/>
+                    </VBox>
+                </HBox>
+
+                <HBox spacing="26" styleClass="tracker-card">
+                    <StackPane prefWidth="150" prefHeight="150">
+                        <ProgressIndicator fx:id="waterProgress"
+                                           prefWidth="150"
+                                           prefHeight="150"
+                                           styleClass="water-circle"/>
+                        <VBox alignment="CENTER">
+                            <Label fx:id="waterValueLabel" text="0" styleClass="circle-number"/>
+                            <Label text="ML" styleClass="circle-unit"/>
+                            <Label fx:id="waterPercentLabel" text="0%" styleClass="circle-percent-blue"/>
+                        </VBox>
+                    </StackPane>
+
+                    <VBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="WATER" styleClass="card-title"/>
+                        <Label fx:id="waterGoalLabel" text="0 / 2250 ml" styleClass="tracker-value"/>
+
+                        <Button text="+ 250 ml 💧"
+                                onAction="#addWater250"
+                                styleClass="water-btn"/>
+                    </VBox>
+                </HBox>
+
+            </HBox>
+        </VBox>
+
+        <VBox spacing="12" styleClass="weekly-card">
+            <Label text="WEEKLY CALORIES" styleClass="section-title"/>
+
+            <BarChart fx:id="weeklyCaloriesChart"
+                      prefHeight="260"
+                      animated="false"
+                      legendVisible="true">
+                <xAxis>
+                    <CategoryAxis/>
+                </xAxis>
+                <yAxis>
+                    <NumberAxis/>
+                </yAxis>
+            </BarChart>
+        </VBox>
+
+    </children>
+</VBox>

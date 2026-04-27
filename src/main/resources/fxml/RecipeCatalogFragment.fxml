@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.TilePane?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="controllers.RecipeCatalogController"
+            fitToWidth="true"
+            pannable="true"
+            hbarPolicy="NEVER"
+            vbarPolicy="AS_NEEDED"
+            styleClass="nutrition-scroll"
+            stylesheets="@../css/recette.css">
+
+    <content>
+        <VBox spacing="26" styleClass="nutrition-page">
+
+            <HBox alignment="CENTER_LEFT" styleClass="nutrition-header">
+                <VBox spacing="6">
+                    <Label text="Nutrition Management" styleClass="nutrition-title"/>
+                    <Label text="Fuel your athletes journey to success" styleClass="nutrition-subtitle"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="+ Create New Recipe"
+                        onAction="#onToggleForm"
+                        styleClass="nutrition-create-btn"/>
+            </HBox>
+
+            <VBox fx:id="formPane"
+                  visible="false"
+                  managed="false"
+                  spacing="24"
+                  styleClass="nutrition-form-card">
+
+                <HBox alignment="CENTER_LEFT">
+                    <Label text="+ Create New Recipe" styleClass="nutrition-form-title"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="&#x2715;"
+                            onAction="#onToggleForm"
+                            styleClass="nutrition-close-btn"/>
+                </HBox>
+
+                <GridPane hgap="22" vgap="20">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="50"/>
+                        <ColumnConstraints percentWidth="50"/>
+                    </columnConstraints>
+
+                    <VBox spacing="8" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                        <Label text="Recipe name" styleClass="nutrition-label"/>
+                        <TextField fx:id="titleField"
+                                   promptText="Ex: Chicken Salad"
+                                   styleClass="nutrition-input"/>
+                    </VBox>
+
+                    <VBox spacing="8" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                        <Label text="Meal type" styleClass="nutrition-label"/>
+                        <ComboBox fx:id="typeMealCombo" styleClass="nutrition-combo"/>
+                    </VBox>
+
+                    <VBox spacing="8" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                        <Label text="Calories (kcal)" styleClass="nutrition-label"/>
+                        <TextField fx:id="kcalField"
+                                   promptText="Ex: 450"
+                                   styleClass="nutrition-input"/>
+                    </VBox>
+
+                    <VBox spacing="8" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                        <Label text="Proteins (g)" styleClass="nutrition-label"/>
+                        <TextField fx:id="proteinsField"
+                                   promptText="Ex: 35"
+                                   styleClass="nutrition-input"/>
+                    </VBox>
+
+                    <VBox spacing="8" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.columnSpan="2">
+                        <Label text="Image" styleClass="nutrition-label"/>
+                        <HBox spacing="16" alignment="CENTER_LEFT">
+                            <VBox spacing="8" alignment="CENTER_LEFT">
+                                <HBox spacing="12" alignment="CENTER_LEFT" styleClass="nutrition-file-box">
+                                    <Button text="Choisir un fichier"
+                                            onAction="#onChooseImage"
+                                            styleClass="nutrition-file-btn"/>
+                                    <Label fx:id="imageFileLabel"
+                                           text="Aucun fichier n'a ete selectionne"
+                                           styleClass="nutrition-file-label"/>
+                                </HBox>
+                                <Label text="JPG / PNG / WEBP - max 3MB" styleClass="nutrition-help"/>
+                            </VBox>
+                            <ImageView fx:id="formImagePreview"
+                                       fitWidth="120" fitHeight="80"
+                                       preserveRatio="true"
+                                       visible="false"
+                                       managed="false"/>
+                        </HBox>
+                    </VBox>
+
+                    <VBox spacing="8" GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.columnSpan="2">
+                        <Label text="Description" styleClass="nutrition-label"/>
+                        <TextArea fx:id="descriptionArea"
+                                  prefHeight="110"
+                                  wrapText="true"
+                                  styleClass="nutrition-textarea"/>
+                    </VBox>
+
+                    <VBox spacing="8" GridPane.columnIndex="0" GridPane.rowIndex="4" GridPane.columnSpan="2">
+                        <Label text="Ingredients" styleClass="nutrition-label"/>
+                        <TextArea fx:id="ingredientsArea"
+                                  prefHeight="140"
+                                  wrapText="true"
+                                  styleClass="nutrition-textarea"/>
+                    </VBox>
+
+                    <VBox spacing="8" GridPane.columnIndex="0" GridPane.rowIndex="5" GridPane.columnSpan="2">
+                        <Label text="Preparation" styleClass="nutrition-label"/>
+                        <TextArea fx:id="preparationArea"
+                                  prefHeight="140"
+                                  wrapText="true"
+                                  styleClass="nutrition-textarea"/>
+                    </VBox>
+                </GridPane>
+
+                <VBox spacing="12" styleClass="allergen-card">
+                    <Label text="Allergens &amp; Sensitivity Check" styleClass="nutrition-section-title"/>
+                    <Label text="Select any ingredients that may cause allergic reactions."
+                           styleClass="nutrition-help"/>
+                    <TilePane hgap="12" vgap="12" prefColumns="4">
+                        <CheckBox fx:id="peanutsCB" text="Peanuts" styleClass="allergen-checkbox"/>
+                        <CheckBox fx:id="treeNutsCB" text="Tree nuts" styleClass="allergen-checkbox"/>
+                        <CheckBox fx:id="milkCB" text="Milk" styleClass="allergen-checkbox"/>
+                        <CheckBox fx:id="eggsCB" text="Eggs" styleClass="allergen-checkbox"/>
+                        <CheckBox fx:id="glutenCB" text="Wheat / Gluten" styleClass="allergen-checkbox"/>
+                        <CheckBox fx:id="soyCB" text="Soy" styleClass="allergen-checkbox"/>
+                        <CheckBox fx:id="fishCB" text="Fish" styleClass="allergen-checkbox"/>
+                        <CheckBox fx:id="shellfishCB" text="Shellfish" styleClass="allergen-checkbox"/>
+                        <CheckBox fx:id="sesameCB" text="Sesame" styleClass="allergen-checkbox"/>
+                        <CheckBox fx:id="mustardCB" text="Mustard" styleClass="allergen-checkbox"/>
+                        <CheckBox fx:id="celeryCB" text="Celery" styleClass="allergen-checkbox"/>
+                        <CheckBox fx:id="sulfitesCB" text="Sulfites" styleClass="allergen-checkbox"/>
+                    </TilePane>
+                </VBox>
+
+                <VBox spacing="14">
+                    <Label text="Objectives for this recipe" styleClass="nutrition-section-title"/>
+                    <HBox spacing="16">
+                        <VBox fx:id="weightLossCard" spacing="6"
+                              styleClass="nutrition-objective-card"
+                              onMouseClicked="#onToggleWeightLoss">
+                            <Label text="Weight Loss" styleClass="nutrition-objective-title"/>
+                            <Label text="Burn fat &amp; get lean" styleClass="nutrition-objective-subtitle"/>
+                        </VBox>
+                        <VBox fx:id="muscleGainCard" spacing="6"
+                              styleClass="nutrition-objective-card"
+                              onMouseClicked="#onToggleMuscleGain">
+                            <Label text="Muscle Gain" styleClass="nutrition-objective-title"/>
+                            <Label text="Build strength &amp; mass" styleClass="nutrition-objective-subtitle"/>
+                        </VBox>
+                        <VBox fx:id="enduranceCard" spacing="6"
+                              styleClass="nutrition-objective-card"
+                              onMouseClicked="#onToggleEndurance">
+                            <Label text="Endurance" styleClass="nutrition-objective-title"/>
+                            <Label text="Stamina &amp; heart health" styleClass="nutrition-objective-subtitle"/>
+                        </VBox>
+                        <VBox fx:id="wellBeingCard" spacing="6"
+                              styleClass="nutrition-objective-card"
+                              onMouseClicked="#onToggleWellBeing">
+                            <Label text="Well-being" styleClass="nutrition-objective-title"/>
+                            <Label text="Flexibility &amp; stress relief" styleClass="nutrition-objective-subtitle"/>
+                        </VBox>
+                    </HBox>
+                    <Label text="Choisis au moins un objectif." styleClass="nutrition-help"/>
+                </VBox>
+
+                <HBox alignment="CENTER_RIGHT">
+                    <Button text="Save Recipe"
+                            onAction="#onSaveRecipe"
+                            styleClass="nutrition-save-btn"/>
+                </HBox>
+            </VBox>
+
+            <VBox spacing="14" styleClass="nutrition-search-card">
+                <Label text="Search &amp; Filters" styleClass="nutrition-search-title"/>
+                <Label text="Search by name" styleClass="nutrition-label"/>
+                <HBox spacing="14" alignment="CENTER_LEFT">
+                    <TextField fx:id="searchField"
+                               promptText="Ex: Avocado Power Toast"
+                               HBox.hgrow="ALWAYS"
+                               styleClass="nutrition-input"/>
+                    <Button text="Search"
+                            onAction="#onSearchRecipes"
+                            styleClass="nutrition-search-btn"/>
+                    <Button text="Reset"
+                            onAction="#onResetSearch"
+                            styleClass="nutrition-reset-btn"/>
+                </HBox>
+            </VBox>
+
+            <TilePane fx:id="recipesGrid"
+                      prefColumns="3"
+                      hgap="22"
+                      vgap="22"/>
+        </VBox>
+    </content>
+</ScrollPane>

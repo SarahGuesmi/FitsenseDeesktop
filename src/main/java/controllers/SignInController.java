@@ -17,13 +17,14 @@ import models.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import services.ProfilePhysiqueService;
 import services.UserService;
+import utils.SessionManager;
+import utils.WebAssets;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Objects;
 
 public class SignInController {
-    private static final String ADMIN_EMAIL = "admin@fitsense.com";
+    private static final String ADMIN_EMAIL = "sarahguesmi223@gmail.com";
 
     @FXML
     private StackPane root;
@@ -52,7 +53,11 @@ public class SignInController {
 
     @FXML
     private void initialize() {
-        WebAssets.loadPublicAsset(heroImageView, WebAssets.HERO_SPORT_IMAGE);
+        try {
+            WebAssets.loadPublicAsset(heroImageView, WebAssets.HERO_SPORT_IMAGE);
+        } catch (Exception e) {
+            System.out.println("Impossible de charger l'image hero : " + e.getMessage());
+        }
     }
 
     @FXML
@@ -72,32 +77,45 @@ public class SignInController {
 
         try {
             User user = userService.findByEmail(email);
+
             if (user == null || user.getPassword() == null || !passwordEncoder.matches(password, user.getPassword())) {
                 showAlert(Alert.AlertType.ERROR, "Authentication Failed", "Invalid email or password.");
                 return;
             }
 
+            // session dynamique
+            SessionManager.setCurrentUser(user);
+
+            // tu peux garder AppSession si ton projet l'utilise ailleurs
             AppSession.setCurrentUser(user);
             ActivityTracker.startSession();
 
             String rolesJson = user.getRolesJson() == null ? "" : user.getRolesJson();
+
             if (ADMIN_EMAIL.equalsIgnoreCase(user.getEmail()) || rolesJson.contains("ROLE_ADMIN")) {
                 switchScene("/fxml/AdminDashboardView.fxml", "/css/admin.css");
                 return;
             }
+
             if (rolesJson.contains("ROLE_COACH")) {
                 switchScene("/fxml/CoachDashboardView.fxml", "/css/admin.css");
                 return;
             }
 
             boolean hasProfile = !profilePhysiqueService.findByUserId(user.getId()).isEmpty();
+
             if (hasProfile) {
                 switchScene("/fxml/DashboardView.fxml", "/css/dashboard.css");
             } else {
                 AppSession.resetOnboarding();
                 switchScene("/fxml/HeightView.fxml", "/css/onboarding.css");
             }
+
         } catch (SQLException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Sign In Failed", e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "Sign In Failed", e.getMessage());
         }
     }
@@ -112,12 +130,18 @@ public class SignInController {
             Parent newRoot = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(fxmlPath)));
             Scene scene = root.getScene();
             scene.setRoot(newRoot);
-            scene.getStylesheets().setAll(Objects.requireNonNull(getClass().getResource(cssPath)).toExternalForm());
+            scene.getStylesheets().setAll(
+                    Objects.requireNonNull(getClass().getResource(cssPath)).toExternalForm()
+            );
         } catch (Exception e) {
             Throwable cause = e.getCause() != null ? e.getCause() : e;
             cause.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Navigation Error",
-                    "Could not load view: " + fxmlPath + "\n\n" + cause.getClass().getSimpleName() + ": " + cause.getMessage());
+            showAlert(
+                    Alert.AlertType.ERROR,
+                    "Navigation Error",
+                    "Could not load view: " + fxmlPath + "\n\n"
+                            + cause.getClass().getSimpleName() + ": " + cause.getMessage()
+            );
         }
     }
 

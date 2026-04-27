@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="24"
+      styleClass="nutrition-root"
+      stylesheets="@../css/nutrition.css"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controllers.NutritionController">
+
+    <children>
+
+        <VBox spacing="22" styleClass="discover-card">
+            <Label text="🔎 Discover Recipes" styleClass="nutrition-title"/>
+
+            <GridPane hgap="16" vgap="16" styleClass="filter-grid">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="40"/>
+                    <ColumnConstraints percentWidth="18"/>
+                    <ColumnConstraints percentWidth="18"/>
+                    <ColumnConstraints percentWidth="24"/>
+                </columnConstraints>
+
+                <VBox spacing="8" GridPane.columnIndex="0">
+                    <Label text="SEARCH BY NAME" styleClass="filter-title"/>
+                    <TextField fx:id="searchField" promptText="Ex: Avocado Power Toast" styleClass="search-bar"/>
+                </VBox>
+
+                <VBox spacing="8" GridPane.columnIndex="1">
+                    <Label text="MAX CALORIES" styleClass="filter-title"/>
+                    <TextField fx:id="calorieField" promptText="1500 kcal" styleClass="filter-input"/>
+                </VBox>
+
+                <VBox spacing="8" GridPane.columnIndex="2">
+                    <Label text="MIN PROTEINS" styleClass="filter-title"/>
+                    <TextField fx:id="proteinField" promptText="0 g" styleClass="filter-input"/>
+                </VBox>
+
+                <VBox spacing="8" GridPane.columnIndex="3">
+                    <Label text="ALLERGY FILTER" styleClass="filter-title"/>
+                    <ComboBox fx:id="allergyFilterCombo" promptText="All" onAction="#onFilterRecipes" styleClass="allergy-combo"/>
+                </VBox>
+            </GridPane>
+
+            <HBox spacing="14" alignment="CENTER_RIGHT">
+                <Button text="Search" onAction="#onFilterRecipes" styleClass="btn-search"/>
+                <Button text="Reset" onAction="#onResetFilters" styleClass="btn-reset"/>
+            </HBox>
+        </VBox>
+
+        <VBox spacing="12" styleClass="food-api-card">
+            <Label text="🍽 Add what you ate" styleClass="food-api-title"/>
+            <Label text="Example: 1 apple, 1 bowl lentil soup, 2 eggs" styleClass="food-api-subtitle"/>
+
+            <TextField fx:id="foodInput" promptText="Type food... (ex: 1 apple)" styleClass="food-input"/>
+
+            <HBox spacing="18" alignment="CENTER">
+                <Button text="Check calories" onAction="#onCheckCalories" styleClass="btn-check-calories"/>
+
+                <Label fx:id="foodCaloriesLabel"
+                       text="+ Add calories"
+                       styleClass="calories-preview"
+                       HBox.hgrow="ALWAYS"/>
+
+                <Button fx:id="addCaloriesBtn"
+                        text="+ Add calories"
+                        onAction="#onAddCalories"
+                        disable="true"
+                        styleClass="btn-add-calories"/>
+            </HBox>
+        </VBox>
+
+        <HBox alignment="CENTER_RIGHT">
+            <Button text="🔎 Search recipes"
+                    onAction="#toggleRecipeSearch"
+                    styleClass="btn-search-recipes"/>
+        </HBox>
+
+        <VBox fx:id="recipeSearchPanel" spacing="12" styleClass="recipe-api-card">
+            <HBox alignment="CENTER_RIGHT">
+                <Button text="✖ Close" onAction="#toggleRecipeSearch" styleClass="btn-close-results"/>
+            </HBox>
+
+            <Label text="🔎 Search recipes" styleClass="food-api-title"/>
+            <Label text="Type an ingredient: chicken, egg, tomato, rice..." styleClass="food-api-subtitle"/>
+
+            <HBox spacing="14" alignment="CENTER">
+                <TextField fx:id="ingredientInput"
+                           promptText="Type ingredient... (ex: chicken)"
+                           styleClass="food-input"
+                           HBox.hgrow="ALWAYS"/>
+
+                <Button text="Search" onAction="#onSearchApiRecipes" styleClass="btn-search-recipes"/>
+            </HBox>
+
+            <ScrollPane fx:id="apiRecipesScroll"
+                        fitToWidth="true"
+                        prefHeight="300"
+                        maxHeight="300"
+                        hbarPolicy="NEVER"
+                        vbarPolicy="AS_NEEDED"
+                        styleClass="api-recipes-scroll">
+                <content>
+                    <VBox fx:id="apiRecipesBox" spacing="14" styleClass="api-recipes-list"/>
+                </content>
+            </ScrollPane>
+        </VBox>
+
+        <GridPane fx:id="recipesGrid"
+                  hgap="28"
+                  vgap="28"
+                  styleClass="recipes-grid"/>
+
+
+        <VBox spacing="16" styleClass="youtube-card">
+
+            <Label text="▶ YouTube Nutrition Videos" styleClass="food-api-title"/>
+            <Label text="Find helpful recipe videos and meal ideas" styleClass="food-api-subtitle"/>
+
+            <HBox spacing="14" alignment="CENTER">
+                <TextField fx:id="youtubeSearchField"
+                           promptText="Ex: high protein breakfast"
+                           styleClass="food-input"
+                           HBox.hgrow="ALWAYS"/>
+
+                <Button text="Search Videos"
+                        onAction="#onSearchYoutubeVideos"
+                        styleClass="btn-search"/>
+            </HBox>
+
+            <ScrollPane fitToWidth="true"
+                        hbarPolicy="NEVER"
+                        vbarPolicy="NEVER"
+                        styleClass="youtube-scroll">
+                <content>
+                    <GridPane fx:id="youtubeVideosBox"
+                              hgap="18"
+                              vgap="18"
+                              alignment="CENTER"
+                              styleClass="youtube-videos-box"/>
+                </content>
+            </ScrollPane>
+
+        </VBox>
+    </children>
+</VBox>

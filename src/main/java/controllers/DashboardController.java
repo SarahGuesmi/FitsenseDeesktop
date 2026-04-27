@@ -12,25 +12,33 @@ import javafx.scene.layout.VBox;
 import models.User;
 import models.Workout;
 import utils.FeedbackLauncher;
-
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import javafx.scene.control.Alert;
+import services.NotificationService;
+import java.util.List;
 import java.io.IOException;
 import java.util.Objects;
-
 public class DashboardController {
+
     @FXML
     private StackPane root;
     @FXML
     private Label welcomeLabel;
     @FXML
     private Label navbarPageTitle;
+    @FXML private VBox dashNutritionPane;
+    @FXML private Button dashNutritionBtn;
     @FXML
     private Label navbarPageSubtitle;
+    @FXML private Label notificationBadge;
     @FXML
     private Button navbarBellBtn;
     @FXML
     private Label navbarUserName;
     @FXML
     private Label navbarUserRole;
+    private Stage notificationStage;
     @FXML
     private Label navbarAvatar;
     @FXML private VBox dashHomePane;
@@ -44,11 +52,11 @@ public class DashboardController {
     @FXML private Button dashWorkoutsBtn;
     @FXML private ProfileFragmentController dashProfileController;
     @FXML private ActivityLogController dashActivityController;
+    @FXML private NutritionFragmentController dashNutritionStatsController;
 
     // Singleton reference so child controllers can call back
     private static DashboardController instance;
     public static DashboardController getInstance() { return instance; }
-
     @FXML
     private void initialize() {
         instance = this;
@@ -61,6 +69,61 @@ public class DashboardController {
         refreshNavbar();
         setDashboardNavbarTitles();
         showDashboardHome();
+        refreshNotificationBadge();
+    }
+    @FXML
+    private void onShowNutrition() {
+        showOnly(dashNutritionPane); // ou le bon pane
+        setDashNavActive(dashNutritionBtn);
+    }
+    @FXML
+    private void onShowNotifications() {
+        try {
+            if (notificationStage != null && notificationStage.isShowing()) {
+                notificationStage.close();
+                notificationStage = null;
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/NotificationPopup.fxml"));
+            Parent root = loader.load();
+
+            NotificationPopupController controller = loader.getController();
+            String userId = AppSession.getCurrentUser().getId().toString();
+            controller.loadNotifications(userId, this);
+
+            notificationStage = new Stage();
+            notificationStage.setScene(new Scene(root));
+            notificationStage.initStyle(StageStyle.TRANSPARENT);
+            notificationStage.show();
+
+            notificationStage.setOnHidden(e -> notificationStage = null);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void refreshNotificationBadge(){
+        int unreadCount = 1; // après on le lit depuis la DB
+
+        notificationBadge.setText(String.valueOf(unreadCount));
+        notificationBadge.setVisible(unreadCount > 0);
+        notificationBadge.setManaged(unreadCount > 0);
+    }
+
+    private void showOnly(VBox paneToShow) {
+        dashHomePane.setVisible(false);
+        dashHomePane.setManaged(false);
+        dashNutritionPane.setVisible(false);
+        dashNutritionPane.setManaged(false);
+        dashProfilePane.setVisible(false);
+        dashProfilePane.setManaged(false);
+
+
+
+        paneToShow.setVisible(true);
+        paneToShow.setManaged(true);
     }
 
     private void setDashboardNavbarTitles() {
@@ -188,19 +251,12 @@ public class DashboardController {
         setDashboardNavbarTitles();
         showDashboardHome();
     }
-
     @FXML
     private void onShowProfile() {
         setProfileNavbarTitles();
-        if (dashHomePane != null) {
-            dashHomePane.setManaged(false);
-            dashHomePane.setVisible(false);
-        }
-        if (dashProfilePane != null) {
-            dashProfilePane.setManaged(true);
-            dashProfilePane.setVisible(true);
-        }
+        showOnly(dashProfilePane);
         setDashNavActive(dashProfileBtn);
+
         if (dashProfileController != null) {
             dashProfileController.reloadFromSession();
         }
@@ -212,6 +268,10 @@ public class DashboardController {
         if (dashWorkoutsPane != null) { dashWorkoutsPane.setManaged(false); dashWorkoutsPane.setVisible(false); }
         if (dashActivityPane != null) { dashActivityPane.setManaged(false); dashActivityPane.setVisible(false); }
         setDashNavActive(dashHomeBtn);
+
+        if (dashNutritionStatsController != null) {
+            dashNutritionStatsController.reloadNutrition();
+        }
     }
 
     private void setDashNavActive(Button selected) {
@@ -221,8 +281,14 @@ public class DashboardController {
                 if (b == selected) b.getStyleClass().add("dash-side-link-active");
             }
         }
-    }
 
+        if (dashNutritionBtn != null) {
+            dashNutritionBtn.getStyleClass().setAll("dash-side-link");
+            if (selected == dashNutritionBtn) {
+                dashNutritionBtn.getStyleClass().add("dash-side-link-active");
+            }
+        }
+    }
     @FXML
     private void onTestFeedback() {
         // Test: use workout id=1 (change to any existing workout id in your DB)

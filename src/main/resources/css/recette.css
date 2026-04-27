@@ -1,0 +1,586 @@
+.root {
+    -fx-font-family: "Segoe UI", "Inter", sans-serif;
+}
+
+/* SCROLL */
+.nutrition-scroll {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+.nutrition-scroll > .viewport {
+    -fx-background-color: #0b1020;
+}
+
+.nutrition-scroll .corner {
+    -fx-background-color: #0b1020;
+}
+
+/* PAGE */
+.nutrition-page {
+    -fx-background-color: linear-gradient(to bottom, #0b1020, #0d1324);
+    -fx-padding: 28 34 34 34;
+    -fx-spacing: 26;
+}
+
+.nutrition-header {
+    -fx-padding: 2 0 4 0;
+}
+
+.nutrition-title {
+    -fx-text-fill: linear-gradient(to right, #53a8ff, #7b6dff);
+    -fx-font-size: 28px;
+    -fx-font-weight: 900;
+}
+
+.nutrition-subtitle {
+    -fx-text-fill: #a2abc3;
+    -fx-font-size: 14px;
+}
+
+/* TOP BUTTON */
+.nutrition-create-btn {
+    -fx-background-color: linear-gradient(to right, #4b83ff, #a55cff);
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: 800;
+    -fx-padding: 15 26 15 26;
+    -fx-background-radius: 18;
+    -fx-border-radius: 18;
+    -fx-cursor: hand;
+}
+
+.nutrition-create-btn:hover {
+    -fx-opacity: 0.95;
+}
+
+/* FORM CARD */
+.nutrition-form-card {
+    -fx-background-color: linear-gradient(to bottom right, #171b27, #1e212d);
+    -fx-background-radius: 26;
+    -fx-border-color: rgba(255,255,255,0.06);
+    -fx-border-radius: 26;
+    -fx-padding: 28 28 24 28;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.45), 28, 0.25, 0, 8);
+}
+
+.nutrition-form-title {
+    -fx-text-fill: #f7f8ff;
+    -fx-font-size: 18px;
+    -fx-font-weight: 900;
+}
+
+.nutrition-close-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #cfd4e6;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-padding: 2 8 2 8;
+}
+
+.nutrition-close-btn:hover {
+    -fx-text-fill: white;
+}
+
+/* LABELS */
+.nutrition-label,
+.nutrition-section-title {
+    -fx-text-fill: #eef2ff;
+    -fx-font-size: 13px;
+    -fx-font-weight: 800;
+}
+
+.nutrition-help {
+    -fx-text-fill: #96a1bb;
+    -fx-font-size: 12px;
+}
+
+/* INPUTS */
+.nutrition-input,
+.nutrition-combo,
+.nutrition-textarea {
+    -fx-background-color: #0b0f19;
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: #7e89a6;
+    -fx-background-radius: 16;
+    -fx-border-color: rgba(255,255,255,0.05);
+    -fx-border-radius: 16;
+    -fx-border-width: 1;
+    -fx-font-size: 13px;
+}
+
+.nutrition-input,
+.nutrition-combo {
+    -fx-pref-height: 50;
+    -fx-padding: 0 16 0 16;
+}
+
+.nutrition-textarea {
+    -fx-padding: 12 14 12 14;
+}
+
+.nutrition-textarea .content {
+    -fx-background-color: #0b0f19;
+    -fx-background-radius: 16;
+}
+
+.nutrition-input:focused,
+.nutrition-combo:focused,
+.nutrition-textarea:focused {
+    -fx-border-color: #6f74ff;
+    -fx-effect: dropshadow(gaussian, rgba(111,116,255,0.18), 12, 0.2, 0, 0);
+}
+
+.nutrition-combo .list-cell {
+    -fx-text-fill: white;
+    -fx-background-color: transparent;
+}
+
+.nutrition-combo .arrow-button {
+    -fx-background-color: transparent;
+}
+
+.nutrition-combo .arrow {
+    -fx-background-color: #d2d7e8;
+}
+
+/* FILE BOX */
+.nutrition-file-box {
+    -fx-background-color: #0b0f19;
+    -fx-background-radius: 16;
+    -fx-border-color: rgba(255,255,255,0.05);
+    -fx-border-radius: 16;
+    -fx-padding: 12 14 12 14;
+}
+
+.nutrition-file-btn {
+    -fx-background-color: linear-gradient(to right, #5e81ff, #7d63ff);
+    -fx-text-fill: white;
+    -fx-font-weight: 800;
+    -fx-padding: 10 18 10 18;
+    -fx-background-radius: 14;
+    -fx-cursor: hand;
+}
+
+.nutrition-file-btn:hover {
+    -fx-opacity: 0.95;
+}
+
+.nutrition-file-label {
+    -fx-text-fill: #f0f2fb;
+    -fx-font-size: 13px;
+}
+
+/* OBJECTIVES */
+.nutrition-objective-card {
+    -fx-background-color: #131824;
+    -fx-border-color: rgba(255,255,255,0.06);
+    -fx-border-width: 1;
+    -fx-border-radius: 18;
+    -fx-background-radius: 18;
+    -fx-padding: 16 18 16 18;
+    -fx-pref-width: 245;
+    -fx-min-height: 110;
+    -fx-cursor: hand;
+}
+
+.nutrition-objective-card:hover {
+    -fx-border-color: rgba(124,109,255,0.32);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 16, 0.2, 0, 3);
+}
+
+.nutrition-objective-card.objective-card-selected {
+    -fx-background-color: linear-gradient(to bottom right, rgba(89,103,255,0.22), rgba(164,93,255,0.14));
+    -fx-border-color: #7a5cff;
+    -fx-border-width: 1.4;
+    -fx-effect: dropshadow(gaussian, rgba(122,92,255,0.20), 16, 0.2, 0, 4);
+}
+
+.nutrition-objective-emoji {
+    -fx-font-size: 24px;
+}
+
+.nutrition-objective-title {
+    -fx-text-fill: #f5f7ff;
+    -fx-font-size: 15px;
+    -fx-font-weight: 900;
+}
+
+.nutrition-objective-subtitle {
+    -fx-text-fill: #a8b1c8;
+    -fx-font-size: 12px;
+    -fx-wrap-text: true;
+}
+
+/* SAVE BUTTON */
+.nutrition-save-btn {
+    -fx-background-color: linear-gradient(to bottom, #2f9646, #236f34);
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: 900;
+    -fx-padding: 15 28 15 28;
+    -fx-background-radius: 18;
+    -fx-border-radius: 18;
+    -fx-cursor: hand;
+}
+
+.nutrition-save-btn:hover {
+    -fx-opacity: 0.96;
+}
+
+/* SCROLLBAR */
+.scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 10;
+}
+
+.scroll-bar:vertical .track {
+    -fx-background-color: #141a27;
+    -fx-background-radius: 8;
+}
+
+.scroll-bar:vertical .thumb {
+    -fx-background-color: #3a4258;
+    -fx-background-radius: 8;
+}
+
+.scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #56607c;
+}
+
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.scroll-bar .increment-arrow,
+.scroll-bar .decrement-arrow {
+    -fx-shape: "";
+    -fx-padding: 0;
+}
+
+/* RECIPE CARDS */
+.recipe-card {
+    -fx-background-color: #161b28;
+    -fx-background-radius: 18;
+    -fx-border-color: rgba(255,255,255,0.05);
+    -fx-border-radius: 18;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.34), 18, 0.2, 0, 4);
+    -fx-cursor: hand;
+}
+
+.recipe-card-title {
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: 900;
+}
+
+.recipe-card-desc {
+    -fx-text-fill: #aeb6cb;
+    -fx-font-size: 12px;
+}
+
+.recipe-type-badge {
+    -fx-background-color: rgba(123,92,255,0.20);
+    -fx-text-fill: #d5cbff;
+    -fx-background-radius: 10;
+    -fx-padding: 5 10 5 10;
+    -fx-font-size: 11px;
+    -fx-font-weight: 800;
+}
+
+.recipe-kcal-chip,
+.recipe-prot-chip {
+    -fx-background-color: #0f1420;
+    -fx-text-fill: #f1f4ff;
+    -fx-background-radius: 12;
+    -fx-padding: 6 10 6 10;
+    -fx-font-size: 11px;
+    -fx-font-weight: 800;
+}
+.recipe-modal-overlay {
+    -fx-background-color: rgba(5, 10, 20, 0.72);
+    -fx-alignment: center;
+}
+
+.recipe-modal-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+.recipe-modal-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.recipe-modal-card {
+    -fx-background-color: linear-gradient(to bottom right, #0f172a, #111827);
+    -fx-background-radius: 28;
+    -fx-border-radius: 28;
+    -fx-border-color: rgba(255,255,255,0.08);
+    -fx-border-width: 1;
+    -fx-padding: 20;
+    -fx-spacing: 18;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.55), 35, 0.25, 0, 10);
+    -fx-max-width: 820;
+    -fx-pref-width: 820;
+}
+
+.recipe-modal-title {
+    -fx-text-fill: white;
+    -fx-font-size: 24px;
+    -fx-font-weight: 800;
+}
+
+.recipe-modal-close-btn {
+    -fx-background-color: rgba(255,255,255,0.08);
+    -fx-text-fill: white;
+    -fx-background-radius: 14;
+    -fx-border-radius: 14;
+    -fx-border-color: rgba(255,255,255,0.10);
+    -fx-padding: 10 14;
+    -fx-cursor: hand;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.recipe-modal-close-btn:hover {
+    -fx-background-color: rgba(255,255,255,0.16);
+}
+
+.recipe-badge {
+    -fx-padding: 8 16;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+}
+
+.recipe-badge-blue {
+    -fx-background-color: rgba(37, 99, 235, 0.16);
+    -fx-border-color: rgba(96, 165, 250, 0.45);
+    -fx-text-fill: #60a5fa;
+}
+
+.recipe-badge-purple {
+    -fx-background-color: rgba(147, 51, 234, 0.14);
+    -fx-border-color: rgba(196, 181, 253, 0.4);
+    -fx-text-fill: #c4b5fd;
+}
+
+.recipe-badge-gray {
+    -fx-background-color: rgba(255,255,255,0.06);
+    -fx-border-color: rgba(255,255,255,0.22);
+    -fx-text-fill: #d1d5db;
+}
+
+.recipe-goal-chip {
+    -fx-background-color: rgba(30, 64, 175, 0.18);
+    -fx-border-color: rgba(96, 165, 250, 0.45);
+    -fx-text-fill: #60a5fa;
+    -fx-padding: 8 14;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+}
+
+.recipe-modal-image {
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 18, 0.2, 0, 6);
+}
+
+.recipe-section-title {
+    -fx-text-fill: white;
+    -fx-font-size: 17px;
+    -fx-font-weight: 800;
+}
+
+.recipe-section-text {
+    -fx-text-fill: #d1d5db;
+    -fx-font-size: 15px;
+    -fx-line-spacing: 5px;
+}
+
+.recipe-modal-footer {
+    -fx-padding: 16 0 0 0;
+    -fx-border-color: rgba(255,255,255,0.08) transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+}
+
+.recipe-edit-btn {
+    -fx-background-color: rgba(255,255,255,0.04);
+    -fx-text-fill: white;
+    -fx-border-color: rgba(255,255,255,0.35);
+    -fx-border-radius: 14;
+    -fx-background-radius: 14;
+    -fx-padding: 12 24;
+    -fx-font-size: 15px;
+    -fx-font-weight: 700;
+    -fx-cursor: hand;
+}
+
+.recipe-edit-btn:hover {
+    -fx-background-color: rgba(255,255,255,0.10);
+}
+
+.recipe-delete-btn {
+    -fx-background-color: rgba(127, 29, 29, 0.30);
+    -fx-text-fill: #fca5a5;
+    -fx-border-color: rgba(248, 113, 113, 0.45);
+    -fx-border-radius: 14;
+    -fx-background-radius: 14;
+    -fx-padding: 12 24;
+    -fx-font-size: 15px;
+    -fx-font-weight: 700;
+    -fx-cursor: hand;
+}
+
+
+.recipe-delete-btn:hover {
+    -fx-background-color: rgba(127, 29, 29, 0.45);
+}
+.recipe-modal-input,
+.recipe-modal-combo,
+.recipe-modal-textarea {
+    -fx-background-color: #0b1730;
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: #94a3b8;
+    -fx-border-color: rgba(255,255,255,0.35);
+    -fx-border-radius: 16;
+    -fx-background-radius: 16;
+    -fx-padding: 12 16;
+    -fx-font-size: 15px;
+}
+
+.recipe-modal-input {
+    -fx-pref-height: 48;
+}
+
+.recipe-modal-combo {
+    -fx-pref-height: 48;
+}
+
+.recipe-modal-textarea {
+    -fx-padding: 14 16;
+}
+
+.recipe-modal-textarea .content {
+    -fx-background-color: #0b1730;
+    -fx-background-radius: 16;
+}
+
+.recipe-modal-textarea:focused,
+.recipe-modal-input:focused,
+.recipe-modal-combo:focused {
+    -fx-border-color: #60a5fa;
+    -fx-effect: dropshadow(gaussian, rgba(96,165,250,0.18), 10, 0.2, 0, 0);
+}
+
+.recipe-field-label {
+    -fx-text-fill: #d1d5db;
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+}
+
+.recipe-file-btn {
+    -fx-background-color: rgba(255,255,255,0.06);
+    -fx-text-fill: white;
+    -fx-border-color: rgba(255,255,255,0.20);
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-padding: 10 16;
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+    -fx-cursor: hand;
+}
+
+.recipe-file-btn:hover {
+    -fx-background-color: rgba(255,255,255,0.12);
+}
+
+.recipe-file-label {
+    -fx-text-fill: #94a3b8;
+    -fx-font-size: 13px;
+}
+
+.recipe-save-btn {
+    -fx-background-color: linear-gradient(to right, #22c55e, #16a34a);
+    -fx-text-fill: white;
+    -fx-border-color: transparent;
+    -fx-border-radius: 14;
+    -fx-background-radius: 14;
+    -fx-padding: 12 28;
+    -fx-font-size: 16px;
+    -fx-font-weight: 800;
+    -fx-cursor: hand;
+}
+
+.recipe-save-btn:hover {
+    -fx-opacity: 0.92;
+}
+.nutrition-search-card {
+    -fx-background-color: linear-gradient(to right, #181c26, #1c1f2b);
+    -fx-background-radius: 22;
+    -fx-padding: 20;
+    -fx-spacing: 14;
+    -fx-border-color: rgba(255,255,255,0.05);
+    -fx-border-radius: 22;
+}
+
+.nutrition-search-title {
+    -fx-text-fill: white;
+    -fx-font-size: 20px;
+    -fx-font-weight: 800;
+}
+
+.nutrition-search-btn {
+    -fx-background-color: linear-gradient(to right, #3f7d39, #4f9a46);
+    -fx-text-fill: white;
+    -fx-font-weight: 800;
+    -fx-background-radius: 16;
+    -fx-padding: 12 22;
+    -fx-cursor: hand;
+}
+
+.nutrition-search-btn:hover {
+    -fx-opacity: 0.92;
+}
+
+.nutrition-reset-btn {
+    -fx-background-color: #2a2f3a;
+    -fx-text-fill: white;
+    -fx-font-weight: 800;
+    -fx-background-radius: 16;
+    -fx-padding: 12 22;
+    -fx-cursor: hand;
+}
+
+.nutrition-reset-btn:hover {
+    -fx-background-color: #353b48;
+}
+
+.allergen-card {
+    -fx-background-color: rgba(30, 41, 59, 0.55);
+    -fx-background-radius: 16px;
+    -fx-border-color: #7c3aed;
+    -fx-border-radius: 16px;
+    -fx-border-style: dashed;
+    -fx-padding: 18px;
+}
+
+.allergen-checkbox {
+    -fx-text-fill: white;
+    -fx-background-color: #111827;
+    -fx-background-radius: 10px;
+    -fx-border-color: #334155;
+    -fx-border-radius: 10px;
+    -fx-padding: 10px 14px;
+    -fx-font-size: 13px;
+    -fx-pref-width: 210px;
+}

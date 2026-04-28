@@ -118,3 +118,118 @@
 .btn-signup-inline:hover {
     -fx-text-fill: #bea8ff;
 }
+
+.form-error-label {
+    -fx-text-fill: #ff5c6e;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-padding: 2 0 0 4;
+}
+
+.input-field-error {
+    -fx-border-color: #ff5c6e;
+    -fx-border-width: 1.5px;
+}
+
+.btn-forgot-password {
+    -fx-background-color: transparent;
+    -fx-text-fill: #9f7cff;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+}
+
+.btn-forgot-password:hover {
+    -fx-text-fill: #bea8ff;
+}
+
+.remember-me-checkbox {
+    -fx-text-fill: #a6a8b6;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+}
+
+.remember-me-checkbox .box {
+    -fx-background-color: #13131b;
+    -fx-border-color: rgba(255, 255, 255, 0.15);
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+}
+
+.remember-me-checkbox:selected .box {
+    -fx-background-color: #9f7cff;
+    -fx-border-color: #9f7cff;
+}
+
+.remember-me-checkbox:selected .mark {
+    -fx-background-color: white;
+}
+
+.btn-faceid {
+    -fx-background-insets: 0;
+    -fx-background-color: #9f7cff;
+    -fx-text-fill: white;
+    -fx-font-size: 17px;
+    -fx-font-weight: 800;
+    -fx-padding: 14px 18px;
+    -fx-background-radius: 12px;
+    -fx-border-radius: 12px;
+    -fx-cursor: hand;
+}
+
+.btn-faceid:hover {
+    -fx-background-color: #b89aff;
+}
+
+/* Face ID QR overlay */
+.faceid-card {
+    -fx-background-color: #0e0e18;
+    -fx-background-radius: 18px;
+    -fx-border-radius: 18px;
+    -fx-border-color: rgba(159,124,255,0.25);
+    -fx-border-width: 1.5px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.7), 40, 0.5, 0, 0);
+}
+
+.faceid-title {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 22px;
+    -fx-font-weight: 800;
+    -fx-alignment: CENTER;
+}
+
+.faceid-subtitle {
+    -fx-text-fill: #a6a8b6;
+    -fx-font-size: 14px;
+    -fx-alignment: CENTER;
+    -fx-max-width: 320px;
+}
+
+.faceid-qr-frame {
+    -fx-background-color: white;
+    -fx-background-radius: 14px;
+    -fx-padding: 14px;
+}
+
+.faceid-status {
+    -fx-text-fill: #9f7cff;
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+    -fx-alignment: CENTER;
+}
+
+.faceid-cancel-btn {
+    -fx-background-color: rgba(255,255,255,0.07);
+    -fx-text-fill: #a6a8b6;
+    -fx-font-size: 15px;
+    -fx-font-weight: 600;
+    -fx-padding: 12px;
+    -fx-background-radius: 10px;
+    -fx-cursor: hand;
+    -fx-background-insets: 0;
+}
+
+.faceid-cancel-btn:hover {
+    -fx-background-color: rgba(255,255,255,0.12);
+}

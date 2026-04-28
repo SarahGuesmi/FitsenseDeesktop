@@ -7,9 +7,12 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import models.User;
+import utils.SidebarAvatarLoader;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -41,6 +44,8 @@ public class DashboardController {
     @FXML
     private VBox dashWorkoutsPane;
     @FXML
+    private VBox dashChatroomPane;
+    @FXML
     private Button dashHomeBtn;
     @FXML
     private Button dashProfileBtn;
@@ -48,6 +53,11 @@ public class DashboardController {
     private Button dashWorkoutsBtn;
     @FXML
     private Button dashMentalHealthBtn;
+    @FXML private Button dashChatroomBtn;
+    @FXML private Button dashSecurityBtn;
+    @FXML private ScrollPane dashSecurityPane;
+    @FXML private ImageView sidebarAvatarView;
+    @FXML private Label     sidebarAvatarInitials;
     @FXML
     private ProfileFragmentController dashProfileController;
 
@@ -62,6 +72,7 @@ public class DashboardController {
         refreshNavbar();
         setDashboardNavbarTitles();
         showDashboardHome();
+        SidebarAvatarLoader.load(AppSession.getCurrentUser(), sidebarAvatarView, sidebarAvatarInitials);
     }
 
     private void setDashboardNavbarTitles() {
@@ -150,25 +161,36 @@ public class DashboardController {
     }
 
     @FXML
+    private void onShowChatroom() {
+        if (navbarPageTitle != null) navbarPageTitle.setText("Chatroom");
+        if (navbarPageSubtitle != null) navbarPageSubtitle.setText("Message your coaches and teammates");
+        hideAllDashPanes();
+        if (dashChatroomPane != null) { dashChatroomPane.setManaged(true); dashChatroomPane.setVisible(true); }
+        setDashNavActive(dashChatroomBtn);
+    }
+
+    private void hideAllDashPanes() {
+        for (VBox p : new VBox[]{dashHomePane, dashProfilePane, dashMentalHealthPane, dashWorkoutsPane, dashChatroomPane}) {
+            if (p != null) { p.setManaged(false); p.setVisible(false); }
+        }
+        if (dashSecurityPane != null) { dashSecurityPane.setManaged(false); dashSecurityPane.setVisible(false); }
+    }
+
+    @FXML
+    private void onShowSecurity() {
+        if (navbarPageTitle != null) navbarPageTitle.setText("Security");
+        if (navbarPageSubtitle != null) navbarPageSubtitle.setText("Manage two-factor authentication");
+        hideAllDashPanes();
+        if (dashSecurityPane != null) { dashSecurityPane.setManaged(true); dashSecurityPane.setVisible(true); }
+        setDashNavActive(dashSecurityBtn);
+    }
+
+    @FXML
     private void onShowWorkouts() {
         if (navbarPageTitle != null) navbarPageTitle.setText("My Workouts");
         if (navbarPageSubtitle != null) navbarPageSubtitle.setText("Personalized sessions matching your goals");
-        if (dashHomePane != null) {
-            dashHomePane.setManaged(false);
-            dashHomePane.setVisible(false);
-        }
-        if (dashProfilePane != null) {
-            dashProfilePane.setManaged(false);
-            dashProfilePane.setVisible(false);
-        }
-        if (dashMentalHealthPane != null) {
-            dashMentalHealthPane.setManaged(false);
-            dashMentalHealthPane.setVisible(false);
-        }
-        if (dashWorkoutsPane != null) {
-            dashWorkoutsPane.setManaged(true);
-            dashWorkoutsPane.setVisible(true);
-        }
+        hideAllDashPanes();
+        if (dashWorkoutsPane != null) { dashWorkoutsPane.setManaged(true); dashWorkoutsPane.setVisible(true); }
         setDashNavActive(dashWorkoutsBtn);
     }
 
@@ -181,86 +203,59 @@ public class DashboardController {
     @FXML
     private void onShowProfile() {
         setProfileNavbarTitles();
-        if (dashHomePane != null) {
-            dashHomePane.setManaged(false);
-            dashHomePane.setVisible(false);
-        }
-        if (dashMentalHealthPane != null) {
-            dashMentalHealthPane.setManaged(false);
-            dashMentalHealthPane.setVisible(false);
-        }
-        if (dashWorkoutsPane != null) {
-            dashWorkoutsPane.setManaged(false);
-            dashWorkoutsPane.setVisible(false);
-        }
-        if (dashProfilePane != null) {
-            dashProfilePane.setManaged(true);
-            dashProfilePane.setVisible(true);
-        }
+        hideAllDashPanes();
+        if (dashProfilePane != null) { dashProfilePane.setManaged(true); dashProfilePane.setVisible(true); }
         setDashNavActive(dashProfileBtn);
-        if (dashProfileController != null) {
-            dashProfileController.reloadFromSession();
-        }
+        if (dashProfileController != null) dashProfileController.reloadFromSession();
     }
 
     @FXML
     private void onShowMentalHealth() {
         setMentalHealthNavbarTitles();
-        if (dashHomePane != null) {
-            dashHomePane.setManaged(false);
-            dashHomePane.setVisible(false);
-        }
-        if (dashProfilePane != null) {
-            dashProfilePane.setManaged(false);
-            dashProfilePane.setVisible(false);
-        }
-        if (dashWorkoutsPane != null) {
-            dashWorkoutsPane.setManaged(false);
-            dashWorkoutsPane.setVisible(false);
-        }
-        if (dashMentalHealthPane != null) {
-            dashMentalHealthPane.setManaged(true);
-            dashMentalHealthPane.setVisible(true);
-        }
+        hideAllDashPanes();
+        if (dashMentalHealthPane != null) { dashMentalHealthPane.setManaged(true); dashMentalHealthPane.setVisible(true); }
         setDashNavActive(dashMentalHealthBtn);
     }
 
     private void showDashboardHome() {
-        if (dashHomePane != null) {
-            dashHomePane.setManaged(true);
-            dashHomePane.setVisible(true);
-        }
-        if (dashProfilePane != null) {
-            dashProfilePane.setManaged(false);
-            dashProfilePane.setVisible(false);
-        }
-        if (dashMentalHealthPane != null) {
-            dashMentalHealthPane.setManaged(false);
-            dashMentalHealthPane.setVisible(false);
-        }
-        if (dashWorkoutsPane != null) {
-            dashWorkoutsPane.setManaged(false);
-            dashWorkoutsPane.setVisible(false);
-        }
+        hideAllDashPanes();
+        if (dashHomePane != null) { dashHomePane.setManaged(true); dashHomePane.setVisible(true); }
         setDashNavActive(dashHomeBtn);
     }
 
     private void setDashNavActive(Button selected) {
-        Stream.of(dashHomeBtn, dashProfileBtn, dashWorkoutsBtn, dashMentalHealthBtn)
+        Stream.of(dashHomeBtn, dashProfileBtn, dashWorkoutsBtn, dashMentalHealthBtn, dashChatroomBtn, dashSecurityBtn)
                 .filter(Objects::nonNull)
                 .forEach(b -> {
                     b.getStyleClass().setAll("dash-side-link");
-                    if (b == selected) {
-                        b.getStyleClass().add("dash-side-link-active");
-                    }
+                    if (b == selected) b.getStyleClass().add("dash-side-link-active");
                 });
     }
 
     @FXML
+    private StackPane logoutOverlay;
+
+    @FXML
     private void onLogout() {
+        if (logoutOverlay != null) {
+            logoutOverlay.setManaged(true);
+            logoutOverlay.setVisible(true);
+        }
+    }
+
+    @FXML
+    private void onConfirmLogout() {
         AppSession.setCurrentUser(null);
         AppSession.resetOnboarding();
         switchScene("/fxml/SignInView.fxml", "/css/signin.css");
+    }
+
+    @FXML
+    private void onCancelLogout() {
+        if (logoutOverlay != null) {
+            logoutOverlay.setManaged(false);
+            logoutOverlay.setVisible(false);
+        }
     }
 
     private void switchScene(String fxmlPath, String cssPath) {

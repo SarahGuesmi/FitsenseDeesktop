@@ -53,6 +53,20 @@ public class ObjectiveController {
             b.setText(name);
             b.setUserData(name);
         }
+
+        // Restore selection from session
+        String saved = AppSession.getOnboardingData().getObjectiveName();
+        if (saved != null && !saved.isBlank()) {
+            String[] split = saved.split(", ");
+            for (String s : split) {
+                selectedObjectives.add(s);
+                for (Button b : objectiveButtons) {
+                    if (s.equals(b.getUserData())) {
+                        b.getStyleClass().add("choice-selected");
+                    }
+                }
+            }
+        }
     }
 
     @FXML
@@ -66,6 +80,11 @@ public class ObjectiveController {
             selectedObjectives.add(name);
             clicked.getStyleClass().add("choice-selected");
         }
+    }
+
+    @FXML
+    private void onBack() {
+        switchScene("/fxml/GenderView.fxml", "/css/onboarding.css");
     }
 
     @FXML
@@ -83,21 +102,34 @@ public class ObjectiveController {
 
         AppSession.getOnboardingData().setObjectiveName(String.join(", ", selectedObjectives));
 
-        ProfilePhysique profile = new ProfilePhysique();
-        profile.setUserId(currentUser.getId());
-        profile.setHeight(AppSession.getOnboardingData().getHeightCm());
-        profile.setWeight(AppSession.getOnboardingData().getWeightKg());
-        profile.setGender(AppSession.getOnboardingData().getGender());
-
         try {
-            profileService.createPrepared(profile);
+            List<ProfilePhysique> existing = profileService.findByUserId(currentUser.getId());
+            ProfilePhysique profile;
+            if (!existing.isEmpty()) {
+                profile = existing.get(0);
+                profile.setHeight(AppSession.getOnboardingData().getHeightCm());
+                profile.setWeight(AppSession.getOnboardingData().getWeightKg());
+                profile.setGender(AppSession.getOnboardingData().getGender());
+                profileService.update(profile);
+                // Clear old objectives to replace them
+                objectifService.deleteByProfilePhysiqueId(profile.getId());
+            } else {
+                profile = new ProfilePhysique();
+                profile.setUserId(currentUser.getId());
+                profile.setHeight(AppSession.getOnboardingData().getHeightCm());
+                profile.setWeight(AppSession.getOnboardingData().getWeightKg());
+                profile.setGender(AppSession.getOnboardingData().getGender());
+                profileService.createPrepared(profile);
+            }
+
             for (String name : selectedObjectives) {
                 ObjectifSportif objectif = new ObjectifSportif();
                 objectif.setName(name);
                 objectif.setProfilePhysiqueId(profile.getId());
                 objectifService.createPrepared(objectif);
             }
-            switchScene("/fxml/DashboardView.fxml", "/css/dashboard.css");
+            // Go to AI username picker next
+            switchScene("/fxml/UsernamePickView.fxml", "/css/onboarding.css");
         } catch (SQLException e) {
             showAlert(Alert.AlertType.ERROR, "Save Failed", e.getMessage());
         }

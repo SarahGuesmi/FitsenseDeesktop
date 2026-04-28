@@ -1,0 +1,322 @@
+@startuml FitSense_Deployment_Diagram
+
+skinparam backgroundColor #0d1117
+skinparam defaultFontColor #c9d1d9
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+
+skinparam node {
+    BackgroundColor #161b22
+    BorderColor #30363d
+    FontColor #c9d1d9
+    FontStyle bold
+}
+
+skinparam component {
+    BackgroundColor #1f2937
+    BorderColor #374151
+    FontColor #e5e7eb
+}
+
+skinparam artifact {
+    BackgroundColor #1e3a5f
+    BorderColor #2563eb
+    FontColor #93c5fd
+}
+
+skinparam database {
+    BackgroundColor #1a2e1a
+    BorderColor #16a34a
+    FontColor #86efac
+}
+
+skinparam interface {
+    BackgroundColor #2d1b4e
+    BorderColor #7c3aed
+    FontColor #c4b5fd
+}
+
+skinparam arrow {
+    Color #6b7280
+    FontColor #9ca3af
+    FontSize 10
+}
+
+title FitSense — Deployment Diagram
+
+' ═══════════════════════════════════════════════════════════════
+' NODE 1 : DEVELOPER MACHINE (Build)
+' ═══════════════════════════════════════════════════════════════
+node "Developer Machine" as DEV <<device>> {
+
+    node "JDK 17 + Maven 3.x" as MAVEN_ENV <<execution environment>> {
+
+        artifact "pom.xml\n(Maven build descriptor)" as POM
+        artifact "mvnw.cmd\n(Maven wrapper)" as MVNW
+
+        component "Maven Build Process" as BUILD {
+            artifact "src/main/java/**\n(Java source files)" as SRC
+            artifact "src/main/resources/**\n(FXML, CSS, assets)" as RES
+        }
+
+        artifact "FitSense-1.0-SNAPSHOT.jar\n(compiled artifact)" as JAR
+    }
+
+    POM --> BUILD : configures
+    MVNW --> BUILD : executes\n«mvn javafx:run»
+    BUILD --> JAR : produces
+}
+
+' ═══════════════════════════════════════════════════════════════
+' NODE 2 : CLIENT MACHINE (Runtime)
+' ═══════════════════════════════════════════════════════════════
+node "Client Machine\n(Windows / Linux / macOS)" as CLIENT <<device>> {
+
+    node "JVM 17 (Java Virtual Machine)" as JVM <<execution environment>> {
+
+        node "JavaFX Runtime 21" as JFX_RT <<execution environment>> {
+
+            ' ── Application Layer ──────────────────────────────
+            component "Application Bootstrap" as APP_BOOT {
+                artifact "FitSenseApp.java\n«Application entry point»\nstart() → loads HomeView.fxml\nseedCoach() → creates default coach" as FITSENSE_APP
+                artifact "AppSession.java\n«In-memory session»\ncurrentUser, OnboardingData" as APP_SESSION
+                artifact "SessionManager.java\n«Static user holder»" as SESSION_MGR
+            }
+
+            ' ── Presentation Layer (FXML Views) ────────────────
+            component "Presentation Layer\n«FXML Views»" as VIEWS {
+                artifact "HomeView.fxml\n+ home.css" as V_HOME
+                artifact "SignInView.fxml\n+ signin.css" as V_SIGNIN
+                artifact "SignUpView.fxml\n+ signup.css" as V_SIGNUP
+                artifact "AdminDashboardView.fxml\n+ admin.css" as V_ADMIN
+                artifact "CoachDashboardView.fxml\n+ admin.css" as V_COACH
+                artifact "DashboardView.fxml\n+ dashboard.css" as V_DASH
+                artifact "ProfileFragment.fxml\n+ profile.css" as V_PROFILE
+                artifact "ChatroomFragment.fxml\n+ chatroom.css" as V_CHAT
+                artifact "MentalHealthUserFragment.fxml\n+ mental-health.css" as V_MENTAL
+                artifact "CoachLatestAssessmentsFragment.fxml\n+ latest-assessments.css" as V_ASSESS
+                artifact "CoachMentalTestsFragment.fxml\n+ coach-mental-tests.css" as V_TESTS
+                artifact "CoachMentalAssessmentsFragment.fxml\n+ coach-mental-assessments.css" as V_COACH_ASSESS
+                artifact "UserWorkoutsFragment.fxml\n+ user_workouts.css" as V_WORKOUTS
+                artifact "WorkoutDetailView.fxml\n+ workout_detail.css" as V_WORKOUT_DETAIL
+                artifact "ExerciseListFragment.fxml\n+ exercise.css" as V_EXERCISE
+                artifact "FeedbackFormView.fxml" as V_FEEDBACK
+                artifact "RecipeCatalogView.fxml\n+ recette.css" as V_RECIPE
+                artifact "HeightView.fxml\nWeightView.fxml\nGenderView.fxml\nObjectiveView.fxml\n+ onboarding.css" as V_ONBOARD
+            }
+
+            ' ── Controller Layer ───────────────────────────────
+            component "Controller Layer\n«JavaFX Controllers»" as CONTROLLERS {
+                artifact "HomeController" as C_HOME
+                artifact "SignInController\n«BCrypt verify»\n«Role-based routing»" as C_SIGNIN
+                artifact "SignUpController\n«Validation»\n«Notification trigger»" as C_SIGNUP
+                artifact "AdminDashboardController\n«User CRUD»\n«Filters: search/status/role»\n«Notifications panel»" as C_ADMIN
+                artifact "CoachDashboardController" as C_COACH
+                artifact "DashboardController" as C_DASH
+                artifact "ProfileFragmentController" as C_PROFILE
+                artifact "ChatroomController\n«Polling loop»" as C_CHAT
+                artifact "MentalHealthUserFragmentController\n«Dynamic form builder»" as C_MENTAL
+                artifact "CoachLatestAssessmentsFragmentController\n«FilteredList»\n«search + status filter»" as C_ASSESS
+                artifact "CoachMentalTestsFragmentController" as C_TESTS
+                artifact "CoachMentalAssessmentsFragmentController" as C_COACH_ASSESS
+                artifact "WorkoutController / WorkoutFormController\nWorkoutDetailController\nUserWorkoutsController" as C_WORKOUT
+                artifact "ExerciseController / ExerciseFormController\nExerciseListController" as C_EXERCISE
+                artifact "FeedbackFormController" as C_FEEDBACK
+                artifact "RecipeCatalogController" as C_RECIPE
+                artifact "HeightController / WeightController\nGenderController / ObjectiveController" as C_ONBOARD
+            }
+
+            ' ── Service Layer ──────────────────────────────────
+            component "Service Layer\n«CRUD<X> implementations»" as SERVICES {
+                artifact "UserService\n«createPrepared()»\n«findByEmail()»\n«update() / delete()»\n«BCrypt hash»" as S_USER
+                artifact "WorkoutService\n«CRUD Workout»" as S_WORKOUT
+                artifact "ExerciseService\n«CRUD Exercise»" as S_EXERCISE
+                artifact "ProfilePhysiqueService\n«findByUserId()»" as S_PROFILE
+                artifact "ObjectifSportifService\n«CRUD ObjectifSportif»" as S_OBJECTIF
+                artifact "RecetteNutritionnelleService\n«CRUD RecetteNutritionnelle»" as S_RECIPE
+                artifact "ChatService\n«send() / getMessages()»" as S_CHAT
+                artifact "NotificationService\n«create() / readAll()»\n«markRead() / markAllRead()»\n«ensureTableExists()»" as S_NOTIF
+                artifact "FeedbackService\nFeedbackResponseService" as S_FEEDBACK
+                artifact "CoachMentalTestService\n«Singleton»\n«in-memory tests»" as S_MENTAL_TEST
+                artifact "MentalHealthSubmissionService\n«Singleton»\n«recordMemberSubmission()»" as S_MENTAL_SUB
+                artifact "MentalHealthEvaluationRepository\n«findByUserId()»\n«delete()»" as S_MENTAL_EVAL
+                artifact "MentalHealthSubmissionRepository\nCoachMentalTestRepository" as S_REPOS
+            }
+
+            ' ── Model Layer ────────────────────────────────────
+            component "Model Layer\n«Plain Java Objects»" as MODELS {
+                artifact "User\n(id:UUID, email, password\nroles, status, dateCreation)" as M_USER
+                artifact "Workout / Exercise\nRecommendedExercise" as M_WORKOUT
+                artifact "ProfilePhysique\nObjectifSportif" as M_PROFILE
+                artifact "RecetteNutritionnelle" as M_RECIPE
+                artifact "ChatMessage\n(senderId, content, sentAt)" as M_CHAT
+                artifact "Notification\n(type, message, targetEmail\nisRead, createdAt)" as M_NOTIF
+                artifact "CoachMentalTest\nCoachMentalTestQuestion\nMentalHealthEvaluation\nMentalHealthAssessmentSubmission\nQuestionnaire / FeedbackResponse" as M_MENTAL
+            }
+
+            ' ── Utility Layer ──────────────────────────────────
+            component "Utility Layer" as UTILS {
+                artifact "DbConnection.java\n«Singleton»\nDriverManager.getConnection()\njdbc:mysql://127.0.0.1:3306/fitsense" as U_DB
+                artifact "UuidUtil.java\n«UUID ↔ BINARY(16)»" as U_UUID
+                artifact "HashGen.java\n«BCrypt utilities»" as U_HASH
+                artifact "WebAssets.java\n«Asset URL resolver»" as U_ASSETS
+                artifact "ResultSetColumns.java" as U_RS
+            }
+
+            ' ── External Libraries (runtime) ───────────────────
+            component "Runtime Dependencies\n«from pom.xml»" as LIBS {
+                artifact "javafx-controls 21\njavafx-fxml 21\njavafx-media 21\njavafx-base 21" as LIB_JFX
+                artifact "spring-security-crypto 6.2.1\n«BCryptPasswordEncoder»" as LIB_BCRYPT
+                artifact "mysql-connector-j 8.0.33\n«JDBC Driver»" as LIB_MYSQL
+                artifact "gson 2.10.1\n«JSON roles parsing»" as LIB_GSON
+                artifact "commons-logging 1.2" as LIB_LOG
+            }
+        }
+    }
+
+    ' ── JavaFX Scene Graph (OS Window) ─────────────────────────
+    node "OS Window Manager" as OS_WIN <<execution environment>> {
+        component "JavaFX Stage\n«Single window»" as STAGE {
+            artifact "Scene\n«Single scene»\nscene.setRoot(newRoot)\n«Navigation mechanism»" as SCENE
+            artifact "Root Node\n«StackPane / VBox / BorderPane»\n«Swapped on navigation»" as ROOT_NODE
+        }
+    }
+}
+
+' ═══════════════════════════════════════════════════════════════
+' NODE 3 : DATABASE SERVER
+' ═══════════════════════════════════════════════════════════════
+node "Database Server\n(localhost / 127.0.0.1)" as DB_SERVER <<device>> {
+
+    node "MySQL Server 8.x\n:3306" as MYSQL <<execution environment>> {
+
+        database "fitsense\n«Schema»" as DB_SCHEMA {
+
+            artifact "app_user\n(id BINARY(16), email_email\npassword, roles, name_firstname\nname_lastname, account_status\ndate_creation, username\nphone_number, photo)" as T_USER
+
+            artifact "workout\n(id, title, description\ndifficulty, duration, user_id)" as T_WORKOUT
+
+            artifact "exercise\n(id, name, description\nmuscle_group, sets, reps)" as T_EXERCISE
+
+            artifact "profile_physique\n(id, user_id, height_cm\nweight_kg, gender, objectif)" as T_PROFILE
+
+            artifact "objectif_sportif\n(id, nom, description)" as T_OBJECTIF
+
+            artifact "recette_nutritionnelle\n(id, titre, description\ncalories, proteines)" as T_RECIPE
+
+            artifact "chat_message\n(id, sender_id, receiver_id\ncontent, sent_at, is_read)" as T_CHAT
+
+            artifact "admin_notification\n(id INT AUTO_INCREMENT\ntype, message, target_email\nis_read TINYINT, created_at)" as T_NOTIF
+
+            artifact "mental_health_evaluation\n(id, user_id, coach_test_id\nscore, status, tested_at\nmood, stress, sleep\nmotivation, mental_tired)" as T_MENTAL
+
+            artifact "mental_health_submission\n(id, user_id, coach_test_id\nrecommendation, tested_at)" as T_SUBMISSION
+
+            artifact "feedback / feedback_response\n(id, user_id, content\ncreated_at)" as T_FEEDBACK
+        }
+
+        artifact "schema_mysql.sql\n«DDL script»" as SQL_SCHEMA
+        artifact "fix_profile_objectif_binary_uuid.sql\n«Migration script»" as SQL_FIX
+        artifact "insert_admin.sql\n«Admin seed»" as SQL_SEED
+    }
+}
+
+' ═══════════════════════════════════════════════════════════════
+' NODE 4 : EXTERNAL ASSET SERVER (optional / Symfony)
+' ═══════════════════════════════════════════════════════════════
+node "External Asset Server\n(Symfony / HTTP)" as ASSET_SERVER <<device>> {
+    component "HTTP Server\n:80 / :443" as HTTP_SRV {
+        artifact "public/images/\n«Hero images»" as ASSET_IMG
+        artifact "public/videos/\n«Background gym video»" as ASSET_VID
+    }
+}
+
+' ═══════════════════════════════════════════════════════════════
+' INTERFACES
+' ═══════════════════════════════════════════════════════════════
+interface "JDBC\njdbc:mysql://127.0.0.1:3306/fitsense\n?serverTimezone=UTC\n&characterEncoding=UTF-8" as IFACE_JDBC
+
+interface "HTTP/HTTPS\nGET /public/assets" as IFACE_HTTP
+
+interface "JavaFX\nFXMLLoader.load()\nscene.setRoot()" as IFACE_FXML
+
+' ═══════════════════════════════════════════════════════════════
+' CONNECTIONS
+' ═══════════════════════════════════════════════════════════════
+
+' Build → Runtime
+JAR --> JVM : deployed to\n«mvn javafx:run»
+
+' App bootstrap
+FITSENSE_APP --> IFACE_FXML : loads FXML\ninstantiates controllers
+IFACE_FXML --> VIEWS : parses
+IFACE_FXML --> CONTROLLERS : injects @FXML\ncalls initialize()
+
+' Navigation (scene swap)
+CONTROLLERS --> SCENE : switchScene()\nscene.setRoot(newRoot)\nscene.getStylesheets().setAll()
+SCENE --> ROOT_NODE : contains\n«current view»
+STAGE --> SCENE : hosts
+
+' MVC wiring
+VIEWS --> CONTROLLERS : onAction="#method"\nfx:controller="..."
+CONTROLLERS --> SERVICES : calls CRUD methods
+SERVICES --> MODELS : creates / reads\nobjects
+CONTROLLERS --> MODELS : reads / writes\nproperties
+CONTROLLERS --> APP_SESSION : AppSession.getCurrentUser()\nAppSession.setCurrentUser()
+APP_SESSION --> SESSION_MGR : mirrors session
+
+' Service → DB
+SERVICES --> U_DB : DbConnection.getInstance().getCnx()
+U_DB --> IFACE_JDBC : DriverManager\n.getConnection(DB_URL)
+IFACE_JDBC --> MYSQL : TCP :3306
+
+' DB internals
+MYSQL --> DB_SCHEMA : hosts
+SQL_SCHEMA --> DB_SCHEMA : creates tables
+SQL_FIX --> DB_SCHEMA : migrates
+SQL_SEED --> T_USER : inserts admin
+
+' Specific service → table mappings
+S_USER --> T_USER : PreparedStatement\nINSERT/SELECT/UPDATE/DELETE
+S_WORKOUT --> T_WORKOUT : CRUD
+S_EXERCISE --> T_EXERCISE : CRUD
+S_PROFILE --> T_PROFILE : findByUserId()
+S_OBJECTIF --> T_OBJECTIF : CRUD
+S_RECIPE --> T_RECIPE : CRUD
+S_CHAT --> T_CHAT : send() / getMessages()
+S_NOTIF --> T_NOTIF : create()\nreadAll()\nmarkRead()
+S_MENTAL_EVAL --> T_MENTAL : findByUserId()\ndelete()
+S_MENTAL_SUB --> T_SUBMISSION : recordMemberSubmission()
+S_FEEDBACK --> T_FEEDBACK : CRUD
+
+' Utilities
+S_USER --> U_UUID : UuidUtil.toBytes16()\nUuidUtil.fromResultSet()
+S_USER --> LIB_BCRYPT : passwordEncoder.encode()\npasswordEncoder.matches()
+LIB_MYSQL --> IFACE_JDBC : implements JDBC Driver
+LIB_GSON --> MODELS : JSON roles parsing
+
+' Asset loading
+U_ASSETS --> IFACE_HTTP : assetUrl()\nloadPublicAsset()
+IFACE_HTTP --> HTTP_SRV : HTTP GET
+HTTP_SRV --> ASSET_IMG : serves
+HTTP_SRV --> ASSET_VID : serves
+C_HOME --> U_ASSETS : WebAssets.HOME_GYM_VIDEO\n«background video»
+C_SIGNIN --> U_ASSETS : WebAssets.HERO_SPORT_IMAGE
+C_SIGNUP --> U_ASSETS : WebAssets.HERO_SPORT_IMAGE
+
+' Notification flow
+C_SIGNUP --> S_NOTIF : new Notification("NEW_USER",...)\nns.create(notif)
+C_ADMIN --> S_NOTIF : readAll()\nmarkRead()\nmarkAllRead()
+
+' Mental health flow
+C_MENTAL --> S_MENTAL_TEST : getTests()\nfindById()
+C_MENTAL --> S_MENTAL_EVAL : findByUserId()\ndelete()
+C_MENTAL --> S_MENTAL_SUB : recordMemberSubmission()
+C_ASSESS --> S_MENTAL_SUB : getSubmissions()\n«FilteredList»
+
+' Auth flow
+C_SIGNIN --> S_USER : findByEmail()
+C_SIGNIN --> LIB_BCRYPT : passwordEncoder.matches()
+C_SIGNIN --> APP_SESSION : setCurrentUser(user)
+
+@enduml

@@ -3,10 +3,11 @@ package models;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class Questionnaire {
 
-    private Integer id;
+    private UUID id;
     private User user;
     private List<Workout> workouts = new ArrayList<>();
     private Integer noteGlobale;
@@ -27,8 +28,8 @@ public class Questionnaire {
     private Instant dateSoumission;
     private String userName;
 
-    public Integer getId() { return id; }
-    public void setId(Integer id) { this.id = id; }
+    public UUID getId() { return id; }
+    public void setId(UUID id) { this.id = id; }
 
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }

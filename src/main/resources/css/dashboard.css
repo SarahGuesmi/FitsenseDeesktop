@@ -198,3 +198,78 @@
     -fx-background-color: rgba(176, 196, 246, 0.35);
     -fx-background-radius: 6px;
 }
+
+/* ── Logout confirmation overlay ── */
+.dash-logout-card {
+    -fx-background-color: linear-gradient(to bottom right, #1a253a, #101927);
+    -fx-background-radius: 20px;
+    -fx-border-color: rgba(171, 194, 255, 0.55);
+    -fx-border-radius: 20px;
+    -fx-effect: dropshadow(gaussian, rgba(7, 12, 22, 0.85), 24, 0.35, 0, 6);
+}
+
+.dash-logout-icon {
+    -fx-font-size: 24px;
+    -fx-text-fill: #ff6b7a;
+    -fx-background-color: rgba(255, 80, 80, 0.15);
+    -fx-background-radius: 50px;
+    -fx-min-width: 52px;
+    -fx-min-height: 52px;
+    -fx-max-width: 52px;
+    -fx-max-height: 52px;
+    -fx-alignment: center;
+}
+
+.dash-logout-title {
+    -fx-text-fill: #f3f7ff;
+    -fx-font-size: 22px;
+    -fx-font-weight: 800;
+}
+
+.dash-logout-subtitle {
+    -fx-text-fill: #9caed8;
+    -fx-font-size: 14px;
+    -fx-text-alignment: center;
+}
+
+.dash-logout-cancel {
+    -fx-background-color: rgba(24, 34, 56, 0.95);
+    -fx-border-color: rgba(178, 196, 239, 0.55);
+    -fx-border-radius: 12px;
+    -fx-background-radius: 12px;
+    -fx-text-fill: #d5e1fb;
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+    -fx-padding: 11 18;
+    -fx-cursor: hand;
+}
+
+.dash-logout-confirm {
+    -fx-background-color: linear-gradient(to right, #ff6b7a, #ff4a66);
+    -fx-text-fill: #fff4f6;
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+    -fx-background-radius: 12px;
+    -fx-padding: 11 18;
+    -fx-cursor: hand;
+}
+
+/* ── Sidebar avatar ──────────────────────────────────────────────────────── */
+.sidebar-avatar-frame {
+    -fx-background-color: radial-gradient(center 50% 50%, radius 70%, #2a2060, #0d0d1a);
+    -fx-background-radius: 50px;
+    -fx-border-radius: 50px;
+    -fx-border-color: rgba(159,124,255,0.4);
+    -fx-border-width: 2.5px;
+    -fx-min-width: 80px;
+    -fx-min-height: 80px;
+    -fx-max-width: 80px;
+    -fx-max-height: 80px;
+    -fx-effect: dropshadow(gaussian, rgba(159,124,255,0.35), 14, 0.3, 0, 0);
+}
+
+.sidebar-avatar-initials {
+    -fx-text-fill: #9f7cff;
+    -fx-font-size: 26px;
+    -fx-font-weight: 800;
+}

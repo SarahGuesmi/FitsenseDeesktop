@@ -20,7 +20,12 @@
                   <Button fx:id="objectiveBtn4" mnemonicParsing="false" onAction="#onObjectiveClick" prefHeight="95.0" prefWidth="190.0" styleClass="choice-card" text="Well-being" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                </children>
             </GridPane>
-            <Button mnemonicParsing="false" onAction="#onContinue" styleClass="btn-continue" text="Continue →" />
+            <javafx.scene.layout.HBox alignment="CENTER" spacing="12.0">
+               <children>
+                  <Button mnemonicParsing="false" onAction="#onBack" styleClass="btn-back" text="← Back" />
+                  <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#onContinue" styleClass="btn-continue" text="Continue →" javafx.scene.layout.HBox.hgrow="ALWAYS" />
+               </children>
+            </javafx.scene.layout.HBox>
          </children>
          <padding>
             <Insets bottom="22.0" left="26.0" right="26.0" top="24.0" />

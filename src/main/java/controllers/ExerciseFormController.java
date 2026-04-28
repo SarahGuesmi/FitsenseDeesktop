@@ -11,7 +11,6 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import models.Exercise;
 import services.ExerciseService;
-import utils.WebAssets;
 
 import java.io.File;
 import java.io.IOException;
@@ -211,7 +210,11 @@ public class ExerciseFormController {
     // =========================
     private void loadCurrentImage(String imageName) {
         try {
-            String url = WebAssets.assetUrl("uploads/exercises/" + imageName);
+            // Try local uploads folder first, fall back to pidevassets
+            java.io.File localFile = new java.io.File("../FitsenseApp/public/uploads/exercises/" + imageName);
+            String url = localFile.exists()
+                    ? localFile.toURI().toString()
+                    : new java.io.File("C:/xampp/htdocs/pidevassets/uploads/exercises/" + imageName).toURI().toString();
             Image img = new Image(url, 160, 160, true, true, true);
 
             imagePreview.setImage(img);

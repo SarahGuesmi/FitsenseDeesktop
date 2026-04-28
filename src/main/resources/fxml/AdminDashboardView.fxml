@@ -8,6 +8,7 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -23,11 +24,23 @@
          <left>
             <VBox prefWidth="250.0" spacing="14.0" styleClass="admin-sidebar">
                <children>
+                  <HBox alignment="CENTER">
+                     <StackPane alignment="CENTER" styleClass="sidebar-avatar-frame">
+                        <children>
+                           <ImageView fx:id="sidebarAvatarView" fitHeight="72.0" fitWidth="72.0"
+                                      preserveRatio="true" smooth="true" />
+                           <Label fx:id="sidebarAvatarInitials" styleClass="sidebar-avatar-initials" text="?" />
+                        </children>
+                     </StackPane>
+                  </HBox>
                   <Label styleClass="admin-brand" text="FITSENSE" />
                   <Label styleClass="admin-side-sub" text="ADMIN PANEL" />
                   <Button fx:id="adminDashboardBtn" mnemonicParsing="false" onAction="#onShowAdminDashboard" styleClass="side-link" text="◈  Admin Dashboard" />
                   <Button fx:id="userManagementBtn" mnemonicParsing="false" onAction="#onShowUserManagement" styleClass="side-link" text="◉  User Management" />
+                  <Button fx:id="chatroomBtn" mnemonicParsing="false" onAction="#onShowChatroom" styleClass="side-link" text="💬  Chatroom" />
                   <Button fx:id="profileBtn" mnemonicParsing="false" onAction="#onShowProfile" styleClass="side-link" text="☺  Profile" />
+                  <Button fx:id="notificationsBtn" mnemonicParsing="false" onAction="#onShowNotifications" styleClass="side-link" text="🔔  Notifications" />
+                  <Button fx:id="securityBtn" mnemonicParsing="false" onAction="#onShowSecurity" styleClass="side-link" text="🔐  Security" />
                   <Button mnemonicParsing="false" onAction="#onLogout" styleClass="side-link" text="⏻  Sign Out" />
                </children>
                <padding>
@@ -65,45 +78,50 @@
                   </HBox>
                   <StackPane styleClass="admin-center-stack" VBox.vgrow="ALWAYS">
                <children>
-                  <VBox fx:id="adminDashboardPane" spacing="14.0" styleClass="admin-content">
-                     <children>
-                        <Label styleClass="page-title" text="Dashboard" />
-                        <GridPane hgap="12.0" vgap="12.0">
-                           <children>
-                              <VBox styleClass="stat-card">
-                                 <children>
-                                    <Label styleClass="stat-title" text="TOTAL USERS" />
-                                    <Label fx:id="totalUsersLabel" styleClass="stat-value" text="0" />
-                                 </children>
-                                 <padding>
-                                    <Insets bottom="12.0" left="14.0" right="14.0" top="12.0" />
-                                 </padding>
-                              </VBox>
-                              <VBox styleClass="stat-card" GridPane.columnIndex="1">
-                                 <children>
-                                    <Label styleClass="stat-title" text="ACTIVE SESSIONS" />
-                                    <Label fx:id="activeUsersLabel" styleClass="stat-value" text="0" />
-                                 </children>
-                                 <padding>
-                                    <Insets bottom="12.0" left="14.0" right="14.0" top="12.0" />
-                                 </padding>
-                              </VBox>
-                              <VBox styleClass="stat-card" GridPane.columnIndex="2">
-                                 <children>
-                                    <Label styleClass="stat-title" text="2FA PROTECTED" />
-                                    <Label fx:id="twoFaLabel" styleClass="stat-value" text="0" />
-                                 </children>
-                                 <padding>
-                                    <Insets bottom="12.0" left="14.0" right="14.0" top="12.0" />
-                                 </padding>
-                              </VBox>
-                           </children>
-                        </GridPane>
-                     </children>
-                     <padding>
-                        <Insets bottom="18.0" left="18.0" right="18.0" top="18.0" />
-                     </padding>
-                  </VBox>
+                   <ScrollPane fx:id="adminDashboardScroll" fitToWidth="true" styleClass="modal-scroll" VBox.vgrow="ALWAYS">
+                      <content>
+                         <VBox fx:id="adminDashboardPane" spacing="14.0" styleClass="admin-content">
+                            <children>
+                               <Label styleClass="page-title" text="Dashboard" />
+                               <GridPane hgap="12.0" vgap="12.0">
+                                  <children>
+                                     <VBox styleClass="stat-card">
+                                        <children>
+                                           <Label styleClass="stat-title" text="TOTAL USERS" />
+                                           <Label fx:id="totalUsersLabel" styleClass="stat-value" text="0" />
+                                        </children>
+                                        <padding>
+                                           <Insets bottom="12.0" left="14.0" right="14.0" top="12.0" />
+                                        </padding>
+                                     </VBox>
+                                     <VBox styleClass="stat-card" GridPane.columnIndex="1">
+                                        <children>
+                                           <Label styleClass="stat-title" text="ACTIVE SESSIONS" />
+                                           <Label fx:id="activeUsersLabel" styleClass="stat-value" text="0" />
+                                        </children>
+                                        <padding>
+                                           <Insets bottom="12.0" left="14.0" right="14.0" top="12.0" />
+                                        </padding>
+                                     </VBox>
+                                     <VBox styleClass="stat-card" GridPane.columnIndex="2">
+                                        <children>
+                                           <Label styleClass="stat-title" text="2FA PROTECTED" />
+                                           <Label fx:id="twoFaLabel" styleClass="stat-value" text="0" />
+                                        </children>
+                                        <padding>
+                                           <Insets bottom="12.0" left="14.0" right="14.0" top="12.0" />
+                                        </padding>
+                                     </VBox>
+                                  </children>
+                               </GridPane>
+                               <javafx.scene.web.WebView fx:id="chartsWebView" minHeight="900.0" prefHeight="900.0" />
+                            </children>
+                            <padding>
+                               <Insets bottom="18.0" left="18.0" right="18.0" top="18.0" />
+                            </padding>
+                         </VBox>
+                      </content>
+                   </ScrollPane>
                   <VBox fx:id="profilePane" managed="false" spacing="0.0" styleClass="admin-content" visible="false" VBox.vgrow="ALWAYS">
                      <children>
                         <fx:include fx:id="adminProfile" source="ProfileFragment.fxml" VBox.vgrow="ALWAYS" />
@@ -128,27 +146,27 @@
                               <Insets bottom="8.0" left="2.0" right="2.0" top="2.0" />
                            </padding>
                         </HBox>
-                        <HBox alignment="BOTTOM_LEFT" spacing="16.0" styleClass="user-filters-bar">
+                        <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="user-filters-bar">
                            <children>
-                              <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                              <VBox spacing="5.0" HBox.hgrow="ALWAYS">
                                  <children>
                                     <Label styleClass="filter-field-label" text="Search Users" />
-                                    <TextField fx:id="userSearchField" promptText="Search by name or email..." styleClass="filter-search-field" />
+                                    <TextField fx:id="userSearchField" promptText="Search by name or email..." styleClass="filter-search-field" maxWidth="Infinity" />
                                  </children>
                               </VBox>
-                              <VBox spacing="6.0">
+                              <VBox spacing="5.0">
                                  <children>
                                     <Label styleClass="filter-field-label" text="Status" />
-                                    <ComboBox fx:id="userStatusFilterCombo" prefWidth="150.0" styleClass="filter-combo" />
+                                    <ComboBox fx:id="userStatusFilterCombo" prefWidth="120.0" styleClass="filter-combo" />
                                  </children>
                               </VBox>
-                              <VBox spacing="6.0">
+                              <VBox spacing="5.0">
                                  <children>
                                     <Label styleClass="filter-field-label" text="Role" />
-                                    <ComboBox fx:id="userRoleFilterCombo" prefWidth="150.0" styleClass="filter-combo" />
+                                    <ComboBox fx:id="userRoleFilterCombo" prefWidth="120.0" styleClass="filter-combo" />
                                  </children>
                               </VBox>
-                              <Button mnemonicParsing="false" onAction="#onClearUserFilters" styleClass="filter-clear-btn" text="Clear" />
+                              <Button mnemonicParsing="false" onAction="#onClearUserFilters" styleClass="filter-clear-btn" text="Clear" VBox.vgrow="NEVER" />
                            </children>
                            <padding>
                               <Insets bottom="14.0" left="16.0" right="16.0" top="14.0" />
@@ -168,6 +186,47 @@
                         <Insets bottom="18.0" left="18.0" right="18.0" top="18.0" />
                      </padding>
                   </VBox>
+                  <VBox fx:id="chatroomPane" managed="false" spacing="0" styleClass="admin-content" visible="false" VBox.vgrow="ALWAYS">
+                     <children>
+                        <fx:include fx:id="chatroom" source="ChatroomFragment.fxml" VBox.vgrow="ALWAYS" />
+                     </children>
+                  </VBox>
+                  <VBox fx:id="notificationsPane" managed="false" spacing="0" styleClass="admin-content" visible="false" VBox.vgrow="ALWAYS">
+                     <children>
+                        <VBox spacing="16.0">
+                           <children>
+                              <!-- Header card -->
+                              <VBox styleClass="notif-header-card" spacing="4.0">
+                                 <children>
+                                    <Label styleClass="notif-header-title" text="Notifications Center" />
+                                    <Label styleClass="notif-header-sub" text="Track system events and new user registrations" />
+                                 </children>
+                                 <padding><Insets bottom="20.0" left="20.0" right="20.0" top="20.0" /></padding>
+                              </VBox>
+                              <!-- Mark all read button row -->
+                              <HBox alignment="CENTER_LEFT" spacing="12.0">
+                                 <children>
+                                    <Label styleClass="notif-section-title" text="Recent Alerts" HBox.hgrow="ALWAYS" />
+                                    <Button fx:id="markAllReadBtn" mnemonicParsing="false" onAction="#onMarkAllRead" styleClass="notif-mark-all-btn" text="Mark all as read" />
+                                 </children>
+                              </HBox>
+                              <!-- Notifications list -->
+                              <ScrollPane fitToWidth="true" styleClass="modal-scroll" VBox.vgrow="ALWAYS">
+                                 <content>
+                                    <VBox fx:id="notificationsListBox" spacing="10.0" />
+                                 </content>
+                              </ScrollPane>
+                           </children>
+                           <padding><Insets bottom="18.0" left="18.0" right="18.0" top="18.0" /></padding>
+                        </VBox>
+                     </children>
+                  </VBox>
+                  <ScrollPane fx:id="securityPane" managed="false" visible="false"
+                              fitToWidth="true" styleClass="admin-content tfa-scroll-pane">
+                     <content>
+                        <fx:include fx:id="adminSecurity" source="TwoFactorSetupFragment.fxml" />
+                     </content>
+                  </ScrollPane>
                </children>
                   </StackPane>
                </children>
@@ -319,6 +378,26 @@
                      <children>
                         <Button mnemonicParsing="false" onAction="#onCloseModal" styleClass="modal-btn-cancel" text="CANCEL" />
                         <Button mnemonicParsing="false" onAction="#onConfirmDelete" styleClass="modal-btn-danger" text="DELETE USER" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </children>
+      </StackPane>
+
+      <!-- Logout confirmation overlay -->
+      <StackPane fx:id="logoutOverlay" managed="false" visible="false" styleClass="modal-overlay" maxWidth="Infinity" maxHeight="Infinity">
+         <children>
+            <VBox alignment="CENTER" spacing="12.0" styleClass="modal-card" maxWidth="380.0" maxHeight="220.0">
+               <padding><Insets bottom="24.0" left="28.0" right="28.0" top="20.0" /></padding>
+               <children>
+                  <Label alignment="CENTER" styleClass="dash-logout-icon" text="⏻" />
+                  <Label alignment="CENTER" styleClass="modal-title" text="Sign Out" />
+                  <Label alignment="CENTER" maxWidth="300.0" styleClass="users-subtitle" text="Are you sure you want to sign out?" textAlignment="CENTER" wrapText="true" />
+                  <HBox alignment="CENTER" spacing="12.0">
+                     <children>
+                        <Button mnemonicParsing="false" onAction="#onCancelLogout" styleClass="modal-btn-cancel" text="Cancel" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
+                        <Button mnemonicParsing="false" onAction="#onConfirmLogout" styleClass="modal-btn-danger" text="Sign Out" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
                      </children>
                   </HBox>
                </children>

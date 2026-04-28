@@ -140,26 +140,31 @@ public class RecipeCatalogController {
             String kcalText = getText(kcalField);
             String proteinsText = getText(proteinsField);
 
+            List<String> objectifs = getSelectedObjectifs();
+
+            // 1) Vérifier les champs vides d'abord
+            if (title.isBlank() || description.isBlank() || ingredients.isBlank()
+                    || preparation.isBlank() || typeMeal == null
+                    || kcalText.isBlank() || proteinsText.isBlank()
+                    || objectifs.isEmpty()) {
+                showAlert(Alert.AlertType.WARNING, "Validation",
+                        "Veuillez remplir tous les champs obligatoires.");
+                return;
+            }
+
+            // 2) Vérifier que kcal et proteins sont des entiers
             Integer kcal = parseInteger(kcalText);
             Integer proteins = parseInteger(proteinsText);
 
-// 🔴 validation spéciale nombres
             if (kcal == null) {
-                showAlert(Alert.AlertType.ERROR, "Erreur", "Calories doit être un nombre entier !");
+                showAlert(Alert.AlertType.ERROR, "Valeur invalide",
+                        "Le champ Calories doit contenir un nombre entier.");
                 return;
             }
 
             if (proteins == null) {
-                showAlert(Alert.AlertType.ERROR, "Erreur", "Proteins doit être un nombre entier !");
-                return;
-            }
-            List<String> objectifs = getSelectedObjectifs();
-
-            if (title.isBlank() || description.isBlank() || ingredients.isBlank()
-                    || preparation.isBlank() || typeMeal == null
-                    || kcal == null || proteins == null || objectifs.isEmpty()) {
-                showAlert(Alert.AlertType.WARNING, "Validation",
-                        "Merci de remplir tous les champs obligatoires.");
+                showAlert(Alert.AlertType.ERROR, "Valeur invalide",
+                        "Le champ Protéines doit contenir un nombre entier.");
                 return;
             }
 
@@ -196,11 +201,10 @@ public class RecipeCatalogController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Database Error",
-                    "Impossible d'enregistrer la recette dans la base.");
+            showAlert(Alert.AlertType.ERROR, "Erreur",
+                    "Impossible d'enregistrer la recette.");
         }
     }
-
     private void refreshObjectiveCards() {
         setCardSelected(weightLossCard, weightLossSelected);
         setCardSelected(muscleGainCard, muscleGainSelected);

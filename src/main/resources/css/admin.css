@@ -526,3 +526,227 @@
     -fx-alignment: center;
     -fx-padding: 0;
 }
+
+/* ── Logout confirmation overlay ── */
+.dash-logout-icon {
+    -fx-font-size: 24px;
+    -fx-text-fill: #ff6b7a;
+    -fx-background-color: rgba(255, 80, 80, 0.15);
+    -fx-background-radius: 50px;
+    -fx-min-width: 52px;
+    -fx-min-height: 52px;
+    -fx-max-width: 52px;
+    -fx-max-height: 52px;
+    -fx-alignment: center;
+}
+
+/* ── User filter bar ── */
+.user-filters-bar {
+    -fx-background-color: #131b30;
+    -fx-background-radius: 14px;
+    -fx-border-color: rgba(140, 166, 255, 0.22);
+    -fx-border-radius: 14px;
+    -fx-border-width: 1px;
+}
+
+.filter-field-label {
+    -fx-text-fill: #c8d4f0;
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+}
+
+.filter-search-field {
+    -fx-background-color: rgba(255, 255, 255, 0.04);
+    -fx-text-fill: #eff4ff;
+    -fx-prompt-text-fill: #5a6a8a;
+    -fx-background-radius: 8px;
+    -fx-border-color: rgba(140, 166, 255, 0.28);
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-font-size: 13px;
+    -fx-padding: 8 12;
+}
+
+.filter-search-field:focused {
+    -fx-border-color: rgba(100, 150, 255, 0.7);
+    -fx-background-color: rgba(255, 255, 255, 0.07);
+}
+
+.filter-combo {
+    -fx-background-color: rgba(255, 255, 255, 0.06);
+    -fx-background-radius: 8px;
+    -fx-border-color: rgba(140, 166, 255, 0.35);
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-font-size: 13px;
+    -fx-text-fill: #eff4ff;
+    -fx-padding: 2 4;
+}
+
+.filter-combo .list-cell {
+    -fx-text-fill: #eff4ff;
+    -fx-background-color: transparent;
+    -fx-font-size: 13px;
+}
+
+.filter-combo:focused {
+    -fx-border-color: rgba(100, 150, 255, 0.7);
+}
+
+.filter-clear-btn {
+    -fx-background-color: rgba(255, 255, 255, 0.07);
+    -fx-text-fill: #c8d4f0;
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+    -fx-background-radius: 8px;
+    -fx-border-color: rgba(140, 166, 255, 0.35);
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-padding: 8 18;
+    -fx-cursor: hand;
+    -fx-translate-y: 10;
+}
+
+.filter-clear-btn:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.12);
+    -fx-text-fill: #ffffff;
+}
+
+/* ── Notifications page ── */
+.notif-header-card {
+    -fx-background-color: linear-gradient(to right, #131b30, #1a2540);
+    -fx-background-radius: 14px;
+    -fx-border-color: rgba(100, 140, 255, 0.35);
+    -fx-border-radius: 14px;
+    -fx-border-width: 0 0 0 4;
+    -fx-border-color: #4a82ff;
+}
+
+.notif-header-title {
+    -fx-text-fill: #f4f8ff;
+    -fx-font-size: 26px;
+    -fx-font-weight: 800;
+}
+
+.notif-header-sub {
+    -fx-text-fill: #8b96b0;
+    -fx-font-size: 13px;
+}
+
+.notif-section-title {
+    -fx-text-fill: #f4f8ff;
+    -fx-font-size: 18px;
+    -fx-font-weight: 700;
+}
+
+.notif-mark-all-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #7b9fff;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-border-color: rgba(100, 150, 255, 0.45);
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 6 14;
+    -fx-cursor: hand;
+}
+
+.notif-mark-all-btn:hover {
+    -fx-background-color: rgba(100, 150, 255, 0.12);
+}
+
+.notif-row-unread {
+    -fx-background-color: #131b30;
+    -fx-background-radius: 12px;
+    -fx-border-color: rgba(100, 140, 255, 0.22);
+    -fx-border-radius: 12px;
+    -fx-border-width: 1px;
+}
+
+.notif-row-read {
+    -fx-background-color: #0f1520;
+    -fx-background-radius: 12px;
+    -fx-border-color: rgba(255, 255, 255, 0.06);
+    -fx-border-radius: 12px;
+    -fx-border-width: 1px;
+}
+
+.notif-avatar {
+    -fx-font-size: 20px;
+    -fx-background-color: rgba(74, 130, 255, 0.18);
+    -fx-background-radius: 50px;
+    -fx-min-width: 44px;
+    -fx-min-height: 44px;
+    -fx-max-width: 44px;
+    -fx-max-height: 44px;
+    -fx-alignment: center;
+}
+
+.notif-msg {
+    -fx-text-fill: #f0f4ff;
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+}
+
+.notif-msg-read {
+    -fx-text-fill: #6a7a9a;
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+}
+
+.notif-time {
+    -fx-text-fill: #5a6a8a;
+    -fx-font-size: 12px;
+}
+
+.notif-view-link {
+    -fx-text-fill: #5a9aff;
+    -fx-font-size: 12px;
+    -fx-cursor: hand;
+}
+
+.notif-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #7b9fff;
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+    -fx-border-color: rgba(100, 150, 255, 0.5);
+    -fx-border-radius: 20px;
+    -fx-background-radius: 20px;
+    -fx-padding: 5 14;
+    -fx-cursor: hand;
+}
+
+.notif-btn:hover {
+    -fx-background-color: rgba(100, 150, 255, 0.15);
+}
+
+.notif-btn-read {
+    -fx-background-color: transparent;
+    -fx-text-fill: #3a4a6a;
+    -fx-font-size: 12px;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-radius: 20px;
+    -fx-background-radius: 20px;
+    -fx-padding: 5 14;
+}
+
+/* ── Sidebar avatar ──────────────────────────────────────────────────────── */
+.sidebar-avatar-frame {
+    -fx-background-color: radial-gradient(center 50% 50%, radius 70%, #2a2060, #0d0d1a);
+    -fx-background-radius: 50px;
+    -fx-border-radius: 50px;
+    -fx-border-color: rgba(159,124,255,0.4);
+    -fx-border-width: 2.5px;
+    -fx-min-width: 80px;
+    -fx-min-height: 80px;
+    -fx-max-width: 80px;
+    -fx-max-height: 80px;
+    -fx-effect: dropshadow(gaussian, rgba(159,124,255,0.35), 14, 0.3, 0, 0);
+}
+
+.sidebar-avatar-initials {
+    -fx-text-fill: #9f7cff;
+    -fx-font-size: 26px;
+    -fx-font-weight: 800;
+}

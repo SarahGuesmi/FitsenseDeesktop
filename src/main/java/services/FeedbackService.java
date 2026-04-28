@@ -1,10 +1,12 @@
 package services;
 
 import models.Questionnaire;
+import utils.UuidUtil;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class FeedbackService implements CRUD<Questionnaire> {
 
@@ -16,60 +18,56 @@ public class FeedbackService implements CRUD<Questionnaire> {
 
     @Override
     public void create(Questionnaire q) throws SQLException {
-        String sql = "INSERT INTO questionnaire (user_id, coach_id, titre, type, note_globale, satisfaction, " +
-                "intensite, exercices_compris, duree, ressenti_physique, stress, motivation, progression, " +
-                "rapproche_objectifs, commentaire, options, user_name, date_soumission) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (Statement stmt = connection.createStatement()) {
-            stmt.executeUpdate(sql);
-        }
+        createPrepared(q);
     }
 
     @Override
     public void createPrepared(Questionnaire q) throws SQLException {
-        String sql = "INSERT INTO questionnaire (user_id, coach_id, titre, type, note_globale, satisfaction, " +
-                "intensite, exercices_compris, duree, ressenti_physique, stress, motivation, progression, " +
-                "rapproche_objectifs, commentaire, options, user_name, date_soumission) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        UUID newId = UUID.randomUUID();
+        String sql = "INSERT INTO `questionnaire` (`id`, `user_id`, `coach_id`, `titre`, `type`, `note_globale`, "
+                + "`satisfaction`, `intensite`, `exercices_compris`, `duree`, `ressenti_physique`, `stress`, "
+                + "`motivation`, `progression`, `rapproche_objectifs`, `commentaire`, `options`, `user_name`, "
+                + "`date_soumission`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            // user_id and coach_id are int in DB
-            if (q.getUser() != null)
-                ps.setInt(1, (int) q.getUser().getId().getLeastSignificantBits());
+            ps.setBytes(1, UuidUtil.toBytes16(newId));
+            if (q.getUser() != null && q.getUser().getId() != null)
+                ps.setBytes(2, UuidUtil.toBytes16(q.getUser().getId()));
             else
-                ps.setNull(1, Types.INTEGER);
-            if (q.getCoach() != null)
-                ps.setInt(2, (int) q.getCoach().getId().getLeastSignificantBits());
+                ps.setNull(2, Types.BINARY);
+            if (q.getCoach() != null && q.getCoach().getId() != null)
+                ps.setBytes(3, UuidUtil.toBytes16(q.getCoach().getId()));
             else
-                ps.setNull(2, Types.INTEGER);
-            ps.setString(3, q.getTitre());
-            ps.setString(4, q.getType());
-            ps.setObject(5, q.getNoteGlobale());
-            ps.setObject(6, q.getSatisfaction());
-            ps.setString(7, q.getIntensite());
-            ps.setString(8, q.getExercicesCompris());
-            ps.setString(9, q.getDuree());
-            ps.setString(10, q.getRessentiPhysique());
-            ps.setString(11, q.getStress());
-            ps.setString(12, q.getMotivation());
-            ps.setString(13, q.getProgression());
-            ps.setObject(14, q.getRapprocheObjectifs());
-            ps.setString(15, q.getCommentaire());
-            ps.setString(16, q.getOptions());
-            ps.setString(17, q.getUserName());
-            ps.setObject(18, q.getDateSoumission() != null ? Timestamp.from(q.getDateSoumission()) : null);
+                ps.setNull(3, Types.BINARY);
+            ps.setString(4, q.getTitre());
+            ps.setString(5, q.getType() != null ? q.getType() : "template");
+            ps.setObject(6, q.getNoteGlobale());
+            ps.setObject(7, q.getSatisfaction());
+            ps.setString(8, q.getIntensite());
+            ps.setString(9, q.getExercicesCompris());
+            ps.setString(10, q.getDuree());
+            ps.setString(11, q.getRessentiPhysique());
+            ps.setString(12, q.getStress());
+            ps.setString(13, q.getMotivation());
+            ps.setString(14, q.getProgression());
+            ps.setObject(15, q.getRapprocheObjectifs());
+            ps.setString(16, q.getCommentaire());
+            ps.setString(17, q.getOptions());
+            ps.setString(18, q.getUserName());
+            ps.setObject(19, q.getDateSoumission() != null ? Timestamp.from(q.getDateSoumission()) : null);
             ps.executeUpdate();
+            q.setId(newId);
         }
     }
 
     @Override
     public List<Questionnaire> read() throws SQLException {
         List<Questionnaire> list = new ArrayList<>();
-        String sql = "SELECT * FROM questionnaire";
+        String sql = "SELECT * FROM `questionnaire`";
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 Questionnaire q = new Questionnaire();
-                q.setId(rs.getObject("id", Integer.class));
+                q.setId(UuidUtil.fromResultSet(rs, "id"));
                 q.setTitre(rs.getString("titre"));
                 q.setType(rs.getString("type"));
                 q.setNoteGlobale(rs.getObject("note_globale", Integer.class));
@@ -95,23 +93,24 @@ public class FeedbackService implements CRUD<Questionnaire> {
 
     @Override
     public void update(Questionnaire q) throws SQLException {
-        String sql = "UPDATE questionnaire SET titre=?, type=?, options=?, exercices_compris=?, date_soumission=? WHERE id=?";
+        String sql = "UPDATE `questionnaire` SET `titre` = ?, `type` = ?, `options` = ?, "
+                + "`exercices_compris` = ?, `date_soumission` = ? WHERE `id` = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, q.getTitre());
             ps.setString(2, q.getType() != null ? q.getType() : "template");
             ps.setString(3, q.getOptions());
             ps.setString(4, q.getExercicesCompris());
             ps.setObject(5, q.getDateSoumission() != null ? Timestamp.from(q.getDateSoumission()) : null);
-            ps.setInt(6, q.getId());
+            ps.setBytes(6, UuidUtil.toBytes16(q.getId()));
             ps.executeUpdate();
         }
     }
 
     @Override
     public void delete(Questionnaire q) throws SQLException {
-        String sql = "DELETE FROM questionnaire WHERE id=?";
+        String sql = "DELETE FROM `questionnaire` WHERE `id` = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, q.getId());
+            ps.setBytes(1, UuidUtil.toBytes16(q.getId()));
             ps.executeUpdate();
         }
     }

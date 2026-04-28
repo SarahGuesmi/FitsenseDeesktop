@@ -39,6 +39,11 @@ public class WeightController {
     }
 
     @FXML
+    private void onBack() {
+        switchScene("/fxml/HeightView.fxml", "/css/onboarding.css");
+    }
+
+    @FXML
     private void onContinue() {
         AppSession.getOnboardingData().setWeightKg((float) weightSlider.getValue());
         switchScene("/fxml/GenderView.fxml", "/css/onboarding.css");

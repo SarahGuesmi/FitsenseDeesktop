@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<StackPane fx:id="root" prefHeight="620.0" prefWidth="980.0" styleClass="onb-root"
+           stylesheets="@../css/onboarding.css"
+           xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="controllers.AvatarPickController">
+   <children>
+      <VBox alignment="CENTER" maxWidth="700.0" spacing="10.0">
+         <children>
+
+            <Label styleClass="onb-title" text="Discover Your Look" />
+            <Label styleClass="onb-subtitle" wrapText="true" alignment="CENTER"
+                   text="Choose an avatar that represents you on your fitness journey" />
+            <Region prefHeight="10.0" />
+
+            <HBox alignment="CENTER">
+               <Button fx:id="redesignBtn" mnemonicParsing="false" onAction="#onRedesign"
+                       styleClass="username-regen-btn" text="⟳  New Avatars" />
+            </HBox>
+            <Region prefHeight="8.0" />
+
+            <Label fx:id="loadingLabel" styleClass="onb-subtitle" text="✨ Generating avatars..."
+                   managed="false" visible="false" />
+
+            <!-- Avatar grid -->
+            <FlowPane fx:id="avatarsPane" hgap="18.0" vgap="18.0" alignment="CENTER"
+                      prefWrapLength="660.0" />
+
+            <Region prefHeight="16.0" />
+
+            <HBox alignment="CENTER" maxWidth="340.0" spacing="12.0">
+               <children>
+                  <Button mnemonicParsing="false" onAction="#onBack" styleClass="btn-back" text="← Back" />
+                  <Button fx:id="confirmBtn" maxWidth="Infinity" mnemonicParsing="false" onAction="#onConfirm" prefHeight="48.0" styleClass="btn-continue" text="CONFIRM &amp; CONTINUE" HBox.hgrow="ALWAYS" />
+               </children>
+            </HBox>
+            <Label fx:id="errorLabel" styleClass="username-error" managed="false" visible="false" text="" />
+
+         </children>
+         <padding><Insets bottom="32.0" left="32.0" right="32.0" top="32.0"/></padding>
+      </VBox>
+   </children>
+</StackPane>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<StackPane fx:id="root" minHeight="620.0" minWidth="980.0" prefHeight="620.0" prefWidth="980.0"
+           styleClass="signin-root" stylesheets="@../css/signin.css"
+           xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="controllers.TwoFactorVerifyController">
+   <children>
+      <VBox alignment="CENTER" maxWidth="460" spacing="0" styleClass="signin-card">
+         <padding><Insets bottom="48" left="48" right="48" top="48"/></padding>
+         <children>
+
+            <!-- Icon + title -->
+            <Label styleClass="tfa-verify-icon" text="🔐" />
+            <Region prefHeight="12" />
+            <Label styleClass="welcome-title" text="Two-Factor Auth" />
+            <Region prefHeight="8" />
+            <Label styleClass="welcome-subtitle" wrapText="true" alignment="CENTER"
+                   text="Open your authenticator app and enter the 6-digit code for FitSense." />
+            <Region prefHeight="32" />
+
+            <!-- Code input -->
+            <Label styleClass="field-label" text="AUTHENTICATION CODE" />
+            <Region prefHeight="6" />
+            <TextField fx:id="codeField" promptText="000000" styleClass="tfa-verify-input"
+                       maxWidth="Infinity" />
+            <Label fx:id="codeError" styleClass="form-error-label" managed="false" visible="false" text="" />
+            <Region prefHeight="20" />
+
+            <!-- Verify button -->
+            <Button fx:id="verifyBtn" mnemonicParsing="false" onAction="#onVerify"
+                    styleClass="btn-signin-password" text="VERIFY" maxWidth="Infinity" />
+            <Region prefHeight="16" />
+
+            <!-- Back link -->
+            <HBox alignment="CENTER">
+               <children>
+                  <Button mnemonicParsing="false" onAction="#onBackToSignIn"
+                          styleClass="btn-signup-inline" text="← Back to Sign In" />
+               </children>
+            </HBox>
+
+         </children>
+      </VBox>
+   </children>
+</StackPane>

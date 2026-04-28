@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="0" styleClass="tfa-root" stylesheets="@../css/two-factor.css"      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controllers.TwoFactorSetupController">
+   <children>
+
+      <!-- Header -->
+      <VBox styleClass="tfa-header" spacing="6">
+         <padding><Insets bottom="28" left="0" right="0" top="0"/></padding>
+         <children>
+            <Label styleClass="tfa-title" text="🔐  Two-Factor Authentication" />
+            <Label styleClass="tfa-subtitle" wrapText="true"
+                   text="Add an extra layer of security to your account. Once enabled, you'll need a 6-digit code from your authenticator app every time you sign in." />
+         </children>
+      </VBox>
+
+      <!-- Status card -->
+      <HBox styleClass="tfa-status-card" spacing="16" alignment="CENTER_LEFT">
+         <padding><Insets bottom="20" left="24" right="24" top="20"/></padding>
+         <children>
+            <Label fx:id="statusIcon" styleClass="tfa-status-icon" text="🔓" />
+            <VBox spacing="4" HBox.hgrow="ALWAYS">
+               <children>
+                  <Label fx:id="statusTitle" styleClass="tfa-status-title" text="2FA is Disabled" />
+                  <Label fx:id="statusDesc" styleClass="tfa-status-desc" wrapText="true"
+                         text="Your account is protected by password only." />
+               </children>
+            </VBox>
+            <Button fx:id="toggleBtn" mnemonicParsing="false" onAction="#onToggle"
+                    styleClass="tfa-toggle-btn" text="Enable 2FA" />
+         </children>
+      </HBox>
+
+      <!-- Setup panel (shown when enabling) -->
+      <VBox fx:id="setupPanel" managed="false" visible="false" spacing="24">
+         <padding><Insets top="28"/></padding>
+         <children>
+
+            <!-- Step 1 -->
+            <VBox styleClass="tfa-step-card" spacing="14">
+               <padding><Insets bottom="22" left="22" right="22" top="22"/></padding>
+               <children>
+                  <HBox spacing="12" alignment="CENTER_LEFT">
+                     <children>
+                        <Label styleClass="tfa-step-badge" text="1" />
+                        <Label styleClass="tfa-step-title" text="Install an authenticator app" />
+                     </children>
+                  </HBox>
+                  <Label styleClass="tfa-step-desc" wrapText="true"
+                         text="Download Google Authenticator, Authy, or any TOTP-compatible app on your phone." />
+               </children>
+            </VBox>
+
+            <!-- Step 2 — QR code -->
+            <VBox styleClass="tfa-step-card" spacing="14">
+               <padding><Insets bottom="22" left="22" right="22" top="22"/></padding>
+               <children>
+                  <HBox spacing="12" alignment="CENTER_LEFT">
+                     <children>
+                        <Label styleClass="tfa-step-badge" text="2" />
+                        <Label styleClass="tfa-step-title" text="Scan the QR code" />
+                     </children>
+                  </HBox>
+                  <Label styleClass="tfa-step-desc" wrapText="true"
+                         text="Open your authenticator app and scan the QR code below." />
+                  <HBox alignment="CENTER">
+                     <children>
+                        <StackPane styleClass="tfa-qr-frame">
+                           <children>
+                              <ImageView fx:id="qrImageView" fitHeight="180" fitWidth="180"
+                                         preserveRatio="true" smooth="true" />
+                              <Label fx:id="qrLoadingLabel" styleClass="tfa-qr-loading"
+                                     text="Loading QR code..." />
+                           </children>
+                        </StackPane>
+                     </children>
+                  </HBox>
+                  <VBox styleClass="tfa-secret-box" spacing="6">
+                     <padding><Insets bottom="12" left="14" right="14" top="12"/></padding>
+                     <children>
+                        <Label styleClass="tfa-secret-label" text="Can't scan? Enter this key manually:" />
+                        <Label fx:id="secretLabel" styleClass="tfa-secret-value" text="" />
+                     </children>
+                  </VBox>
+               </children>
+            </VBox>
+
+            <!-- Step 3 — Verify -->
+            <VBox styleClass="tfa-step-card" spacing="14">
+               <padding><Insets bottom="22" left="22" right="22" top="22"/></padding>
+               <children>
+                  <HBox spacing="12" alignment="CENTER_LEFT">
+                     <children>
+                        <Label styleClass="tfa-step-badge" text="3" />
+                        <Label styleClass="tfa-step-title" text="Verify and activate" />
+                     </children>
+                  </HBox>
+                  <Label styleClass="tfa-step-desc" wrapText="true"
+                         text="Enter the 6-digit code from your authenticator app to confirm setup." />
+                  <HBox spacing="12" alignment="CENTER_LEFT">
+                     <children>
+                        <TextField fx:id="verifyCodeField" promptText="000000"
+                                   styleClass="tfa-code-field" maxWidth="140" />
+                        <Button mnemonicParsing="false" onAction="#onVerifyAndActivate"
+                                styleClass="tfa-activate-btn" text="Activate" />
+                     </children>
+                  </HBox>
+                  <Label fx:id="verifyError" styleClass="tfa-error" managed="false" visible="false" text="" />
+               </children>
+            </VBox>
+
+         </children>
+      </VBox>
+
+      <!-- Disable confirmation panel -->
+      <VBox fx:id="disablePanel" managed="false" visible="false" spacing="16">
+         <padding><Insets top="28"/></padding>
+         <children>
+            <VBox styleClass="tfa-step-card" spacing="14">
+               <padding><Insets bottom="22" left="22" right="22" top="22"/></padding>
+               <children>
+                  <Label styleClass="tfa-step-title" text="⚠  Disable Two-Factor Authentication" />
+                  <Label styleClass="tfa-step-desc" wrapText="true"
+                         text="Enter your current authenticator code to confirm you want to disable 2FA. Your account will be less secure." />
+                  <HBox spacing="12" alignment="CENTER_LEFT">
+                     <children>
+                        <TextField fx:id="disableCodeField" promptText="000000"
+                                   styleClass="tfa-code-field" maxWidth="140" />
+                        <Button mnemonicParsing="false" onAction="#onConfirmDisable"
+                                styleClass="tfa-disable-btn" text="Disable 2FA" />
+                        <Button mnemonicParsing="false" onAction="#onCancelDisable"
+                                styleClass="tfa-cancel-btn" text="Cancel" />
+                     </children>
+                  </HBox>
+                  <Label fx:id="disableError" styleClass="tfa-error" managed="false" visible="false" text="" />
+               </children>
+            </VBox>
+         </children>
+      </VBox>
+
+      <Region VBox.vgrow="ALWAYS" />
+
+      <!-- Login History -->
+      <VBox spacing="14">
+         <padding><Insets top="28"/></padding>
+         <children>
+            <Label styleClass="tfa-title" text="📋  Recent Login Activity" />
+            <Label styleClass="tfa-subtitle" wrapText="true"
+                   text="Your last 10 sign-in attempts. If you see something suspicious, change your password immediately." />
+            <VBox fx:id="loginHistoryBox" spacing="8" />
+         </children>
+      </VBox>
+
+   </children>
+   <padding><Insets bottom="32" left="32" right="32" top="32"/></padding>
+</VBox>

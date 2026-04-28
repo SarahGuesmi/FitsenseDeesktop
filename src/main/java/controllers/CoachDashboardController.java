@@ -8,6 +8,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -15,6 +16,7 @@ import models.Questionnaire;
 import models.User;
 import models.Workout;
 import services.UserService;
+import utils.SidebarAvatarLoader;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -69,6 +71,10 @@ public class CoachDashboardController {
     private Button nutritionBtn;
     @FXML
     private Button profileBtn;
+    @FXML
+    private Button securityBtn;
+    @FXML private ImageView sidebarAvatarView;
+    @FXML private Label     sidebarAvatarInitials;
 
     @FXML
     private Label navbarPageTitle;
@@ -144,6 +150,7 @@ public class CoachDashboardController {
         }
         refreshNavbar();
         onShowDashboard();
+        SidebarAvatarLoader.load(AppSession.getCurrentUser(), sidebarAvatarView, sidebarAvatarInitials);
     }
 
     @FXML
@@ -335,7 +342,7 @@ public class CoachDashboardController {
         Questionnaire q = new Questionnaire();
         // Check if editing existing
         Object userData = modalTitreField.getUserData();
-        if (userData instanceof Integer existingId) {
+        if (userData instanceof java.util.UUID existingId) {
             q.setId(existingId);
         }
         q.setTitre(titre);
@@ -567,10 +574,40 @@ public class CoachDashboardController {
     }
 
     @FXML
+    private ScrollPane securityPane;
+
+    @FXML
+    private void onShowSecurity() {
+        hideAllContent();
+        if (securityPane != null) { securityPane.setManaged(true); securityPane.setVisible(true); }
+        setNavbarText("Security", "Two-factor authentication settings");
+        setActiveSidebar(securityBtn, null);
+    }
+
+    @FXML
+    private StackPane logoutOverlay;
+
+    @FXML
     private void onLogout() {
+        if (logoutOverlay != null) {
+            logoutOverlay.setManaged(true);
+            logoutOverlay.setVisible(true);
+        }
+    }
+
+    @FXML
+    private void onConfirmLogout() {
         AppSession.setCurrentUser(null);
         AppSession.resetOnboarding();
         switchScene("/fxml/SignInView.fxml", "/css/signin.css");
+    }
+
+    @FXML
+    private void onCancelLogout() {
+        if (logoutOverlay != null) {
+            logoutOverlay.setManaged(false);
+            logoutOverlay.setVisible(false);
+        }
     }
 
     private void hideAllContent() {
@@ -581,6 +618,7 @@ public class CoachDashboardController {
                 p.setVisible(false);
             }
         }
+        if (securityPane != null) { securityPane.setManaged(false); securityPane.setVisible(false); }
     }
 
     private void setNavbarText(String title, String subtitle) {
@@ -637,7 +675,7 @@ public class CoachDashboardController {
      */
     private void setActiveSidebar(Button mainNav, Button mentalSubNav) {
         for (Button b : List.of(coachHomeBtn, athletesBtn, chatroomBtn, workoutCatalogBtn,
-                feedbackBtn, nutritionBtn, profileBtn)) {
+                feedbackBtn, nutritionBtn, profileBtn, securityBtn)) {
             if (b != null) {
                 b.getStyleClass().remove("side-link-active");
             }

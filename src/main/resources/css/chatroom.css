@@ -1,0 +1,247 @@
+/* ── Chatroom ── */
+.chat-root {
+    -fx-background-color: transparent;
+}
+
+/* Contacts panel */
+.chat-contacts-panel {
+    -fx-background-color: #0f1520;
+    -fx-border-color: rgba(255,255,255,0.06);
+    -fx-border-width: 0 1 0 0;
+}
+
+.chat-contacts-title {
+    -fx-text-fill: #6a7a9a;
+    -fx-font-size: 11px;
+    -fx-font-weight: 800;
+    -fx-letter-spacing: 0.08em;
+    -fx-padding: 0 0 10 4;
+}
+
+.chat-contacts-scroll {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.chat-contacts-scroll .viewport { -fx-background-color: transparent; }
+
+.chat-contacts-list {
+    -fx-background-color: transparent;
+}
+
+.chat-contact-row {
+    -fx-background-color: transparent;
+    -fx-background-radius: 10px;
+    -fx-cursor: hand;
+}
+
+.chat-contact-row:hover {
+    -fx-background-color: rgba(255,255,255,0.06);
+}
+
+.chat-unread-badge {
+    -fx-background-color: #ef4444;
+    -fx-text-fill: white;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-padding: 2 6 2 6;
+    -fx-background-radius: 10;
+    -fx-alignment: center;
+    -fx-min-width: 18;
+}
+
+.chat-contact-row-active {
+    -fx-background-color: linear-gradient(to right, rgba(74,130,255,0.22), rgba(111,77,255,0.18));
+    -fx-border-color: rgba(100,150,255,0.35);
+    -fx-border-radius: 10px;
+    -fx-border-width: 1px;
+}
+
+.chat-contact-avatar {
+    -fx-min-width: 40px;
+    -fx-min-height: 40px;
+    -fx-max-width: 40px;
+    -fx-max-height: 40px;
+    -fx-background-color: linear-gradient(to bottom right, #4a82ff, #9f7cff);
+    -fx-background-radius: 10px;
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: 800;
+    -fx-alignment: center;
+}
+
+.chat-contact-name {
+    -fx-text-fill: #e8eeff;
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+}
+
+.chat-contact-role {
+    -fx-text-fill: #5a6a8a;
+    -fx-font-size: 12px;
+}
+
+/* Messages panel */
+.chat-messages-panel {
+    -fx-background-color: #0d1220;
+}
+
+.chat-empty-state {
+    -fx-background-color: transparent;
+}
+
+.chat-empty-icon {
+    -fx-font-size: 52px;
+    -fx-alignment: center;
+}
+
+.chat-empty-title {
+    -fx-text-fill: #e8eeff;
+    -fx-font-size: 20px;
+    -fx-font-weight: 800;
+    -fx-alignment: center;
+}
+
+.chat-empty-sub {
+    -fx-text-fill: #5a6a8a;
+    -fx-font-size: 14px;
+    -fx-text-alignment: center;
+    -fx-alignment: center;
+}
+
+/* Conversation header */
+.chat-conv-header {
+    -fx-background-color: #0f1520;
+    -fx-border-color: transparent transparent rgba(255,255,255,0.06) transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.chat-conv-avatar {
+    -fx-min-width: 42px;
+    -fx-min-height: 42px;
+    -fx-max-width: 42px;
+    -fx-max-height: 42px;
+    -fx-background-color: linear-gradient(to bottom right, #4a82ff, #9f7cff);
+    -fx-background-radius: 10px;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: 800;
+    -fx-alignment: center;
+}
+
+.chat-conv-name {
+    -fx-text-fill: #f0f4ff;
+    -fx-font-size: 15px;
+    -fx-font-weight: 700;
+}
+
+.chat-conv-role {
+    -fx-text-fill: #5a6a8a;
+    -fx-font-size: 12px;
+}
+
+.chat-delete-conv-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #ff6b7a;
+    -fx-font-size: 12px;
+    -fx-border-color: rgba(255,100,120,0.4);
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 5 12;
+    -fx-cursor: hand;
+}
+
+.chat-delete-conv-btn:hover {
+    -fx-background-color: rgba(255,100,120,0.1);
+}
+
+/* Messages */
+.chat-messages-scroll {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.chat-messages-scroll .viewport { -fx-background-color: transparent; }
+
+.chat-messages-box {
+    -fx-background-color: transparent;
+}
+
+.chat-bubble-mine {
+    -fx-background-color: linear-gradient(to bottom right, #4a82ff, #6b4dff);
+    -fx-background-radius: 14px 14px 4px 14px;
+    -fx-padding: 10 14;
+    -fx-max-width: 420px;
+}
+
+.chat-bubble-theirs {
+    -fx-background-color: #1a2540;
+    -fx-background-radius: 14px 14px 14px 4px;
+    -fx-border-color: rgba(100,140,255,0.2);
+    -fx-border-radius: 14px 14px 14px 4px;
+    -fx-border-width: 1px;
+    -fx-padding: 10 14;
+    -fx-max-width: 420px;
+}
+
+.chat-bubble-text {
+    -fx-text-fill: #f0f4ff;
+    -fx-font-size: 14px;
+    -fx-wrap-text: true;
+}
+
+.chat-bubble-time {
+    -fx-text-fill: rgba(200,210,255,0.5);
+    -fx-font-size: 11px;
+}
+
+.chat-msg-action-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: rgba(200,210,255,0.6);
+    -fx-font-size: 11px;
+    -fx-padding: 0 4;
+    -fx-cursor: hand;
+}
+
+.chat-msg-action-btn:hover {
+    -fx-text-fill: #ffffff;
+}
+
+/* Input bar */
+.chat-input-bar {
+    -fx-background-color: #0f1520;
+    -fx-border-color: rgba(255,255,255,0.06) transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+}
+
+.chat-input-field {
+    -fx-background-color: #1a2540;
+    -fx-text-fill: #f0f4ff;
+    -fx-prompt-text-fill: #4a5a7a;
+    -fx-background-radius: 10px;
+    -fx-border-color: rgba(100,140,255,0.25);
+    -fx-border-radius: 10px;
+    -fx-border-width: 1px;
+    -fx-font-size: 14px;
+    -fx-padding: 10 14;
+}
+
+.chat-input-field:focused {
+    -fx-border-color: rgba(100,150,255,0.7);
+}
+
+.chat-send-btn {
+    -fx-background-color: linear-gradient(to right, #4a82ff, #6b4dff);
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+    -fx-background-radius: 10px;
+    -fx-padding: 10 20;
+    -fx-cursor: hand;
+}
+
+.chat-send-btn:hover {
+    -fx-opacity: 0.9;
+}

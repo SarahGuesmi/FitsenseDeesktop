@@ -102,6 +102,14 @@ public class ObjectifSportifService implements CRUD<ObjectifSportif> {
         }
     }
 
+    public void deleteByProfilePhysiqueId(UUID profileId) throws SQLException {
+        String sql = "DELETE FROM `objectif_sportif` WHERE `profile_physique_id` = ?";
+        try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
+            stmt.setBytes(1, utils.UuidUtil.toBytes16(profileId));
+            stmt.executeUpdate();
+        }
+    }
+
     @Override
     public void createPrepared(ObjectifSportif o) throws SQLException {
         UUID newId = java.util.UUID.randomUUID();

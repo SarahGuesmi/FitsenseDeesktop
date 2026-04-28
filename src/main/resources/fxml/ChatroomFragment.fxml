@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<HBox styleClass="chat-root"
+      stylesheets="@../css/chatroom.css"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controllers.ChatroomController"
+      VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS"
+      minHeight="400.0">
+   <children>
+
+      <!-- LEFT: contacts list -->
+      <VBox prefWidth="260.0" minWidth="220.0" maxWidth="260.0" styleClass="chat-contacts-panel">
+         <children>
+            <Label styleClass="chat-contacts-title" text="CONVERSATIONS" />
+            <ScrollPane fitToWidth="true" styleClass="chat-contacts-scroll" VBox.vgrow="ALWAYS">
+               <content>
+                  <VBox fx:id="contactsListBox" spacing="4.0" styleClass="chat-contacts-list">
+                     <padding><Insets bottom="8.0" left="8.0" right="8.0" top="8.0" /></padding>
+                  </VBox>
+               </content>
+            </ScrollPane>
+         </children>
+         <padding><Insets bottom="12.0" left="12.0" right="12.0" top="16.0" /></padding>
+      </VBox>
+
+      <!-- RIGHT: message area — StackPane so empty/active overlay each other -->
+      <StackPane HBox.hgrow="ALWAYS" styleClass="chat-messages-panel">
+         <children>
+
+            <!-- Empty state -->
+            <VBox fx:id="emptyState" alignment="CENTER" spacing="12.0" styleClass="chat-empty-state">
+               <children>
+                  <Label styleClass="chat-empty-icon" text="💬" />
+                  <Label styleClass="chat-empty-title" text="Select a conversation" />
+                  <Label styleClass="chat-empty-sub" text="Choose a contact from the list to start messaging." wrapText="true" />
+               </children>
+            </VBox>
+
+            <!-- Active conversation -->
+            <VBox fx:id="conversationArea" managed="false" visible="false">
+               <children>
+                  <!-- Header -->
+                  <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="chat-conv-header">
+                     <children>
+                        <Label fx:id="convAvatar" styleClass="chat-conv-avatar" text="?" />
+                        <VBox HBox.hgrow="ALWAYS" spacing="2.0">
+                           <children>
+                              <Label fx:id="convName" styleClass="chat-conv-name" text="" />
+                              <Label fx:id="convRole" styleClass="chat-conv-role" text="" />
+                           </children>
+                        </VBox>
+                        <Button mnemonicParsing="false" onAction="#onDeleteConversation"
+                                styleClass="chat-delete-conv-btn" text="🗑 Delete conversation" />
+                     </children>
+                     <padding><Insets bottom="12.0" left="16.0" right="16.0" top="12.0" /></padding>
+                  </HBox>
+
+                  <!-- Messages scroll — takes all remaining height -->
+                  <ScrollPane fx:id="messagesScroll" fitToWidth="true"
+                              styleClass="chat-messages-scroll" VBox.vgrow="ALWAYS">
+                     <content>
+                        <VBox fx:id="messagesBox" spacing="8.0" styleClass="chat-messages-box">
+                           <padding><Insets bottom="16.0" left="16.0" right="16.0" top="16.0" /></padding>
+                        </VBox>
+                     </content>
+                  </ScrollPane>
+
+                  <!-- Input bar -->
+                  <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="chat-input-bar">
+                     <children>
+                        <TextField fx:id="messageInput" promptText="Type a message..."
+                                   styleClass="chat-input-field" HBox.hgrow="ALWAYS" />
+                        <Button mnemonicParsing="false" onAction="#onSendMessage"
+                                styleClass="chat-send-btn" text="Send ➤" />
+                     </children>
+                     <padding><Insets bottom="12.0" left="16.0" right="16.0" top="12.0" /></padding>
+                  </HBox>
+               </children>
+            </VBox>
+
+         </children>
+      </StackPane>
+
+   </children>
+</HBox>

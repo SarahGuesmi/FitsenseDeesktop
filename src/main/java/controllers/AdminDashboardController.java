@@ -17,29 +17,43 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import models.User;
 import services.UserService;
+import services.NotificationService;
+import models.Notification;
+import utils.SidebarAvatarLoader;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.web.WebView;
+import com.google.gson.Gson;
+import models.ChatMessage;
+import models.LoginAttempt;
+import services.ChatService;
+import services.LoginSecurityService;
 
 public class AdminDashboardController {
     private static final String ADMIN_EMAIL = "sarahguesmi223@gmail.com";
 
     @FXML
+    private ScrollPane adminDashboardScroll;
+    @FXML
     private VBox adminDashboardPane;
     @FXML
     private VBox userManagementPane;
+    @FXML
+    private WebView chartsWebView;
     @FXML
     private Button adminDashboardBtn;
     @FXML
@@ -48,6 +62,24 @@ public class AdminDashboardController {
     private Button profileBtn;
     @FXML
     private VBox profilePane;
+    @FXML
+    private Button notificationsBtn;
+    @FXML
+    private VBox notificationsPane;
+    @FXML
+    private VBox notificationsListBox;
+    @FXML
+    private Button securityBtn;
+    @FXML
+    private javafx.scene.control.ScrollPane securityPane;
+    @FXML private ImageView sidebarAvatarView;
+    @FXML private Label     sidebarAvatarInitials;
+    @FXML
+    private Button markAllReadBtn;
+    @FXML
+    private Button chatroomBtn;
+    @FXML
+    private VBox chatroomPane;
     @FXML
     private ProfileFragmentController adminProfileController;
     @FXML
@@ -116,10 +148,15 @@ public class AdminDashboardController {
     private ComboBox<String> userRoleFilterCombo;
 
     private final UserService userService = new UserService();
+    private final NotificationService notificationService = new NotificationService();
+    private final ChatService chatService = new ChatService();
+    private final LoginSecurityService loginSecurityService = new LoginSecurityService();
+    private final Gson gson = new Gson();
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy");
     private List<User> allManagedUsers = List.of();
     private User editingUser;
     private User pendingDeleteUser;
+    private String lastChartsJson;
 
     @FXML
     private void initialize() {
@@ -130,7 +167,21 @@ public class AdminDashboardController {
             adminProfileController.setAfterSaveCallback(this::refreshNavbar);
         }
         refreshNavbar();
-        showAdminDashboard();
+        SidebarAvatarLoader.load(AppSession.getCurrentUser(), sidebarAvatarView, sidebarAvatarInitials);
+        
+        if (chartsWebView != null) {
+            chartsWebView.getEngine().getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
+                if (newState == javafx.concurrent.Worker.State.SUCCEEDED) {
+                    if (lastChartsJson != null) {
+                        chartsWebView.getEngine().executeScript("if(window.updateCharts) updateCharts(" + lastChartsJson + ")");
+                    }
+                }
+            });
+            chartsWebView.getEngine().load(Objects.requireNonNull(getClass().getResource("/html/dashboard_charts.html")).toExternalForm());
+        }
+
+        // Delay showAdminDashboard slightly to ensure UI is ready
+        javafx.application.Platform.runLater(this::showAdminDashboard);
     }
 
     private void refreshNavbar() {
@@ -210,6 +261,88 @@ public class AdminDashboardController {
     }
 
     @FXML
+    private void onShowChatroom() {
+        hideAllPanes();
+        if (chatroomPane != null) { chatroomPane.setManaged(true); chatroomPane.setVisible(true); }
+        setActiveSidebar(chatroomBtn);
+    }
+
+    @FXML
+    private void onShowNotifications() {
+        hideAllPanes();
+        if (notificationsPane != null) { notificationsPane.setManaged(true); notificationsPane.setVisible(true); }
+        setActiveSidebar(notificationsBtn);
+        renderNotifications();
+    }
+
+    @FXML
+    private void onShowSecurity() {
+        hideAllPanes();
+        if (securityPane != null) { securityPane.setManaged(true); securityPane.setVisible(true); }
+        setActiveSidebar(securityBtn);
+    }
+
+    @FXML
+    private void onMarkAllRead() {
+        notificationService.markAllRead();
+        renderNotifications();
+    }
+
+    private void renderNotifications() {
+        if (notificationsListBox == null) return;
+        notificationsListBox.getChildren().clear();
+        java.util.List<Notification> list = notificationService.readAll();
+        if (list.isEmpty()) {
+            Label empty = new Label("No notifications yet.");
+            empty.setStyle("-fx-text-fill: #8b96b0; -fx-font-size: 14px; -fx-padding: 20 0;");
+            notificationsListBox.getChildren().add(empty);
+            return;
+        }
+        java.time.format.DateTimeFormatter fmt = java.time.format.DateTimeFormatter.ofPattern("dd/MMM/yyyy HH:mm");
+        for (Notification n : list) {
+            HBox row = new HBox(14);
+            row.getStyleClass().add(n.isRead() ? "notif-row-read" : "notif-row-unread");
+            row.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+
+            // Avatar icon
+            Label avatar = new Label("👤");
+            avatar.getStyleClass().add("notif-avatar");
+
+            // Info
+            VBox info = new VBox(4);
+            HBox.setHgrow(info, Priority.ALWAYS);
+            Label msg = new Label(n.getMessage());
+            msg.getStyleClass().add(n.isRead() ? "notif-msg-read" : "notif-msg");
+            msg.setWrapText(true);
+            String timeStr = n.getCreatedAt() != null ? n.getCreatedAt().format(fmt) : "";
+            HBox meta = new HBox(8);
+            meta.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+            Label time = new Label("🕐 " + timeStr);
+            time.getStyleClass().add("notif-time");
+            Label dot = new Label("•");
+            dot.setStyle("-fx-text-fill: #4a5a7a;");
+            Label viewLink = new Label("View Profile");
+            viewLink.getStyleClass().add("notif-view-link");
+            meta.getChildren().addAll(time, dot, viewLink);
+            info.getChildren().addAll(msg, meta);
+
+            // Mark read button
+            Button markBtn = new Button(n.isRead() ? "Read" : "Mark as Read");
+            markBtn.getStyleClass().add(n.isRead() ? "notif-btn-read" : "notif-btn");
+            markBtn.setDisable(n.isRead());
+            int notifId = n.getId();
+            markBtn.setOnAction(e -> {
+                notificationService.markRead(notifId);
+                renderNotifications();
+            });
+
+            row.getChildren().addAll(avatar, info, markBtn);
+            row.setPadding(new javafx.geometry.Insets(14, 16, 14, 16));
+            notificationsListBox.getChildren().add(row);
+        }
+    }
+
+    @FXML
     private void onClearUserFilters() {
         if (userSearchField != null) {
             userSearchField.clear();
@@ -224,10 +357,29 @@ public class AdminDashboardController {
     }
 
     @FXML
+    private StackPane logoutOverlay;
+
+    @FXML
     private void onLogout() {
+        if (logoutOverlay != null) {
+            logoutOverlay.setManaged(true);
+            logoutOverlay.setVisible(true);
+        }
+    }
+
+    @FXML
+    private void onConfirmLogout() {
         AppSession.setCurrentUser(null);
         AppSession.resetOnboarding();
         switchScene("/fxml/SignInView.fxml", "/css/signin.css");
+    }
+
+    @FXML
+    private void onCancelLogout() {
+        if (logoutOverlay != null) {
+            logoutOverlay.setManaged(false);
+            logoutOverlay.setVisible(false);
+        }
     }
 
     @FXML
@@ -567,56 +719,47 @@ public class AdminDashboardController {
         showModal(editUserModal);
     }
 
-    private void showAdminDashboard() {
-        adminDashboardPane.setManaged(true);
-        adminDashboardPane.setVisible(true);
-        userManagementPane.setManaged(false);
-        userManagementPane.setVisible(false);
-        if (profilePane != null) {
-            profilePane.setManaged(false);
-            profilePane.setVisible(false);
+    private void hideAllPanes() {
+        if (adminDashboardScroll != null) {
+            adminDashboardScroll.setManaged(false);
+            adminDashboardScroll.setVisible(false);
         }
+        adminDashboardPane.setManaged(false); adminDashboardPane.setVisible(false);
+        userManagementPane.setManaged(false); userManagementPane.setVisible(false);
+        if (profilePane != null)       { profilePane.setManaged(false);       profilePane.setVisible(false); }
+        if (notificationsPane != null) { notificationsPane.setManaged(false); notificationsPane.setVisible(false); }
+        if (chatroomPane != null)      { chatroomPane.setManaged(false);      chatroomPane.setVisible(false); }
+        if (securityPane != null)      { securityPane.setManaged(false);      securityPane.setVisible(false); }
+    }
+
+    private void showAdminDashboard() {
+        hideAllPanes();
+        if (adminDashboardScroll != null) {
+            adminDashboardScroll.setManaged(true);
+            adminDashboardScroll.setVisible(true);
+        }
+        adminDashboardPane.setManaged(true); adminDashboardPane.setVisible(true);
         setActiveSidebar(adminDashboardBtn);
         refreshData();
     }
 
     private void showUserManagement() {
-        adminDashboardPane.setManaged(false);
-        adminDashboardPane.setVisible(false);
-        userManagementPane.setManaged(true);
-        userManagementPane.setVisible(true);
-        if (profilePane != null) {
-            profilePane.setManaged(false);
-            profilePane.setVisible(false);
-        }
+        hideAllPanes();
+        userManagementPane.setManaged(true); userManagementPane.setVisible(true);
         setActiveSidebar(userManagementBtn);
         refreshData();
     }
 
     private void showProfile() {
-        adminDashboardPane.setManaged(false);
-        adminDashboardPane.setVisible(false);
-        userManagementPane.setManaged(false);
-        userManagementPane.setVisible(false);
-        if (profilePane != null) {
-            profilePane.setManaged(true);
-            profilePane.setVisible(true);
-        }
+        hideAllPanes();
+        if (profilePane != null) { profilePane.setManaged(true); profilePane.setVisible(true); }
         setActiveSidebar(profileBtn);
-        if (adminProfileController != null) {
-            adminProfileController.reloadFromSession();
-        }
+        if (adminProfileController != null) adminProfileController.reloadFromSession();
     }
 
     private void setActiveSidebar(Button selectedButton) {
-        if (adminDashboardBtn != null) {
-            adminDashboardBtn.getStyleClass().remove("side-link-active");
-        }
-        if (userManagementBtn != null) {
-            userManagementBtn.getStyleClass().remove("side-link-active");
-        }
-        if (profileBtn != null) {
-            profileBtn.getStyleClass().remove("side-link-active");
+        for (Button b : new Button[]{adminDashboardBtn, userManagementBtn, profileBtn, notificationsBtn, chatroomBtn, securityBtn}) {
+            if (b != null) b.getStyleClass().remove("side-link-active");
         }
         if (selectedButton != null && !selectedButton.getStyleClass().contains("side-link-active")) {
             selectedButton.getStyleClass().add("side-link-active");
@@ -703,9 +846,68 @@ public class AdminDashboardController {
             if (twoFaLabel != null) {
                 twoFaLabel.setText(String.valueOf(twoFaCount));
             }
+
+            // --- Charts Data ---
+            updateCharts(users, twoFaCount);
+
         } catch (SQLException e) {
             allManagedUsers = List.of();
             usersTable.setItems(FXCollections.observableArrayList());
+        }
+    }
+
+    private void updateCharts(List<User> users, long twoFaEnabled) {
+        if (chartsWebView == null) return;
+
+        Map<String, Object> data = new HashMap<>();
+
+        // 1. Roles
+        long adminC = users.stream().filter(u -> safe(u.getRolesJson()).contains("ROLE_ADMIN")).count();
+        long coachC = users.stream().filter(u -> safe(u.getRolesJson()).contains("ROLE_COACH")).count();
+        long userC = users.stream().filter(u -> safe(u.getRolesJson()).contains("ROLE_USER") && !safe(u.getRolesJson()).contains("ROLE_COACH")).count();
+        data.put("roles", Map.of(
+            "labels", List.of("Admins", "Coaches", "Athletes"),
+            "values", List.of(adminC, coachC, userC)
+        ));
+
+        // 2. 2FA
+        data.put("twoFa", Map.of("enabled", twoFaEnabled, "disabled", users.size() - twoFaEnabled));
+
+        // 3. Logins (last 30 days)
+        List<LoginAttempt> history = loginSecurityService.getAllHistory();
+        LocalDate today = LocalDate.now();
+        List<String> labels = new ArrayList<>();
+        List<Long> success = new ArrayList<>();
+        List<Long> failure = new ArrayList<>();
+        for (int i = 29; i >= 0; i--) {
+            LocalDate d = today.minusDays(i);
+            labels.add(d.format(DateTimeFormatter.ofPattern("dd MMM")));
+            success.add(history.stream().filter(a -> a.getTimestamp().toLocalDate().equals(d) && "SUCCESS".equals(a.getStatus())).count());
+            failure.add(history.stream().filter(a -> a.getTimestamp().toLocalDate().equals(d) && "FAILURE".equals(a.getStatus())).count());
+        }
+        data.put("logins", Map.of("labels", labels, "success", success, "failure", failure));
+
+        // 4. Messages
+        try {
+            List<ChatMessage> msgs = chatService.getAllMessages();
+            List<Long> msgCounts = new ArrayList<>();
+            for (int i = 29; i >= 0; i--) {
+                LocalDate d = today.minusDays(i);
+                msgCounts.add(msgs.stream().filter(m -> m.getSentAt().toLocalDate().equals(d)).count());
+            }
+            data.put("messages", Map.of("labels", labels, "values", msgCounts));
+        } catch (SQLException ignored) {
+            data.put("messages", Map.of("labels", labels, "values", Collections.nCopies(30, 0)));
+        }
+
+        // 5. Notifications
+        List<Notification> notifs = notificationService.readAll();
+        Map<String, Long> notifCounts = notifs.stream().collect(Collectors.groupingBy(Notification::getType, Collectors.counting()));
+        data.put("notifs", Map.of("labels", new ArrayList<>(notifCounts.keySet()), "values", new ArrayList<>(notifCounts.values())));
+
+        this.lastChartsJson = gson.toJson(data);
+        if (chartsWebView.getEngine().getLoadWorker().getState() == javafx.concurrent.Worker.State.SUCCEEDED) {
+            chartsWebView.getEngine().executeScript("if(window.updateCharts) updateCharts(" + lastChartsJson + ")");
         }
     }
 

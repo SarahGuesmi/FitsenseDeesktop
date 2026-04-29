@@ -126,3 +126,15 @@
 .btn-signin-inline:hover {
     -fx-text-fill: #bea8ff;
 }
+
+.form-error-label {
+    -fx-text-fill: #ff5c6e;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-padding: 2 0 0 4;
+}
+
+.input-field-error {
+    -fx-border-color: #ff5c6e;
+    -fx-border-width: 1.5px;
+}

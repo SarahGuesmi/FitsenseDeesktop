@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="ca-scroll" stylesheets="@../css/coach-mental-assessments.css" vbarPolicy="AS_NEEDED" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.CoachMentalAssessmentsFragmentController">
+   <content>
+      <VBox maxWidth="Infinity" spacing="20.0" styleClass="ca-outer">
+         <children>
+            <VBox spacing="6.0" styleClass="ca-overview-block">
+               <children>
+                  <HBox alignment="CENTER_LEFT" spacing="14.0">
+                     <children>
+                        <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                           <children>
+                              <Label styleClass="ca-overview-title" text="Mental Health Overview" />
+                              <Label styleClass="ca-overview-subtitle" text="Monitor the wellbeing of all users on the platform" wrapText="true" />
+                           </children>
+                        </VBox>
+                        <Button fx:id="manageRecommendationsBtn" mnemonicParsing="false" onAction="#onManageRecommendations" styleClass="ca-manage-rec-btn" text="📋  Manage Recommendations" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+            <VBox spacing="16.0" styleClass="ca-card">
+               <children>
+                  <HBox alignment="CENTER_LEFT" spacing="14.0">
+                     <children>
+                        <Label styleClass="ca-accent-bar" text="" />
+                        <Label styleClass="ca-card-title" text="Latest Assessments" />
+                        <HBox alignment="CENTER_RIGHT" spacing="12.0" HBox.hgrow="ALWAYS">
+                           <children>
+                              <TextField fx:id="searchField" promptText="🔍  Search user..." styleClass="ca-search-field" />
+                              <ComboBox fx:id="statusFilterCombo" prefWidth="160.0" styleClass="ca-filter-combo" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </HBox>
+                  <TableView fx:id="assessmentsTable" minHeight="360.0" styleClass="ca-table" VBox.vgrow="ALWAYS">
+                     <columns>
+                        <TableColumn fx:id="colUser" prefWidth="220.0" text="USER" />
+                        <TableColumn fx:id="colDate" prefWidth="120.0" text="DATE" />
+                        <TableColumn fx:id="colStress" prefWidth="72.0" text="STRESS" />
+                        <TableColumn fx:id="colSleep" prefWidth="72.0" text="SLEEP" />
+                        <TableColumn fx:id="colMood" prefWidth="72.0" text="MOOD" />
+                        <TableColumn fx:id="colMotivation" prefWidth="96.0" text="MOTIVATION" />
+                        <TableColumn fx:id="colScore" prefWidth="72.0" text="SCORE" />
+                        <TableColumn fx:id="colStatus" prefWidth="100.0" text="STATUS" />
+                        <TableColumn fx:id="colAction" prefWidth="140.0" text="ACTION" />
+                     </columns>
+                  </TableView>
+               </children>
+               <padding>
+                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+               </padding>
+            </VBox>
+         </children>
+         <padding>
+            <Insets bottom="8.0" left="4.0" right="4.0" top="4.0" />
+         </padding>
+      </VBox>
+   </content>
+</ScrollPane>

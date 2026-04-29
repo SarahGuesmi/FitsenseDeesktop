@@ -40,6 +40,11 @@ public class GenderController {
     }
 
     @FXML
+    private void onBack() {
+        switchScene("/fxml/WeightView.fxml", "/css/onboarding.css");
+    }
+
+    @FXML
     private void onContinue() {
         if (selectedGender == null) {
             return;

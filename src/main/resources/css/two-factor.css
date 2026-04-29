@@ -1,0 +1,307 @@
+.tfa-root {
+    -fx-background-color: #0d121f;
+    -fx-min-height: 700px;
+}
+
+.tfa-title {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 22px;
+    -fx-font-weight: 800;
+}
+
+.tfa-subtitle {
+    -fx-text-fill: #a6a8b6;
+    -fx-font-size: 14px;
+    -fx-max-width: 600px;
+}
+
+/* Status card */
+.tfa-status-card {
+    -fx-background-color: #13131b;
+    -fx-background-radius: 14px;
+    -fx-border-radius: 14px;
+    -fx-border-color: rgba(255,255,255,0.07);
+    -fx-border-width: 1px;
+}
+
+.tfa-status-icon {
+    -fx-font-size: 36px;
+}
+
+.tfa-status-title {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 16px;
+    -fx-font-weight: 700;
+}
+
+.tfa-status-desc {
+    -fx-text-fill: #a6a8b6;
+    -fx-font-size: 13px;
+}
+
+.tfa-toggle-btn {
+    -fx-background-color: #9f7cff;
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+    -fx-padding: 10px 22px;
+    -fx-background-radius: 10px;
+    -fx-cursor: hand;
+    -fx-background-insets: 0;
+}
+
+.tfa-toggle-btn:hover {
+    -fx-background-color: #b89aff;
+}
+
+.tfa-toggle-btn.enabled {
+    -fx-background-color: rgba(255,92,110,0.15);
+    -fx-text-fill: #ff5c6e;
+    -fx-border-color: rgba(255,92,110,0.3);
+    -fx-border-width: 1px;
+    -fx-border-radius: 10px;
+}
+
+.tfa-toggle-btn.enabled:hover {
+    -fx-background-color: rgba(255,92,110,0.25);
+}
+
+/* Step cards */
+.tfa-step-card {
+    -fx-background-color: #13131b;
+    -fx-background-radius: 12px;
+    -fx-border-radius: 12px;
+    -fx-border-color: rgba(255,255,255,0.06);
+    -fx-border-width: 1px;
+}
+
+.tfa-step-badge {
+    -fx-background-color: #9f7cff;
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: 800;
+    -fx-min-width: 28px;
+    -fx-min-height: 28px;
+    -fx-max-width: 28px;
+    -fx-max-height: 28px;
+    -fx-background-radius: 50%;
+    -fx-alignment: CENTER;
+}
+
+.tfa-step-title {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 15px;
+    -fx-font-weight: 700;
+}
+
+.tfa-step-desc {
+    -fx-text-fill: #a6a8b6;
+    -fx-font-size: 13px;
+}
+
+/* QR code */
+.tfa-qr-frame {
+    -fx-background-color: white;
+    -fx-background-radius: 12px;
+    -fx-padding: 12px;
+}
+
+.tfa-qr-loading {
+    -fx-text-fill: #888;
+    -fx-font-size: 13px;
+}
+
+/* Secret key box */
+.tfa-secret-box {
+    -fx-background-color: rgba(159,124,255,0.08);
+    -fx-background-radius: 8px;
+    -fx-border-color: rgba(159,124,255,0.2);
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+}
+
+.tfa-secret-label {
+    -fx-text-fill: #a6a8b6;
+    -fx-font-size: 12px;
+}
+
+.tfa-secret-value {
+    -fx-text-fill: #9f7cff;
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+    -fx-font-family: "Courier New", monospace;
+}
+
+/* Code input */
+.tfa-code-field {
+    -fx-background-color: #0d0d14;
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: #6f7285;
+    -fx-font-size: 20px;
+    -fx-font-weight: 700;
+    -fx-alignment: CENTER;
+    -fx-padding: 12px 16px;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-border-color: rgba(255,255,255,0.1);
+    -fx-background-insets: 0;
+    -fx-letter-spacing: 6px;
+}
+
+.tfa-code-field:focused {
+    -fx-border-color: #9f7cff;
+}
+
+/* Activate button */
+.tfa-activate-btn {
+    -fx-background-color: #9f7cff;
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+    -fx-padding: 12px 24px;
+    -fx-background-radius: 10px;
+    -fx-cursor: hand;
+    -fx-background-insets: 0;
+}
+
+.tfa-activate-btn:hover {
+    -fx-background-color: #b89aff;
+}
+
+/* Disable button */
+.tfa-disable-btn {
+    -fx-background-color: rgba(255,92,110,0.12);
+    -fx-text-fill: #ff5c6e;
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+    -fx-padding: 12px 24px;
+    -fx-background-radius: 10px;
+    -fx-border-color: rgba(255,92,110,0.3);
+    -fx-border-width: 1px;
+    -fx-border-radius: 10px;
+    -fx-cursor: hand;
+    -fx-background-insets: 0;
+}
+
+.tfa-disable-btn:hover {
+    -fx-background-color: rgba(255,92,110,0.22);
+}
+
+/* Cancel button */
+.tfa-cancel-btn {
+    -fx-background-color: rgba(255,255,255,0.06);
+    -fx-text-fill: #a6a8b6;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-padding: 12px 20px;
+    -fx-background-radius: 10px;
+    -fx-cursor: hand;
+    -fx-background-insets: 0;
+}
+
+.tfa-cancel-btn:hover {
+    -fx-background-color: rgba(255,255,255,0.1);
+}
+
+/* Error label */
+.tfa-error {
+    -fx-text-fill: #ff5c6e;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+}
+
+/* Verify screen */
+.tfa-verify-icon {
+    -fx-font-size: 52px;
+    -fx-alignment: CENTER;
+}
+
+.tfa-verify-input {
+    -fx-background-color: #13131b;
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: #6f7285;
+    -fx-font-size: 28px;
+    -fx-font-weight: 800;
+    -fx-alignment: CENTER;
+    -fx-padding: 16px;
+    -fx-background-radius: 12px;
+    -fx-border-radius: 12px;
+    -fx-border-color: rgba(255,255,255,0.1);
+    -fx-background-insets: 0;
+    -fx-letter-spacing: 8px;
+}
+
+.tfa-verify-input:focused {
+    -fx-border-color: #9f7cff;
+}
+
+/* Make the ScrollPane wrapper dark to match the app theme */
+.tfa-scroll-pane {
+    -fx-background: #0d121f;
+    -fx-background-color: #0d121f;
+}
+
+.tfa-scroll-pane .viewport {
+    -fx-background-color: #0d121f;
+}
+
+.tfa-scroll-pane .scroll-bar {
+    -fx-background-color: #0d121f;
+}
+
+.tfa-scroll-pane > .scroll-bar:vertical > .track,
+.tfa-scroll-pane > .scroll-bar:horizontal > .track {
+    -fx-background-color: #0d121f;
+}
+
+/* ── Login history ─────────────────────────────────────────────────────────── */
+
+.tfa-history-row {
+    -fx-background-color: #13131b;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-border-color: rgba(255,255,255,0.06);
+    -fx-border-width: 1px;
+    -fx-padding: 12px 16px;
+}
+
+.tfa-history-icon {
+    -fx-font-size: 18px;
+    -fx-min-width: 24px;
+}
+
+.tfa-history-location {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+}
+
+.tfa-history-detail {
+    -fx-text-fill: #6f7285;
+    -fx-font-size: 12px;
+}
+
+.tfa-history-time {
+    -fx-text-fill: #a6a8b6;
+    -fx-font-size: 12px;
+    -fx-min-width: 130px;
+    -fx-alignment: CENTER_RIGHT;
+}
+
+.tfa-badge-success {
+    -fx-background-color: rgba(52,211,153,0.12);
+    -fx-text-fill: #34d399;
+    -fx-font-size: 11px;
+    -fx-font-weight: 700;
+    -fx-padding: 4px 10px;
+    -fx-background-radius: 20px;
+}
+
+.tfa-badge-fail {
+    -fx-background-color: rgba(255,92,110,0.12);
+    -fx-text-fill: #ff5c6e;
+    -fx-font-size: 11px;
+    -fx-font-weight: 700;
+    -fx-padding: 4px 10px;
+    -fx-background-radius: 20px;
+}

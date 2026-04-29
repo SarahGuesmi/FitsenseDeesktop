@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="16.0" styleClass="latest-assessments-root" stylesheets="@../css/latest-assessments.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.CoachLatestAssessmentsFragmentController">
+   <children>
+      <HBox alignment="CENTER_LEFT" spacing="16.0">
+         <children>
+            <HBox alignment="CENTER_LEFT" spacing="8.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <VBox styleClass="title-indicator" prefHeight="24.0" prefWidth="4.0" />
+                  <Label styleClass="page-title" text="Latest Assessments" />
+               </children>
+            </HBox>
+            <TextField fx:id="searchField" promptText="Search user..." styleClass="search-field" prefWidth="250.0" />
+            <ComboBox fx:id="statusCombo" promptText="All Statuses" styleClass="status-combo" prefWidth="150.0" />
+         </children>
+      </HBox>
+      <TableView fx:id="assessmentsTable" styleClass="assessments-table" VBox.vgrow="ALWAYS">
+         <columns>
+            <TableColumn fx:id="colUser" text="USER" prefWidth="250.0" />
+            <TableColumn fx:id="colDate" text="DATE" prefWidth="150.0" />
+            <TableColumn fx:id="colStress" text="STRESS" prefWidth="80.0" />
+            <TableColumn fx:id="colSleep" text="SLEEP" prefWidth="80.0" />
+            <TableColumn fx:id="colMood" text="MOOD" prefWidth="80.0" />
+            <TableColumn fx:id="colMotivation" text="MOTIVATION" prefWidth="110.0" />
+            <TableColumn fx:id="colScore" text="SCORE" prefWidth="80.0" />
+            <TableColumn fx:id="colStatus" text="STATUS" prefWidth="120.0" />
+            <TableColumn fx:id="colAction" text="ACTION" prefWidth="160.0" />
+         </columns>
+      </TableView>
+   </children>
+   <padding>
+      <Insets bottom="8.0" left="4.0" right="4.0" top="4.0" />
+   </padding>
+</VBox>

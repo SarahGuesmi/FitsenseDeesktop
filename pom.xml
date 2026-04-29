@@ -1,71 +1,125 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+    pom.xml — fichier de configuration Maven
+    ==========================================
+    Maven est l'outil qui gère le projet : il télécharge les bibliothèques
+    (dépendances), compile le code Java, et lance l'application.
+    Pour lancer l'app : mvn javafx:run
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <!-- Identité du projet Maven -->
     <groupId>org.example</groupId>
     <artifactId>FitSense</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
+        <!-- On compile en Java 17 -->
         <maven.compiler.release>17</maven.compiler.release>
+        <!-- Encodage des fichiers source en UTF-8 -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencies>
+
+        <!-- ── Base de données ─────────────────────────────────────────────── -->
+
+        <!-- Pilote JDBC MySQL : permet à Java de parler à la base de données MySQL.
+             Utilisé dans DbConnection.java via DriverManager.getConnection(...) -->
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
             <version>8.0.33</version>
         </dependency>
+
+        <!-- ── Interface graphique JavaFX ──────────────────────────────────── -->
+
+        <!-- javafx-controls : tous les composants visuels (Button, TextField,
+             TableView, Label, ComboBox...) utilisés dans les fichiers FXML -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
             <version>21</version>
         </dependency>
+
+        <!-- javafx-fxml : permet de charger les fichiers .fxml avec FXMLLoader
+             et de lier les fx:id et onAction aux contrôleurs Java via @FXML -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
             <version>21</version>
         </dependency>
+
+        <!-- javafx-base : classes de base JavaFX (propriétés observables,
+             bindings...) nécessaires au fonctionnement interne de JavaFX -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-base</artifactId>
             <version>21</version>
-        </dependency>        <dependency>
+        </dependency>
+
+        <!-- javafx-media : lecture de fichiers audio/vidéo.
+             Utilisé dans HomeController pour la vidéo de fond (MediaPlayer, MediaView) -->
+        <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-media</artifactId>
             <version>21</version>
         </dependency>
+
+        <!-- javafx-web : contenu HTML/JS via WebView -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-web</artifactId>
             <version>21</version>
         </dependency>
+
+        <!-- ── Sécurité ────────────────────────────────────────────────────── -->
+
+        <!-- BCrypt (Spring Security Crypto) : algorithme de hachage des mots de passe.
+             Utilisé dans UserService.hashPasswordIfPlain() et SignInController
+             pour hasher à l'inscription et vérifier à la connexion.
+             Ex: passwordEncoder.encode("123456") → "$2a$10$xyz..."
+                 passwordEncoder.matches("123456", hash) → true/false -->
         <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20231013</version>
-        </dependency>        <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-crypto</artifactId>
             <version>6.2.1</version>
         </dependency>
+
+        <!-- Requis par spring-security-crypto pour le logging interne -->
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <version>1.2</version>
         </dependency>
+
+        <!-- ── Utilitaires ─────────────────────────────────────────────────── -->
+
+        <!-- Gson (Google) : sérialisation/désérialisation JSON.
+             Utilisé pour le champ roles de User qui est stocké en JSON
+             dans la base de données. Ex: ["ROLE_USER"] ou ["ROLE_ADMIN"] -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.10.1</version>
+        </dependency>
+
+        <!-- SendGrid: emails sent via plain HttpClient REST calls, no SDK needed -->
     </dependencies>
 
     <build>
+        <!-- Indique à Maven que les ressources (fxml, css, images) sont dans src/main/resources -->
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
             </resource>
         </resources>
         <plugins>
+            <!-- Plugin JavaFX Maven : permet de lancer l'app avec "mvn javafx:run".
+                 mainClass pointe vers le point d'entrée de l'application. -->
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>

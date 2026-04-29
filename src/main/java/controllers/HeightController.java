@@ -39,6 +39,11 @@ public class HeightController {
     }
 
     @FXML
+    private void onBack() {
+        switchScene("/fxml/SignUpView.fxml", "/css/signin.css");
+    }
+
+    @FXML
     private void onContinue() {
         AppSession.getOnboardingData().setHeightCm((float) heightSlider.getValue());
         switchScene("/fxml/WeightView.fxml", "/css/onboarding.css");

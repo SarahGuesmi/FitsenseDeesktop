@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!-- Imports des classes JavaFX utilisees dans ce fichier FXML -->
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
@@ -11,51 +12,133 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.media.MediaView?>
 
-<StackPane fx:id="root" minHeight="540.0" minWidth="840.0" prefHeight="620.0" prefWidth="980.0" styleClass="root-home" stylesheets="@../css/home.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.HomeController">
+<!--
+    HomeView.fxml — page d'accueil de FitSense.
+
+    Structure de la vue :
+      StackPane (root) — noeud racine, empile les couches les unes sur les autres
+        ├── StackPane (hero-video-layer) — couche video de fond
+        │     └── MediaView — affiche la video (configuree dans HomeController)
+        ├── Region (hero-dark-overlay) — couche sombre semi-transparente sur la video
+        └── BorderPane — structure principale de la page
+              ├── top : HBox avec les boutons SIGN UP et SIGN IN
+              └── center : VBox avec le logo, titre et bouton CTA
+
+    Lien avec le controleur :
+      fx:controller="controllers.HomeController" → JavaFX instancie HomeController
+      fx:id="root" → injecte ce StackPane dans @FXML StackPane root du controleur
+      onAction="#onSignUp" → appelle la methode onSignUp() dans HomeController
+-->
+<StackPane fx:id="root"
+           minHeight="540.0" minWidth="840.0"
+           prefHeight="620.0" prefWidth="980.0"
+           styleClass="root-home"
+           stylesheets="@../css/home.css"
+           xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="controllers.HomeController">
+
    <children>
-      <!-- Background video from Symfony public/ (URL via WebAssets); sized in controller -->
-      <StackPane maxHeight="Infinity" maxWidth="Infinity" styleClass="hero-video-layer">
+
+      <!-- COUCHE 1 : Video de fond en plein ecran -->
+      <!-- mouseTransparent="true" : les clics passent a travers cette couche -->
+      <StackPane maxHeight="Infinity" maxWidth="Infinity"
+                 mouseTransparent="true"
+                 styleClass="hero-video-layer">
          <children>
-            <MediaView fx:id="backgroundMediaView" preserveRatio="false" smooth="true" />
+            <!-- fx:id="backgroundMediaView" : injecte dans HomeController pour
+                 y attacher le MediaPlayer et redimensionner la video -->
+            <MediaView fx:id="backgroundMediaView"
+                       mouseTransparent="true"
+                       preserveRatio="false"
+                       smooth="true" />
          </children>
       </StackPane>
-      <Region styleClass="hero-dark-overlay" maxWidth="Infinity" maxHeight="Infinity" />
+
+      <!-- COUCHE 2 : Overlay sombre semi-transparent pour rendre le texte lisible -->
+      <!-- mouseTransparent="true" : les clics passent a travers -->
+      <Region maxHeight="Infinity" maxWidth="Infinity"
+              mouseTransparent="true"
+              styleClass="hero-dark-overlay" />
+
+      <!-- COUCHE 3 : Contenu principal de la page -->
       <BorderPane maxWidth="Infinity" maxHeight="Infinity">
+
+         <!-- HAUT : barre de navigation avec les boutons SIGN UP et SIGN IN -->
          <top>
-            <HBox alignment="CENTER_RIGHT" spacing="12.0" styleClass="home-top-bar" BorderPane.alignment="CENTER">
+            <HBox alignment="CENTER_RIGHT" spacing="12.0"
+                  styleClass="home-top-bar"
+                  BorderPane.alignment="CENTER">
                <padding>
                   <Insets bottom="8.0" left="32.0" right="32.0" top="24.0" />
                </padding>
                <children>
-                  <Button fx:id="signUpButton" mnemonicParsing="false" onAction="#onSignUp" styleClass="btn-sign-up" text="SIGN UP" />
-                  <Button fx:id="signInButton" mnemonicParsing="false" onAction="#onSignIn" styleClass="btn-sign-in" text="SIGN IN" />
+                  <!-- Bouton SIGN UP :
+                       fx:id="signUpButton" → injecte dans @FXML Button signUpButton
+                       onAction="#onSignUp" → appelle HomeController.onSignUp()
+                       qui appelle switchScene("/fxml/SignUpView.fxml", ...) -->
+                  <Button fx:id="signUpButton"
+                          mnemonicParsing="false"
+                          onAction="#onSignUp"
+                          styleClass="btn-sign-up"
+                          text="SIGN UP" />
+
+                  <!-- Bouton SIGN IN :
+                       onAction="#onSignIn" → appelle HomeController.onSignIn()
+                       qui appelle switchScene("/fxml/SignInView.fxml", ...) -->
+                  <Button fx:id="signInButton"
+                          mnemonicParsing="false"
+                          onAction="#onSignIn"
+                          styleClass="btn-sign-in"
+                          text="SIGN IN" />
                </children>
             </HBox>
          </top>
+
+         <!-- CENTRE : contenu hero (logo, titre, bouton CTA) -->
          <center>
             <VBox alignment="CENTER" spacing="20.0" BorderPane.alignment="CENTER">
                <children>
-                  <!-- Logo: assign Image in Scene Builder (user graphic) or leave as decorative placeholder -->
-                  <ImageView fx:id="logoImageView" fitHeight="96.0" fitWidth="96.0" pickOnBounds="true" preserveRatio="true" styleClass="logo-image" />
+
+                  <!-- Logo de l'application -->
+                  <ImageView fx:id="logoImageView"
+                             fitHeight="96.0" fitWidth="96.0"
+                             pickOnBounds="true" preserveRatio="true"
+                             styleClass="logo-image" />
+
+                  <!-- Titre principal -->
                   <Label styleClass="brand-title" text="FITSENSE" />
+
+                  <!-- Slogan en deux parties avec couleurs differentes -->
                   <HBox alignment="CENTER" spacing="6.0">
                      <children>
                         <Label styleClass="hero-line-white" text="REDEFINE YOUR" />
                         <Label styleClass="hero-line-accent" text="LIMITS" />
                      </children>
                   </HBox>
-                  <!-- HBox keeps the CTA from stretching to the full VBox width -->
+
+                  <!-- Bouton CTA (Call To Action) principal :
+                       onAction="#onStartJourney" → appelle HomeController.onStartJourney()
+                       qui redirige vers SignInView (meme destination que SIGN IN)
+                       HBox autour pour eviter que le bouton s'etire sur toute la largeur -->
                   <HBox alignment="CENTER">
                      <children>
-                        <Button fx:id="startJourneyButton" mnemonicParsing="false" onAction="#onStartJourney" styleClass="btn-cta-home" text="START YOUR JOURNEY" />
+                        <Button fx:id="startJourneyButton"
+                                mnemonicParsing="false"
+                                onAction="#onStartJourney"
+                                styleClass="btn-cta-home"
+                                text="START YOUR JOURNEY" />
                      </children>
                   </HBox>
+
                </children>
                <padding>
                   <Insets bottom="48.0" left="32.0" right="32.0" top="0.0" />
                </padding>
             </VBox>
          </center>
+
       </BorderPane>
+
    </children>
 </StackPane>

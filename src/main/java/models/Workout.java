@@ -6,34 +6,21 @@ import java.util.UUID;
 
 public class Workout {
 
-    private Integer id;
-    private UUID uuid;
+    private UUID id;
     private User coach;
     private String nom;
     private String niveau;
     private Integer duree;
     private String description;
     private String status;
+
     private List<Exercise> exercises = new ArrayList<>();
     private List<ObjectifSportif> objectifs = new ArrayList<>();
 
     public Workout() {}
 
-    public Workout(Integer id, String nom, String niveau, Integer duree, String description, String status, User coach) {
-        this.id = id;
-        this.nom = nom;
-        this.niveau = niveau;
-        this.duree = duree;
-        this.description = description;
-        this.status = status;
-        this.coach = coach;
-    }
-
-    public Integer getId() { return id; }
-    public void setId(Integer id) { this.id = id; }
-
-    public UUID getUuid() { return uuid; }
-    public void setUuid(UUID uuid) { this.uuid = uuid; }
+    public UUID getId() { return id; }
+    public void setId(UUID id) { this.id = id; }
 
     public User getCoach() { return coach; }
     public void setCoach(User coach) { this.coach = coach; }
@@ -41,6 +28,7 @@ public class Workout {
     public String getNom() { return nom; }
     public void setNom(String nom) { this.nom = nom; }
 
+    /** Alias for compatibility with mergeFeedback code. */
     public String getName() { return nom; }
     public void setName(String name) { this.nom = name; }
 
@@ -59,8 +47,18 @@ public class Workout {
     public List<Exercise> getExercises() { return exercises; }
     public void setExercises(List<Exercise> exercises) { this.exercises = exercises; }
 
+    public void addExercise(Exercise exercise) {
+        if (!exercises.contains(exercise)) exercises.add(exercise);
+    }
+    public void removeExercise(Exercise exercise) { exercises.remove(exercise); }
+
     public List<ObjectifSportif> getObjectifs() { return objectifs; }
     public void setObjectifs(List<ObjectifSportif> objectifs) { this.objectifs = objectifs; }
+
+    public void addObjectif(ObjectifSportif objectif) {
+        if (!objectifs.contains(objectif)) objectifs.add(objectif);
+    }
+    public void removeObjectif(ObjectifSportif objectif) { objectifs.remove(objectif); }
 
     @Override
     public String toString() {

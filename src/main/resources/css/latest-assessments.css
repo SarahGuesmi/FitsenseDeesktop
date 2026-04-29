@@ -1,0 +1,146 @@
+.latest-assessments-root {
+    -fx-background-color: transparent;
+}
+
+.title-indicator {
+    -fx-background-color: #6366f1;
+    -fx-background-radius: 4px;
+}
+
+.page-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffffff;
+}
+
+.search-field {
+    -fx-background-color: #1e1e2d;
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: #6b7280;
+    -fx-background-radius: 8px;
+    -fx-padding: 8px 12px;
+    -fx-font-size: 14px;
+}
+
+.status-combo {
+    -fx-background-color: #1e1e2d;
+    -fx-text-fill: white;
+    -fx-background-radius: 8px;
+    -fx-padding: 4px 8px;
+}
+
+.status-combo .list-cell {
+    -fx-text-fill: white;
+}
+
+.assessments-table {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.assessments-table .column-header-background {
+    -fx-background-color: transparent;
+}
+
+.assessments-table .column-header {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.assessments-table .column-header .label {
+    -fx-text-fill: #9ca3af;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-alignment: center-left;
+}
+
+.assessments-table .table-row-cell {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 8px 0px;
+}
+
+.assessments-table .table-row-cell:hover {
+    -fx-background-color: #1e1e2d;
+}
+
+.assessments-table .table-cell {
+    -fx-border-color: transparent;
+    -fx-text-fill: #d1d5db;
+    -fx-font-size: 14px;
+    -fx-alignment: center-left;
+}
+
+.user-cell {
+    -fx-padding: 0 10;
+}
+
+.user-avatar {
+    -fx-background-color: linear-gradient(to bottom right, #8b5cf6, #3b82f6);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+    -fx-alignment: center;
+    -fx-background-radius: 8px;
+}
+
+.user-name {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+.user-role {
+    -fx-text-fill: #6b7280;
+    -fx-font-size: 12px;
+}
+
+.date-text {
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+}
+.time-text {
+    -fx-text-fill: #6b7280;
+    -fx-font-size: 12px;
+}
+
+.score-badge {
+    -fx-background-color: #1e3a8a;
+    -fx-text-fill: #60a5fa;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 4px 8px;
+    -fx-background-radius: 4px;
+}
+
+.status-moderate {
+    -fx-border-color: #ca8a04;
+    -fx-border-radius: 4px;
+    -fx-text-fill: #facc15;
+    -fx-padding: 4px 12px;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.status-low {
+    -fx-border-color: #dc2626;
+    -fx-border-radius: 4px;
+    -fx-text-fill: #f87171;
+    -fx-padding: 4px 12px;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.recommend-btn {
+    -fx-background-color: #3b82f6;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-padding: 6px 12px;
+    -fx-background-radius: 4px;
+    -fx-cursor: hand;
+}
+
+.recommend-btn:hover {
+    -fx-background-color: #2563eb;
+}

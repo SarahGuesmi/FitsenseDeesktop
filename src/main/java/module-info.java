@@ -5,10 +5,10 @@ module org.example.fitsense {
     requires javafx.web;
     requires java.sql;
     requires mysql.connector.j;
+    requires java.net.http;
     requires spring.security.crypto;
     requires commons.logging;
     requires com.google.gson;
-    requires java.net.http;
     requires jdk.httpserver;
     requires org.json;
 

@@ -1,5 +1,9 @@
 package controllers;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -18,11 +22,14 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import models.MentalHealthAssessmentSubmission;
 import models.RecommendedExercise;
+import services.GmailService;
+import services.GroqAiService;
 import services.MentalHealthSubmissionService;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Modal editor: exercises + general note (coach mental health).
@@ -101,7 +108,71 @@ public final class RecommendationEditorDialog {
         Label genLabel = new Label("General Note (Optional)");
         genLabel.getStyleClass().add("rec-section-label");
 
-        VBox body = new VBox(14, exHeader, exScroll, genLabel, generalNote);
+        Button aiBtn = new Button("✨ Recommend with AI");
+        aiBtn.getStyleClass().add("rec-ai-btn");
+        
+        // Inline layout for label + button
+        Region genSpacer = new Region();
+        HBox.setHgrow(genSpacer, Priority.ALWAYS);
+        HBox genHeader = new HBox(10, genLabel, genSpacer, aiBtn);
+        genHeader.setAlignment(Pos.CENTER_LEFT);
+
+        aiBtn.setOnAction(e -> {
+            aiBtn.setDisable(true);
+            aiBtn.setText("Generating...");
+            generalNote.setPromptText("AI is thinking...");
+            
+            GroqAiService.getInstance().generateRecommendation(submission)
+                .thenAccept(result -> Platform.runLater(() -> {
+                    // 1. Set general note
+                    if (result.has("general_note")) {
+                        generalNote.setText(result.get("general_note").getAsString());
+                    }
+
+                    // 2. Clear existing empty or existing rows if AI provides them
+                    if (result.has("exercises")) {
+                        JsonArray exercisesArr = result.getAsJsonArray("exercises");
+                        if (exercisesArr.size() > 0) {
+                            // Clear current UI rows
+                            exercisesBox.getChildren().clear();
+                            rows.clear();
+
+                            // Add new AI suggested rows
+                            for (JsonElement el : exercisesArr) {
+                                JsonObject obj = el.getAsJsonObject();
+                                String exName = obj.has("name") ? obj.get("name").getAsString() : "";
+                                String exDur = obj.has("duration") ? obj.get("duration").getAsString() : "";
+                                String exDesc = obj.has("description") ? obj.get("description").getAsString() : "";
+
+                                ExerciseRow newRow = new ExerciseRow(
+                                        new RecommendedExercise(exName, exDur, exDesc),
+                                        exercisesBox,
+                                        rows
+                                );
+                                rows.add(newRow);
+                                exercisesBox.getChildren().add(newRow.root);
+                            }
+                        }
+                    }
+
+                    aiBtn.setDisable(false);
+                    aiBtn.setText("✨ Recommend with AI");
+                    generalNote.setPromptText("Special overall advice…");
+                }))
+                .exceptionally(ex -> {
+                    Platform.runLater(() -> {
+                        aiBtn.setDisable(false);
+                        aiBtn.setText("✨ AI Failed (Retry)");
+                        Alert a = new Alert(Alert.AlertType.ERROR);
+                        a.setTitle("AI Generation Failed");
+                        a.setContentText("Could not generate recommendation: " + ex.getMessage());
+                        a.show();
+                    });
+                    return null;
+                });
+        });
+
+        VBox body = new VBox(14, exHeader, exScroll, genHeader, generalNote);
         body.getStyleClass().add("rec-body");
         body.setFillWidth(true);
 
@@ -138,6 +209,29 @@ public final class RecommendationEditorDialog {
                 return;
             }
             MentalHealthSubmissionService.getInstance().persistCoachRecommendation(submission);
+            
+            // Send email notification to the athlete
+            String athleteEmail = submission.getUserEmail();
+            if (athleteEmail != null && !athleteEmail.isBlank()) {
+                String subject = "New Mental Health Recommendation from your Coach";
+                String emailBody = "Hello " + (submission.getUserFullName() != null ? submission.getUserFullName() : "Athlete") + ",\n\n"
+                        + "Your coach has updated your mental health recommendation:\n\n"
+                        + buildLegacySummary(submission.getRecommendationGeneralNote() != null ? submission.getRecommendationGeneralNote() : "", submission.getRecommendedExercises())
+                        + "\n\nStay focused and keep up the great work!\nFitSense Team";
+                
+                GmailService.getInstance().sendEmail(athleteEmail, subject, emailBody)
+                    .exceptionally(ex -> {
+                        Platform.runLater(() -> {
+                            Alert a = new Alert(Alert.AlertType.WARNING);
+                            a.setTitle("Email Notification Failed");
+                            a.setHeaderText("Recommendation saved, but email could not be sent.");
+                            a.setContentText("Error: " + ex.getMessage());
+                            a.show();
+                        });
+                        return null;
+                    });
+            }
+
             saved[0] = true;
             stage.close();
         });

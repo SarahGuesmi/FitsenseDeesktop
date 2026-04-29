@@ -3,6 +3,7 @@ package controllers;
 import app.AppSession;
 import models.MentalHealthAssessmentSubmission;
 import models.User;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -26,8 +27,10 @@ import models.CoachMentalTest;
 import models.CoachMentalTestQuestion;
 import models.MentalHealthEvaluation;
 import services.CoachMentalTestService;
+import services.GroqAiService;
 import services.MentalHealthEvaluationRepository;
 import services.MentalHealthSubmissionService;
+import services.WeatherService;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -109,6 +112,14 @@ public class MentalHealthUserFragmentController {
     private TableColumn<MentalHealthAssessmentSubmission, String> colRecSummary;
     @FXML
     private TableColumn<MentalHealthAssessmentSubmission, Void> colRecAction;
+    @FXML
+    private VBox weatherAdviceCard;
+    @FXML
+    private Label weatherIconLabel;
+    @FXML
+    private Label weatherInfoLabel;
+    @FXML
+    private Label aiAdviceLabel;
 
     private final ObservableList<MentalHealthAssessmentSubmission> recommendationRows =
             FXCollections.observableArrayList();
@@ -295,6 +306,7 @@ public class MentalHealthUserFragmentController {
         if (submitCheckInBtn != null) {
             submitCheckInBtn.setText("Calculate My Wellbeing Score →");
         }
+        loadWeatherAndAdvice();
         showFormView();
     }
 
@@ -368,11 +380,32 @@ public class MentalHealthUserFragmentController {
         evaluationsTable.refresh();
         showListView();
 
+        // Show result dialog — then enrich it with live weather asynchronously
+        final int finalSum = sum;
+        final int finalMax = maxScore;
+        final String finalStatus = status;
+
         Alert a = new Alert(Alert.AlertType.INFORMATION);
-        a.setTitle("Saved");
-        a.setHeaderText(null);
-        a.setContentText("Score: " + sum + " / " + maxScore + " — " + status);
-        a.showAndWait();
+        a.setTitle("Check-in Saved");
+        a.setHeaderText("Score: " + finalSum + " / " + finalMax + " — " + finalStatus);
+        a.setContentText("Fetching current weather conditions…");
+        a.show();
+
+        double scoreRatio = finalMax > 0 ? (double) finalSum / finalMax : 0;
+        WeatherService.getInstance().fetchWeather(null)
+                .thenAccept(weather -> Platform.runLater(() -> {
+                    String tip = weather.mentalTip(scoreRatio);
+                    a.setContentText(
+                            "🌍 Current weather: " + weather + "\n\n"
+                            + "💡 " + tip
+                    );
+                }))
+                .exceptionally(ex -> {
+                    Platform.runLater(() ->
+                            a.setContentText("Score: " + finalSum + " / " + finalMax + " — " + finalStatus
+                                    + "\n\n(Weather unavailable)"));
+                    return null;
+                });
     }
 
     private void beginEdit(MentalHealthEvaluation ev) {
@@ -608,5 +641,40 @@ public class MentalHealthUserFragmentController {
 
     private static String safe(String v) {
         return v == null ? "" : v;
+    }
+
+    private void loadWeatherAndAdvice() {
+        if (weatherIconLabel == null || weatherInfoLabel == null || aiAdviceLabel == null) {
+            return;
+        }
+        
+        // Reset to loading state
+        weatherIconLabel.setText("⏳");
+        weatherInfoLabel.setText("Fetching weather…");
+        aiAdviceLabel.setText("Getting personalised advice…");
+
+        // Fetch weather first
+        WeatherService.getInstance().fetchWeather(null)
+                .thenCompose(weather -> {
+                    // Update weather UI
+                    Platform.runLater(() -> {
+                        weatherIconLabel.setText(weather.emoji());
+                        weatherInfoLabel.setText(String.format("%s — %.1f°C, %s",
+                                weather.city, weather.tempCelsius, weather.description));
+                    });
+                    // Then fetch AI advice based on weather
+                    return GroqAiService.getInstance().generateWeatherAdvice(weather);
+                })
+                .thenAccept(advice -> Platform.runLater(() -> {
+                    aiAdviceLabel.setText("💡 " + advice);
+                }))
+                .exceptionally(ex -> {
+                    Platform.runLater(() -> {
+                        weatherIconLabel.setText("⚠️");
+                        weatherInfoLabel.setText("Weather unavailable");
+                        aiAdviceLabel.setText("Take a moment to check in with yourself before starting.");
+                    });
+                    return null;
+                });
     }
 }

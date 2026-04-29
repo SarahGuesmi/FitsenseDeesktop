@@ -18,15 +18,25 @@ import java.util.concurrent.CompletableFuture;
  */
 public class WeatherService {
 
-    private static final String API_KEY = "d3f77cf0258317fbf250a358c95705d1";
     private static final String BASE_URL = "https://api.openweathermap.org/data/2.5/weather";
     private static final String DEFAULT_CITY = "Tunis";
 
     private static WeatherService instance;
     private final HttpClient httpClient;
+    private final String apiKey;
 
     private WeatherService() {
         this.httpClient = HttpClient.newHttpClient();
+        this.apiKey = loadApiKey();
+    }
+
+    private static String loadApiKey() {
+        try (java.io.InputStream in = WeatherService.class.getResourceAsStream("/config.properties")) {
+            if (in == null) return "";
+            java.util.Properties p = new java.util.Properties();
+            p.load(in);
+            return p.getProperty("weather.api.key", "d3f77cf0258317fbf250a358c95705d1");
+        } catch (Exception e) { return ""; }
     }
 
     public static synchronized WeatherService getInstance() {
@@ -44,7 +54,7 @@ public class WeatherService {
         String target = (city == null || city.isBlank()) ? DEFAULT_CITY : city.trim();
         String url = BASE_URL
                 + "?q=" + URLEncoder.encode(target, StandardCharsets.UTF_8)
-                + "&appid=" + API_KEY
+                + "&appid=" + apiKey
                 + "&units=metric";
 
         HttpRequest request = HttpRequest.newBuilder()

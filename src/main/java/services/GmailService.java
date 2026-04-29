@@ -15,14 +15,24 @@ import java.util.concurrent.CompletableFuture;
 public class GmailService {
 
     private static final String RESEND_API_URL = "https://api.resend.com/emails";
-    private static final String API_KEY = "re_CwxNwixb_PWxT2z8hyYmZHbhcMSyyVjDk";
     private static final String FROM_ADDRESS = "FitSense <onboarding@resend.dev>";
 
     private static GmailService instance;
     private final HttpClient httpClient;
+    private final String apiKey;
 
     private GmailService() {
         this.httpClient = HttpClient.newHttpClient();
+        this.apiKey = loadApiKey();
+    }
+
+    private static String loadApiKey() {
+        try (java.io.InputStream in = GmailService.class.getResourceAsStream("/config.properties")) {
+            if (in == null) return "";
+            java.util.Properties p = new java.util.Properties();
+            p.load(in);
+            return p.getProperty("resend.api.key", "");
+        } catch (Exception e) { return ""; }
     }
 
     public static synchronized GmailService getInstance() {
@@ -41,7 +51,7 @@ public class GmailService {
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(RESEND_API_URL))
-                .header("Authorization", "Bearer " + API_KEY)
+                .header("Authorization", "Bearer " + apiKey)
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(payload.toString()))
                 .build();

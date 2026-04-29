@@ -30,6 +30,7 @@ import services.CoachMentalTestService;
 import services.GroqAiService;
 import services.MentalHealthEvaluationRepository;
 import services.MentalHealthSubmissionService;
+import services.MentalHealthTrendService;
 import services.WeatherService;
 
 import java.sql.SQLException;
@@ -120,6 +121,14 @@ public class MentalHealthUserFragmentController {
     private Label weatherInfoLabel;
     @FXML
     private Label aiAdviceLabel;
+    @FXML
+    private VBox trendCard;
+    @FXML
+    private Label trendIconLabel;
+    @FXML
+    private Label trendInfoLabel;
+    @FXML
+    private Label trendInsightLabel;
 
     private final ObservableList<MentalHealthAssessmentSubmission> recommendationRows =
             FXCollections.observableArrayList();
@@ -578,6 +587,7 @@ public class MentalHealthUserFragmentController {
         formPane.setManaged(false);
         formPane.setVisible(false);
         refreshMyRecommendations();
+        loadTrendAnalysis();
     }
 
     private void refreshMyRecommendations() {
@@ -676,5 +686,60 @@ public class MentalHealthUserFragmentController {
                     });
                     return null;
                 });
+    }
+
+    private void loadTrendAnalysis() {
+        if (trendIconLabel == null || trendInfoLabel == null || trendInsightLabel == null) {
+            return;
+        }
+
+        User currentUser = AppSession.getCurrentUser();
+        if (currentUser == null || currentUser.getId() == null) {
+            return;
+        }
+
+        trendIconLabel.setText("📊");
+        trendInfoLabel.setText("Analyzing your mental health history…");
+        trendInsightLabel.setText("Loading insights…");
+
+        new Thread(() -> {
+            try {
+                MentalHealthTrendService trendService = new MentalHealthTrendService();
+                String trend = trendService.calculateTrend(currentUser.getId());
+                String insight = trendService.generateInsight(currentUser.getId());
+                double avgScore = trendService.getAverageScoreLast30Days(currentUser.getId());
+                String commonStatus = trendService.getMostCommonStatus(currentUser.getId());
+
+                Platform.runLater(() -> {
+                    // Set trend icon
+                    String icon = switch (trend) {
+                        case "improving" -> "📈";
+                        case "declining" -> "📉";
+                        case "stable" -> "📊";
+                        default -> "📋";
+                    };
+                    trendIconLabel.setText(icon);
+
+                    // Build trend info
+                    String trendText = switch (trend) {
+                        case "improving" -> "Trend: Improving";
+                        case "declining" -> "Trend: Declining";
+                        case "stable" -> "Trend: Stable";
+                        default -> "Need more data";
+                    };
+
+                    String info = String.format("%s • Avg: %.1f • Most common: %s",
+                            trendText, avgScore, commonStatus);
+                    trendInfoLabel.setText(info);
+                    trendInsightLabel.setText("💭 " + insight);
+                });
+            } catch (SQLException e) {
+                Platform.runLater(() -> {
+                    trendIconLabel.setText("⚠️");
+                    trendInfoLabel.setText("Trend analysis unavailable");
+                    trendInsightLabel.setText("Check back later for insights.");
+                });
+            }
+        }).start();
     }
 }

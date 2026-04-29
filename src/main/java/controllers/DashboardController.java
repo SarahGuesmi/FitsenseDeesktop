@@ -50,6 +50,8 @@ public class DashboardController {
     private Button dashMentalHealthBtn;
     @FXML
     private ProfileFragmentController dashProfileController;
+    @FXML
+    private MentalHealthChartController mentalHealthChartController;
 
     @FXML
     private void initialize() {
@@ -243,6 +245,11 @@ public class DashboardController {
             dashWorkoutsPane.setVisible(false);
         }
         setDashNavActive(dashHomeBtn);
+        
+        // Refresh mental health chart when returning to dashboard
+        if (mentalHealthChartController != null) {
+            mentalHealthChartController.refreshChart();
+        }
     }
 
     private void setDashNavActive(Button selected) {

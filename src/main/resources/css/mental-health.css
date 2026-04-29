@@ -403,9 +403,9 @@
 
 /* Weather + AI Advice Card */
 .mh-weather-card {
-    -fx-background-color: linear-gradient(135deg, rgba(111, 77, 255, 0.12), rgba(74, 130, 255, 0.08));
+    -fx-background-color: #1a1f35;
     -fx-background-radius: 14px;
-    -fx-border-color: rgba(176, 196, 246, 0.25);
+    -fx-border-color: #2a3548;
     -fx-border-width: 1px;
     -fx-border-radius: 14px;
 }
@@ -429,6 +429,41 @@
 }
 
 .mh-ai-advice {
+    -fx-font-size: 14px;
+    -fx-text-fill: #c0d0f5;
+    -fx-line-spacing: 2px;
+    -fx-padding: 8 0 0 0;
+}
+
+
+/* Trend Analysis Card */
+.mh-trend-card {
+    -fx-background-color: #1a1f35;
+    -fx-background-radius: 14px;
+    -fx-border-color: #2a3548;
+    -fx-border-width: 1px;
+    -fx-border-radius: 14px;
+}
+
+.mh-trend-card-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #b0c4f6;
+}
+
+.mh-trend-icon {
+    -fx-font-size: 32px;
+    -fx-min-width: 40px;
+    -fx-alignment: center;
+}
+
+.mh-trend-info {
+    -fx-font-size: 15px;
+    -fx-text-fill: #d4dff9;
+    -fx-font-weight: 500;
+}
+
+.mh-trend-insight {
     -fx-font-size: 14px;
     -fx-text-fill: #c0d0f5;
     -fx-line-spacing: 2px;

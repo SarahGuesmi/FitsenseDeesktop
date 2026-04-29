@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="8.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MentalHealthChartController">
+   <children>
+      <LineChart fx:id="mentalHealthChart" animated="true" createSymbols="true" legendVisible="false" prefHeight="280.0" styleClass="mh-chart">
+         <xAxis>
+            <CategoryAxis fx:id="xAxis" side="BOTTOM" styleClass="mh-chart-axis" />
+         </xAxis>
+         <yAxis>
+            <NumberAxis fx:id="yAxis" autoRanging="false" lowerBound="0.0" side="LEFT" styleClass="mh-chart-axis" tickUnit="5.0" upperBound="25.0" />
+         </yAxis>
+      </LineChart>
+      <Label fx:id="chartStatusLabel" styleClass="chart-status" text="Loading your mental health history..." wrapText="true" />
+   </children>
+</VBox>

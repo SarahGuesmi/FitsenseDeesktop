@@ -33,6 +33,13 @@ public class GmailService {
     }
 
     public CompletableFuture<Void> sendEmail(String to, String subject, String bodyText) {
+        // Resend sandbox mode: only allow sending to verified email
+        String allowedEmail = "zarroukmouhamedaziz904@gmail.com";
+        if (!allowedEmail.equals(to)) {
+            System.out.println("Email skipped - Resend sandbox mode only allows: " + allowedEmail);
+            return CompletableFuture.completedFuture(null);
+        }
+
         JsonObject payload = new JsonObject();
         payload.addProperty("from", FROM_ADDRESS);
         payload.addProperty("to", to);

@@ -78,6 +78,21 @@
                                     <Insets bottom="18.0" left="20.0" right="20.0" top="18.0" />
                                  </padding>
                               </VBox>
+                              <!-- Mental Health Chart Card -->
+                              <VBox spacing="12.0" styleClass="chart-card">
+                                 <children>
+                                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                       <children>
+                                          <Label styleClass="chart-accent-bar" text="" />
+                                          <Label styleClass="chart-title" text="🧠  Mental Health Progress" />
+                                       </children>
+                                    </HBox>
+                                    <fx:include fx:id="mentalHealthChart" source="MentalHealthChartFragment.fxml" />
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="16.0" left="20.0" right="20.0" top="16.0" />
+                                 </padding>
+                              </VBox>
                            </children>
                            <padding>
                               <Insets bottom="22.0" left="22.0" right="22.0" top="22.0" />

@@ -64,6 +64,16 @@
         <!-- javafx-media : lecture de fichiers audio/vidéo.
              Utilisé dans HomeController pour la vidéo de fond (MediaPlayer, MediaView) -->
         <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20240303</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-web</artifactId>
+            <version>21</version>
+        </dependency>
+        <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-media</artifactId>
             <version>21</version>
@@ -124,6 +134,7 @@
                 <directory>src/main/resources</directory>
             </resource>
         </resources>
+
         <plugins>
             <!-- Plugin JavaFX Maven : permet de lancer l'app avec "mvn javafx:run".
                  mainClass pointe vers le point d'entrée de l'application. -->
@@ -133,6 +144,10 @@
                 <version>0.0.8</version>
                 <configuration>
                     <mainClass>app.FitSenseApp</mainClass>
+                    <options>
+                        <option>--add-modules</option>
+                        <option>javafx.controls,javafx.fxml,javafx.web,javafx.media</option>
+                    </options>
                 </configuration>
             </plugin>
         </plugins>

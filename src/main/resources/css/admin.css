@@ -884,3 +884,55 @@
 .btn-send-report:hover {
     -fx-background-color: rgba(99,102,241,0.35);
 }
+
+/* ── feature/favorites: Recipe/Nutrition dashboard panel styles ── */
+.dashboard-panel {
+    -fx-background-color: #0f172a;
+    -fx-background-radius: 14;
+    -fx-border-color: #1e293b;
+    -fx-border-radius: 14;
+    -fx-padding: 12;
+}
+
+.see-all-btn {
+    -fx-background-color: transparent;
+    -fx-border-color: #7c3aed;
+    -fx-text-fill: #d8b4fe;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-font-size: 11px;
+}
+
+.top-recipe-card {
+    -fx-background-color: #111827;
+    -fx-background-radius: 10;
+    -fx-padding: 8;
+    -fx-pref-width: 105;
+}
+
+.top-recipe-title {
+    -fx-text-fill: white;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.top-recipe-info {
+    -fx-text-fill: #cbd5e1;
+    -fx-font-size: 10px;
+}
+
+.chart {
+    -fx-background-color: transparent;
+}
+
+.chart-legend {
+    -fx-background-color: transparent;
+}
+
+.chart-legend-item {
+    -fx-text-fill: white;
+}
+
+.chart-pie-label {
+    -fx-fill: white;
+}

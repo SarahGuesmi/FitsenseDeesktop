@@ -107,4 +107,61 @@ public class NotificationService {
         n.setCreatedAt(ts != null ? ts.toLocalDateTime() : LocalDateTime.now());
         return n;
     }
+
+    // ── User-scoped notification methods (feature/favorites) ─────────────────
+
+    /** Creates a notification for a specific user (UUID-based, `notification` table). */
+    public void createNotification(String userId, String message, String type) {
+        try {
+            String sql = """
+                INSERT INTO notification
+                (id, related_user_id, message, type, is_read, created_at)
+                VALUES (?, ?, ?, ?, 0, ?)
+            """;
+            PreparedStatement ps = cnx.prepareStatement(sql);
+            ps.setBytes(1, uuidToBytes(java.util.UUID.randomUUID().toString()));
+            ps.setBytes(2, uuidToBytes(userId));
+            ps.setString(3, message);
+            ps.setString(4, type);
+            ps.setTimestamp(5, Timestamp.valueOf(LocalDateTime.now()));
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /** Marks all user notifications as read. */
+    public void markAllAsRead(String userId) {
+        try {
+            String sql = "UPDATE notification SET is_read = 1 WHERE related_user_id = ?";
+            PreparedStatement ps = cnx.prepareStatement(sql);
+            ps.setBytes(1, uuidToBytes(userId));
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /** Returns all messages for a user ordered newest first. */
+    public List<String> getUserNotifications(String userId) {
+        List<String> list = new ArrayList<>();
+        try {
+            String sql = "SELECT message FROM notification WHERE related_user_id = ? ORDER BY created_at DESC";
+            PreparedStatement ps = cnx.prepareStatement(sql);
+            ps.setBytes(1, uuidToBytes(userId));
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) list.add(rs.getString("message"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    private static byte[] uuidToBytes(String uuid) {
+        java.util.UUID u = java.util.UUID.fromString(uuid);
+        java.nio.ByteBuffer bb = java.nio.ByteBuffer.wrap(new byte[16]);
+        bb.putLong(u.getMostSignificantBits());
+        bb.putLong(u.getLeastSignificantBits());
+        return bb.array();
+    }
 }

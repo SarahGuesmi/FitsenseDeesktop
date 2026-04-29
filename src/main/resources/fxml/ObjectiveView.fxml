@@ -14,10 +14,10 @@
             <Label styleClass="onb-title" text="Your Fitness Strategy" />
             <GridPane hgap="14.0" vgap="14.0">
                <children>
-                  <Button fx:id="objectiveBtn1" mnemonicParsing="false" onAction="#onObjectiveClick" prefHeight="95.0" prefWidth="190.0" styleClass="choice-card" text="Weight Loss" />
-                  <Button fx:id="objectiveBtn2" mnemonicParsing="false" onAction="#onObjectiveClick" prefHeight="95.0" prefWidth="190.0" styleClass="choice-card" text="Muscle Gain" GridPane.columnIndex="1" />
-                  <Button fx:id="objectiveBtn3" mnemonicParsing="false" onAction="#onObjectiveClick" prefHeight="95.0" prefWidth="190.0" styleClass="choice-card" text="Endurance" GridPane.rowIndex="1" />
-                  <Button fx:id="objectiveBtn4" mnemonicParsing="false" onAction="#onObjectiveClick" prefHeight="95.0" prefWidth="190.0" styleClass="choice-card" text="Well-being" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <Button fx:id="objectiveBtn1" text="Weight Loss" onAction="#onObjectiveClick" styleClass="choice-card"/>
+                  <Button fx:id="objectiveBtn2" text="Muscle Gain" onAction="#onObjectiveClick" styleClass="choice-card" GridPane.columnIndex="1"/>
+                  <Button fx:id="objectiveBtn3" text="Endurance" onAction="#onObjectiveClick" styleClass="choice-card" GridPane.rowIndex="1"/>
+                  <Button fx:id="objectiveBtn4" text="Well-being" onAction="#onObjectiveClick" styleClass="choice-card" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
                </children>
             </GridPane>
             <javafx.scene.layout.HBox alignment="CENTER" spacing="12.0">

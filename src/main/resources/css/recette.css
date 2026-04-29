@@ -564,3 +564,23 @@
 .nutrition-reset-btn:hover {
     -fx-background-color: #353b48;
 }
+
+.allergen-card {
+    -fx-background-color: rgba(30, 41, 59, 0.55);
+    -fx-background-radius: 16px;
+    -fx-border-color: #7c3aed;
+    -fx-border-radius: 16px;
+    -fx-border-style: dashed;
+    -fx-padding: 18px;
+}
+
+.allergen-checkbox {
+    -fx-text-fill: white;
+    -fx-background-color: #111827;
+    -fx-background-radius: 10px;
+    -fx-border-color: #334155;
+    -fx-border-radius: 10px;
+    -fx-padding: 10px 14px;
+    -fx-font-size: 13px;
+    -fx-pref-width: 210px;
+}

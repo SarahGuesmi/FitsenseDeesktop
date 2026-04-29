@@ -26,8 +26,8 @@ public class EmailReportService {
         } catch (Exception ignored) {}
         return "";
     }
-    private static final String FROM_EMAIL = "nourammarr9@gmail.com";
-    private static final String TO_EMAIL = "nourammarr9@gmail.com";
+    private static final String FROM_EMAIL = "nourammarr9@gmail.com"; // must be verified in SendGrid
+    private static final String TO_EMAIL = "nourammarr23@icloud.com";
     private static final String API_URL = "https://api.sendgrid.com/v3/mail/send";
 
     public static void sendDailyReport(List<FeedbackResponse> responses) throws IOException, InterruptedException {

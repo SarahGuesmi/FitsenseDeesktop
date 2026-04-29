@@ -645,6 +645,7 @@ public class MentalHealthUserFragmentController {
 
     private void loadWeatherAndAdvice() {
         if (weatherIconLabel == null || weatherInfoLabel == null || aiAdviceLabel == null) {
+            System.err.println("loadWeatherAndAdvice: one or more labels are null, skipping");
             return;
         }
         
@@ -669,11 +670,24 @@ public class MentalHealthUserFragmentController {
                     aiAdviceLabel.setText("💡 " + advice);
                 }))
                 .exceptionally(ex -> {
-                    Platform.runLater(() -> {
-                        weatherIconLabel.setText("⚠️");
-                        weatherInfoLabel.setText("Weather unavailable");
-                        aiAdviceLabel.setText("Take a moment to check in with yourself before starting.");
-                    });
+                    System.err.println("Weather/AI error: " + ex.getMessage());
+                    ex.printStackTrace();
+                    // Try weather only without AI
+                    WeatherService.getInstance().fetchWeather(null)
+                        .thenAccept(weather -> Platform.runLater(() -> {
+                            weatherIconLabel.setText(weather.emoji());
+                            weatherInfoLabel.setText(String.format("%s — %.1f°C, %s",
+                                    weather.city, weather.tempCelsius, weather.description));
+                            aiAdviceLabel.setText("💡 " + weather.mentalTip(0.5));
+                        }))
+                        .exceptionally(ex2 -> {
+                            Platform.runLater(() -> {
+                                weatherIconLabel.setText("⚠️");
+                                weatherInfoLabel.setText("Weather unavailable");
+                                aiAdviceLabel.setText("Take a moment to check in with yourself before starting.");
+                            });
+                            return null;
+                        });
                     return null;
                 });
     }

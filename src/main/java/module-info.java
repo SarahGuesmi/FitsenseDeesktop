@@ -14,4 +14,6 @@ module org.example.fitsense {
 
     opens app to javafx.graphics;
     opens controllers to javafx.fxml;
+    opens services to com.google.gson;
+    opens models to com.google.gson;
 }

@@ -35,7 +35,7 @@
       </VBox>
 
       <!-- RIGHT: message area — StackPane so empty/active overlay each other -->
-      <StackPane HBox.hgrow="ALWAYS" styleClass="chat-messages-panel">
+      <StackPane HBox.hgrow="ALWAYS" styleClass="chat-messages-panel" minHeight="400.0">
          <children>
 
             <!-- Empty state -->
@@ -49,10 +49,11 @@
 
             <!-- Active conversation -->
             <VBox fx:id="conversationArea" managed="false" visible="false"
-                  VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS" maxHeight="Infinity">
+                  VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS"
+                  maxHeight="1.7976931348623157E308" StackPane.alignment="TOP_LEFT">
                <children>
                   <!-- Header -->
-                  <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="chat-conv-header">
+                  <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="chat-conv-header" VBox.vgrow="NEVER">
                      <children>
                         <Label fx:id="convAvatar" styleClass="chat-conv-avatar" text="?" />
                         <VBox HBox.hgrow="ALWAYS" spacing="2.0">
@@ -70,7 +71,7 @@
                   <!-- Messages scroll — takes all remaining height -->
                   <ScrollPane fx:id="messagesScroll" fitToWidth="true"
                               styleClass="chat-messages-scroll" VBox.vgrow="ALWAYS"
-                              minHeight="200.0">
+                              minHeight="100.0">
                      <content>
                         <VBox fx:id="messagesBox" spacing="8.0" styleClass="chat-messages-box">
                            <padding><Insets bottom="16.0" left="16.0" right="16.0" top="16.0" /></padding>
@@ -78,8 +79,8 @@
                      </content>
                   </ScrollPane>
 
-                  <!-- Input bar -->
-                  <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="chat-input-bar">
+                  <!-- Input bar — always at the bottom, never grows -->
+                  <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="chat-input-bar" VBox.vgrow="NEVER">
                      <children>
                         <TextField fx:id="messageInput" promptText="Type a message..."
                                    styleClass="chat-input-field" HBox.hgrow="ALWAYS" />

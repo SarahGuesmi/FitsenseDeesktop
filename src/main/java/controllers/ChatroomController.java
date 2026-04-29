@@ -59,6 +59,14 @@ public class ChatroomController {
         });
         startPolling();
 
+        // Bind conversationArea to fill its StackPane parent once the scene is ready
+        conversationArea.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null && conversationArea.getParent() instanceof javafx.scene.layout.StackPane sp) {
+                conversationArea.prefHeightProperty().bind(sp.heightProperty());
+                conversationArea.prefWidthProperty().bind(sp.widthProperty());
+            }
+        });
+
         // Reload contacts when pane becomes visible (e.g. coach dashboard tab switch)
         contactsListBox.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null) {
@@ -182,8 +190,27 @@ public class ChatroomController {
         contactsListBox.getChildren().stream()
                 .filter(n -> n instanceof HBox)
                 .map(n -> (HBox) n)
-                .filter(r -> fullName(contact).equals(
-                        ((Label) ((VBox) r.getChildren().get(1)).getChildren().get(0)).getText()))
+                .filter(r -> {
+                    try {
+                        VBox info = (VBox) r.getChildren().get(1);
+                        javafx.scene.Node firstChild = info.getChildren().get(0);
+                        String name;
+                        if (firstChild instanceof Label lbl) {
+                            name = lbl.getText();
+                        } else if (firstChild instanceof HBox nameRow) {
+                            // unread badge row: first child is the name Label
+                            name = nameRow.getChildren().stream()
+                                    .filter(c -> c instanceof Label)
+                                    .map(c -> ((Label) c).getText())
+                                    .findFirst().orElse("");
+                        } else {
+                            return false;
+                        }
+                        return fullName(contact).equals(name);
+                    } catch (Exception ex) {
+                        return false;
+                    }
+                })
                 .findFirst()
                 .ifPresent(r -> r.getStyleClass().add("chat-contact-row-active"));
 
@@ -193,6 +220,11 @@ public class ChatroomController {
         conversationArea.setVisible(true);
         conversationArea.setMaxWidth(Double.MAX_VALUE);
         conversationArea.setMaxHeight(Double.MAX_VALUE);
+        // Force the VBox to fill the StackPane parent's height
+        if (conversationArea.getParent() instanceof javafx.scene.layout.StackPane sp) {
+            conversationArea.prefHeightProperty().bind(sp.heightProperty());
+            conversationArea.prefWidthProperty().bind(sp.widthProperty());
+        }
         StackPane.setAlignment(conversationArea, javafx.geometry.Pos.TOP_LEFT);
 
         loadMessages();

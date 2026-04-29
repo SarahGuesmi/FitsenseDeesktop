@@ -580,7 +580,7 @@ public class CoachDashboardController {
         try {
             List<models.FeedbackResponse> responses = new services.FeedbackResponseService().readWithDetails();
             utils.EmailReportService.sendDailyReport(responses);
-            new Alert(Alert.AlertType.INFORMATION, "Daily report sent to nourammarr9@gmail.com").showAndWait();
+            new Alert(Alert.AlertType.INFORMATION, "Daily report sent to nourammarr23@icloud.com").showAndWait();
         } catch (Exception e) {
             new Alert(Alert.AlertType.ERROR, "Failed to send report: " + e.getMessage()).showAndWait();
         }

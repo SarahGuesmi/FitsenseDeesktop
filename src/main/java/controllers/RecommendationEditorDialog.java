@@ -161,12 +161,49 @@ public final class RecommendationEditorDialog {
                 }))
                 .exceptionally(ex -> {
                     Platform.runLater(() -> {
-                        aiBtn.setDisable(false);
-                        aiBtn.setText("✨ AI Failed (Retry)");
-                        Alert a = new Alert(Alert.AlertType.ERROR);
-                        a.setTitle("AI Generation Failed");
-                        a.setContentText("Could not generate recommendation: " + ex.getMessage());
-                        a.show();
+                        // Groq failed — retry once more, then show an error.
+                        // No hardcoded exercises: everything comes from the AI.
+                        aiBtn.setDisable(true);
+                        aiBtn.setText("Retrying...");
+                        generalNote.setPromptText("Contacting AI...");
+
+                        GroqAiService.getInstance().generateRecommendation(submission)
+                            .thenAccept(result -> Platform.runLater(() -> {
+                                if (result.has("general_note")) {
+                                    generalNote.setText(result.get("general_note").getAsString());
+                                }
+                                if (result.has("exercises")) {
+                                    com.google.gson.JsonArray exercisesArr = result.getAsJsonArray("exercises");
+                                    if (exercisesArr.size() > 0) {
+                                        exercisesBox.getChildren().clear();
+                                        rows.clear();
+                                        for (com.google.gson.JsonElement el : exercisesArr) {
+                                            com.google.gson.JsonObject obj = el.getAsJsonObject();
+                                            String exName = obj.has("name") ? obj.get("name").getAsString() : "";
+                                            String exDur  = obj.has("duration") ? obj.get("duration").getAsString() : "";
+                                            String exDesc = obj.has("description") ? obj.get("description").getAsString() : "";
+                                            ExerciseRow newRow = new ExerciseRow(
+                                                    new RecommendedExercise(exName, exDur, exDesc),
+                                                    exercisesBox, rows);
+                                            rows.add(newRow);
+                                            exercisesBox.getChildren().add(newRow.root);
+                                        }
+                                    }
+                                }
+                                aiBtn.setDisable(false);
+                                aiBtn.setText("✨ Recommend with AI");
+                                generalNote.setPromptText("Special overall advice…");
+                            }))
+                            .exceptionally(ex2 -> {
+                                Platform.runLater(() -> {
+                                    aiBtn.setDisable(false);
+                                    aiBtn.setText("✨ Recommend with AI");
+                                    generalNote.setPromptText("Special overall advice…");
+                                    warn("AI Unavailable",
+                                            "Could not reach Groq AI. Please check your API key in config.properties (groq.api.key) and try again.");
+                                });
+                                return null;
+                            });
                     });
                     return null;
                 });
@@ -221,13 +258,10 @@ public final class RecommendationEditorDialog {
                 
                 GmailService.getInstance().sendEmail(athleteEmail, subject, emailBody)
                     .exceptionally(ex -> {
-                        Platform.runLater(() -> {
-                            Alert a = new Alert(Alert.AlertType.WARNING);
-                            a.setTitle("Email Notification Failed");
-                            a.setHeaderText("Recommendation saved, but email could not be sent.");
-                            a.setContentText("Error: " + ex.getMessage());
-                            a.show();
-                        });
+                        // Email failed (e.g. Resend test-mode restriction) — log only,
+                        // do NOT show a popup since the recommendation was already saved.
+                        System.err.println("[RecommendationEditorDialog] Email not sent to "
+                                + athleteEmail + ": " + ex.getMessage());
                         return null;
                     });
             }

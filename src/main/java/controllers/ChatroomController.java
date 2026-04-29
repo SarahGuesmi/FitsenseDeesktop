@@ -58,6 +58,28 @@ public class ChatroomController {
             }
         });
         startPolling();
+
+        // Reload contacts when pane becomes visible (e.g. coach dashboard tab switch)
+        contactsListBox.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                contactsListBox.visibleProperty().addListener((o, wasVisible, isVisible) -> {
+                    if (isVisible) loadContacts();
+                });
+            }
+        });
+
+        // Also reload when parent becomes visible
+        messageInput.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null && AppSession.getCurrentUser() != null
+                    && contactsListBox.getChildren().isEmpty()) {
+                loadContacts();
+            }
+        });
+    }
+
+    /** Called by parent dashboard when navigating to chatroom tab */
+    public void refresh() {
+        loadContacts();
     }
 
     // ── Contacts ─────────────────────────────────────────────────────────────
@@ -69,6 +91,16 @@ public class ChatroomController {
             List<User> users = new ArrayList<>(userService.read());
             users.removeIf(u -> u.getId().equals(me.getId()));
 
+            // ROLE_USER can only contact admin and coach
+            String myRole = me.getRolesJson() == null ? "" : me.getRolesJson();
+            boolean isMeUser = !myRole.contains("ROLE_ADMIN") && !myRole.contains("ROLE_COACH");
+            if (isMeUser) {
+                users.removeIf(u -> {
+                    String role = u.getRolesJson() == null ? "" : u.getRolesJson();
+                    return !role.contains("ROLE_ADMIN") && !role.contains("ROLE_COACH");
+                });
+            }
+
             Map<UUID, LocalDateTime> lastMsgTimes = new HashMap<>();
             for (User u : users) {
                 LocalDateTime t = chatService.getLastMessageTime(me.getId(), u.getId());
@@ -77,6 +109,12 @@ public class ChatroomController {
             users.sort((u1, u2) -> lastMsgTimes.get(u2.getId()).compareTo(lastMsgTimes.get(u1.getId())));
 
             contactsListBox.getChildren().clear();
+            if (users.isEmpty()) {
+                Label empty = new Label("No contacts available.");
+                empty.setStyle("-fx-text-fill: #6B7280; -fx-font-size: 13px; -fx-padding: 20;");
+                contactsListBox.getChildren().add(empty);
+                return;
+            }
             for (User u : users) {
                 contactsListBox.getChildren().add(buildContactRow(u));
             }

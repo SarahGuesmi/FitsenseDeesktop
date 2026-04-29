@@ -108,6 +108,13 @@
         </dependency>
 
         <!-- SendGrid: emails sent via plain HttpClient REST calls, no SDK needed -->
+
+        <!-- org.json: used by ExerciseLibraryController, MusicService, ExerciseFormController -->
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20240303</version>
+        </dependency>
     </dependencies>
 
     <build>

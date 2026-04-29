@@ -173,7 +173,7 @@ public class SignInController {
         if (!valid) return;
 
         try {
-            // Cherche l'utilisateur par email : SELECT * FROM app_user WHERE email_email = ?
+            // Cherche l'utilisateur par email : SELECT * FROM fitsense.app_user WHERE email_email = ?
             User user = userService.findByEmail(email);
 
             // Verifie le mot de passe avec BCrypt

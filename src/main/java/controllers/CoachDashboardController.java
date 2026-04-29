@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -49,9 +50,17 @@ public class CoachDashboardController {
     @FXML
     private VBox mentalWellnessPane;
     @FXML
+    private VBox mentalTestsPane;
+    @FXML
+    private VBox mentalAssessmentsPane;
+    @FXML
+    private javafx.scene.control.ScrollPane securityPane;
+    @FXML
     private VBox nutritionPane;
     @FXML
     private VBox profilePane;
+    @FXML
+    private javafx.scene.layout.StackPane logoutOverlay;
 
     @FXML
     private Button coachHomeBtn;
@@ -65,6 +74,12 @@ public class CoachDashboardController {
     private Button feedbackBtn;
     @FXML
     private Button mentalWellnessBtn;
+    @FXML
+    private Button mentalTestsBtn;
+    @FXML
+    private Button mentalAssessmentsBtn;
+    @FXML
+    private Button securityBtn;
     @FXML
     private Button nutritionBtn;
     @FXML
@@ -96,6 +111,7 @@ public class CoachDashboardController {
     @FXML private TableColumn<models.FeedbackResponse, String> dashSentimentCol;
     @FXML private TableColumn<models.FeedbackResponse, String> dashCommentCol;
     @FXML private TableColumn<models.FeedbackResponse, String> dashDateCol;
+    @FXML private VBox dashWorkoutsContainer;
 
     @FXML private TableView<User> athletesTable;
     @FXML private TableColumn<User, String> nameCol;
@@ -119,6 +135,7 @@ public class CoachDashboardController {
 
     // Modal overlay fields
     @FXML private StackPane feedbackModalOverlay;
+    @FXML private javafx.scene.control.ScrollPane feedbackModalScroll;
     @FXML private StackPane deleteConfirmOverlay;
     @FXML private TextField modalTitreField;
     @FXML private VBox workoutsCheckboxList;
@@ -130,10 +147,18 @@ public class CoachDashboardController {
     @FXML private VBox responsesContainer;
     @FXML private Label responsesCountLabel;
 
-    private Questionnaire pendingDeleteQuestionnaire;
+    // Sidebar avatar
+    @FXML private javafx.scene.image.ImageView sidebarAvatarView;
+    @FXML private Label sidebarAvatarInitials;
 
-    @FXML
-    private ProfileFragmentController coachProfileController;
+    // Sub-controllers (fx:include) — JavaFX injects as fx:id + "Controller"
+    @FXML private controllers.CoachMentalTestsFragmentController coachMentalTestsController;
+    @FXML private controllers.CoachMentalAssessmentsFragmentController coachMentalAssessmentsController;
+    @FXML private controllers.ProfileFragmentController coachProfileController;
+    @FXML private controllers.TwoFactorSetupController coachSecurityController;
+    @FXML private controllers.ChatroomController chatroomController;
+
+    private Questionnaire pendingDeleteQuestionnaire;
 
     private final UserService userService = new UserService();
     private final WorkoutService workoutService = new WorkoutService();
@@ -141,22 +166,43 @@ public class CoachDashboardController {
 
     @FXML
     private void initialize() {
-        setupAthletesTable();
-        if (coachProfileController != null) {
-            coachProfileController.setAfterSaveCallback(this::refreshNavbar);
+        try {
+            setupAthletesTable();
+            if (coachProfileController != null) {
+                coachProfileController.setAfterSaveCallback(this::refreshNavbar);
+            }
+            refreshNavbar();
+            onShowDashboard();
+        } catch (Exception e) {
+            // Write error to a log file so we can read it
+            try {
+                java.io.FileWriter fw = new java.io.FileWriter("coach_error.log", false);
+                fw.write("CoachDashboardController.initialize() FAILED:\n");
+                fw.write(e.toString() + "\n");
+                for (StackTraceElement el : e.getStackTrace()) {
+                    fw.write("  at " + el.toString() + "\n");
+                }
+                if (e.getCause() != null) {
+                    fw.write("Caused by: " + e.getCause().toString() + "\n");
+                    for (StackTraceElement el : e.getCause().getStackTrace()) {
+                        fw.write("  at " + el.toString() + "\n");
+                    }
+                }
+                fw.close();
+            } catch (Exception ignored) {}
+            throw e;
         }
-        refreshNavbar();
-        onShowDashboard();
     }
 
     @FXML
     private void onShowDashboard() {
         hideAllContent();
+        if (coachDashboardPane == null) return;
         coachDashboardPane.setManaged(true);
         coachDashboardPane.setVisible(true);
         setNavbarText("Coach dashboard", "Train and support your athletes");
         setActiveSidebar(coachHomeBtn);
-        refreshStats(); // always refresh on navigate
+        refreshStats();
     }
 
     @FXML
@@ -176,6 +222,10 @@ public class CoachDashboardController {
         chatroomPane.setVisible(true);
         setNavbarText("Chatroom", "Team messaging");
         setActiveSidebar(chatroomBtn);
+        // Reload contacts now that user is in session
+        if (chatroomController != null) {
+            chatroomController.refresh();
+        }
     }
 
     @FXML
@@ -339,7 +389,7 @@ public class CoachDashboardController {
         Questionnaire q = new Questionnaire();
         // Check if editing existing
         Object userData = modalTitreField.getUserData();
-        if (userData instanceof Integer existingId) {
+        if (userData instanceof UUID existingId) {
             q.setId(existingId);
         }
         q.setTitre(titre);
@@ -661,11 +711,11 @@ public class CoachDashboardController {
     }
 
     private String sentimentBadgeStyle(String sentiment) {
-        if (sentiment == null) return "rc-badge-na";
+        if (sentiment == null) return "rc-badge-default";
         return switch (sentiment.toLowerCase()) {
-            case "positive" -> "rc-badge-excellent";
-            case "negative" -> "rc-badge-poor";
-            default -> "rc-badge-average";
+            case "positive" -> "rc-badge-positive";
+            case "negative" -> "rc-badge-negative";
+            default -> "rc-badge-neutral";
         };
     }
 
@@ -676,6 +726,33 @@ public class CoachDashboardController {
         mentalWellnessPane.setVisible(true);
         setNavbarText("Mental wellness", "Well-being resources");
         setActiveSidebar(mentalWellnessBtn);
+    }
+
+    @FXML
+    private void onShowMentalTests() {
+        hideAllContent();
+        mentalTestsPane.setManaged(true);
+        mentalTestsPane.setVisible(true);
+        setNavbarText("Tests & questionnaires", "Mental health tests");
+        setActiveSidebar(mentalTestsBtn);
+    }
+
+    @FXML
+    private void onShowMentalAssessments() {
+        hideAllContent();
+        mentalAssessmentsPane.setManaged(true);
+        mentalAssessmentsPane.setVisible(true);
+        setNavbarText("Latest assessments", "Member mental assessments");
+        setActiveSidebar(mentalAssessmentsBtn);
+    }
+
+    @FXML
+    private void onShowSecurity() {
+        hideAllContent();
+        securityPane.setManaged(true);
+        securityPane.setVisible(true);
+        setNavbarText("Security", "Account security settings");
+        setActiveSidebar(securityBtn);
     }
 
     @FXML
@@ -701,14 +778,40 @@ public class CoachDashboardController {
 
     @FXML
     private void onLogout() {
+        if (logoutOverlay != null) {
+            logoutOverlay.setManaged(true);
+            logoutOverlay.setVisible(true);
+        } else {
+            doLogout();
+        }
+    }
+
+    @FXML
+    private void onCancelLogout() {
+        if (logoutOverlay != null) {
+            logoutOverlay.setManaged(false);
+            logoutOverlay.setVisible(false);
+        }
+    }
+
+    @FXML
+    private void onConfirmLogout() {
+        doLogout();
+    }
+
+    private void doLogout() {
         AppSession.setCurrentUser(null);
         AppSession.resetOnboarding();
         switchScene("/fxml/SignInView.fxml", "/css/signin.css");
     }
 
     private void hideAllContent() {
-        for (VBox p : List.of(coachDashboardPane, athletesPane, chatroomPane, workoutCatalogPane,
-                feedbackPane, mentalWellnessPane, nutritionPane, profilePane)) {
+        javafx.scene.layout.Region[] panes = {
+            coachDashboardPane, athletesPane, chatroomPane, workoutCatalogPane,
+            feedbackPane, mentalWellnessPane, mentalTestsPane, mentalAssessmentsPane,
+            nutritionPane, profilePane, securityPane
+        };
+        for (javafx.scene.layout.Region p : panes) {
             if (p != null) {
                 p.setManaged(false);
                 p.setVisible(false);
@@ -766,8 +869,10 @@ public class CoachDashboardController {
     }
 
     private void setActiveSidebar(Button selected) {
-        for (Button b : List.of(coachHomeBtn, athletesBtn, chatroomBtn, workoutCatalogBtn,
-                feedbackBtn, mentalWellnessBtn, nutritionBtn, profileBtn)) {
+        Button[] buttons = {coachHomeBtn, athletesBtn, chatroomBtn, workoutCatalogBtn,
+                feedbackBtn, mentalWellnessBtn, mentalTestsBtn, mentalAssessmentsBtn,
+                nutritionBtn, profileBtn, securityBtn};
+        for (Button b : buttons) {
             if (b != null) {
                 b.getStyleClass().remove("side-link-active");
             }
@@ -778,6 +883,7 @@ public class CoachDashboardController {
     }
 
     private void setupAthletesTable() {
+        if (athletesTable == null || nameCol == null) return;
         athletesTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         nameCol.setCellValueFactory(data -> new SimpleStringProperty(
@@ -871,6 +977,124 @@ public class CoachDashboardController {
         } catch (SQLException e) {
             if (sessionsLabel != null) sessionsLabel.setText("—");
         }
+        buildDashWorkouts();
+    }
+
+    private void buildDashWorkouts() {
+        if (dashWorkoutsContainer == null) return;
+        dashWorkoutsContainer.getChildren().clear();
+        try {
+            List<Workout> workouts = workoutService.read();
+
+            // ── Stats row ──────────────────────────────────────────────────
+            long total = workouts.size();
+            long beginner = workouts.stream().filter(w -> "beginner".equalsIgnoreCase(safe(w.getNiveau()))).count();
+            long intermediate = workouts.stream().filter(w -> "intermediate".equalsIgnoreCase(safe(w.getNiveau()))).count();
+            long advanced = workouts.stream().filter(w -> "advanced".equalsIgnoreCase(safe(w.getNiveau()))).count();
+
+            HBox statsRow = new HBox(12);
+            statsRow.getChildren().addAll(
+                buildMiniStat("TOTAL WORKOUTS", String.valueOf(total), "#9f7cff"),
+                buildMiniStat("BEGINNER", String.valueOf(beginner), "#22C55E"),
+                buildMiniStat("INTERMEDIATE", String.valueOf(intermediate), "#F59E0B"),
+                buildMiniStat("ADVANCED", String.valueOf(advanced), "#EF4444")
+            );
+            dashWorkoutsContainer.getChildren().add(statsRow);
+
+            // ── Bar chart by level ─────────────────────────────────────────
+            if (total > 0) {
+                VBox chartBox = new VBox(8);
+                chartBox.setStyle("-fx-background-color:#111827;-fx-border-color:#1F2937;" +
+                        "-fx-border-radius:12;-fx-background-radius:12;-fx-padding:14;");
+                Label chartTitle = new Label("WORKOUTS BY LEVEL");
+                chartTitle.setStyle("-fx-text-fill:#6B7280;-fx-font-size:11px;-fx-font-weight:800;");
+                chartBox.getChildren().add(chartTitle);
+
+                String[][] levels = {
+                    {"Beginner", String.valueOf(beginner), "#22C55E"},
+                    {"Intermediate", String.valueOf(intermediate), "#F59E0B"},
+                    {"Advanced", String.valueOf(advanced), "#EF4444"}
+                };
+                for (String[] lv : levels) {
+                    long count = Long.parseLong(lv[1]);
+                    double pct = total > 0 ? (double) count / total : 0;
+                    HBox barRow = new HBox(10);
+                    barRow.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+                    Label lbl = new Label(lv[0]);
+                    lbl.setStyle("-fx-text-fill:#D1D5DB;-fx-font-size:12px;-fx-min-width:90;");
+                    javafx.scene.layout.StackPane barBg = new javafx.scene.layout.StackPane();
+                    barBg.setStyle("-fx-background-color:#1F2937;-fx-background-radius:4;");
+                    barBg.setPrefHeight(10);
+                    javafx.scene.layout.HBox.setHgrow(barBg, javafx.scene.layout.Priority.ALWAYS);
+                    javafx.scene.layout.Region fill = new javafx.scene.layout.Region();
+                    fill.setStyle("-fx-background-color:" + lv[2] + ";-fx-background-radius:4;");
+                    fill.setPrefHeight(10);
+                    fill.setPrefWidth(pct * 300);
+                    barBg.getChildren().add(fill);
+                    javafx.scene.layout.StackPane.setAlignment(fill, javafx.geometry.Pos.CENTER_LEFT);
+                    Label countLbl = new Label(lv[1]);
+                    countLbl.setStyle("-fx-text-fill:" + lv[2] + ";-fx-font-size:12px;-fx-font-weight:700;-fx-min-width:20;");
+                    barRow.getChildren().addAll(lbl, barBg, countLbl);
+                    chartBox.getChildren().add(barRow);
+                }
+                dashWorkoutsContainer.getChildren().add(chartBox);
+            }
+
+            // ── Workout list ───────────────────────────────────────────────
+            if (workouts.isEmpty()) {
+                Label empty = new Label("No workouts yet. Go to Workout Catalog to add some.");
+                empty.setStyle("-fx-text-fill:#6B7280;-fx-font-size:13px;");
+                dashWorkoutsContainer.getChildren().add(empty);
+                return;
+            }
+            for (Workout w : workouts) {
+                HBox card = new HBox(14);
+                card.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+                card.setStyle("-fx-background-color:#111827;-fx-border-color:#1F2937;" +
+                        "-fx-border-radius:12;-fx-background-radius:12;-fx-padding:14;-fx-cursor:hand;");
+
+                Label icon = new Label("🏋");
+                icon.setStyle("-fx-font-size:22px;");
+
+                VBox info = new VBox(3);
+                javafx.scene.layout.HBox.setHgrow(info, javafx.scene.layout.Priority.ALWAYS);
+                Label name = new Label(safe(w.getNom()));
+                name.setStyle("-fx-text-fill:white;-fx-font-size:14px;-fx-font-weight:700;");
+                Label meta = new Label(
+                        (w.getNiveau() != null ? w.getNiveau() : "—") +
+                        (w.getDuree() != null ? "  •  " + w.getDuree() + " min" : ""));
+                meta.setStyle("-fx-text-fill:#6B7280;-fx-font-size:12px;");
+                info.getChildren().addAll(name, meta);
+
+                String lvl = safe(w.getNiveau()).toLowerCase();
+                String badgeColor = lvl.contains("adv") ? "#EF4444" : lvl.contains("inter") ? "#F59E0B" : "#22C55E";
+                Label statusBadge = new Label(w.getNiveau() != null ? w.getNiveau() : "Beginner");
+                statusBadge.setStyle("-fx-background-color:rgba(34,197,94,0.15);" +
+                        "-fx-border-color:" + badgeColor + ";-fx-border-radius:999;" +
+                        "-fx-background-radius:999;-fx-text-fill:" + badgeColor + ";" +
+                        "-fx-font-size:11px;-fx-font-weight:700;-fx-padding:3 10;");
+
+                card.getChildren().addAll(icon, info, statusBadge);
+                dashWorkoutsContainer.getChildren().add(card);
+            }
+        } catch (SQLException e) {
+            Label err = new Label("Could not load workouts.");
+            err.setStyle("-fx-text-fill:#F87171;-fx-font-size:12px;");
+            dashWorkoutsContainer.getChildren().add(err);
+        }
+    }
+
+    private VBox buildMiniStat(String title, String value, String color) {
+        VBox box = new VBox(4);
+        box.setStyle("-fx-background-color:#111827;-fx-border-color:#1F2937;" +
+                "-fx-border-radius:12;-fx-background-radius:12;-fx-padding:12;");
+        javafx.scene.layout.HBox.setHgrow(box, javafx.scene.layout.Priority.ALWAYS);
+        Label t = new Label(title);
+        t.setStyle("-fx-text-fill:#6B7280;-fx-font-size:10px;-fx-font-weight:800;");
+        Label v = new Label(value);
+        v.setStyle("-fx-text-fill:" + color + ";-fx-font-size:28px;-fx-font-weight:900;");
+        box.getChildren().addAll(t, v);
+        return box;
     }
 
     private void buildRatingChart(List<models.FeedbackResponse> responses) {

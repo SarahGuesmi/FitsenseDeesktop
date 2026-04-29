@@ -151,8 +151,8 @@ public class ExerciseDetailController {
 
         // Check if already done in DB
         UUID userId = AppSession.getCurrentUser() != null ? AppSession.getCurrentUser().getId() : null;
-        if (userId != null && exercise.getUuid() != null) {
-            int saved = progressService.getElapsedTime(userId, exercise.getUuid());
+        if (userId != null && exercise.getId() != null) {
+            int saved = progressService.getElapsedTime(userId, exercise.getId());
             if (saved > 0) {
                 completed = true;
                 elapsedSeconds = saved;
@@ -168,10 +168,10 @@ public class ExerciseDetailController {
 
     private void loadRating() {
         UUID userId = AppSession.getCurrentUser() != null ? AppSession.getCurrentUser().getId() : null;
-        if (userId == null || exercise.getUuid() == null) return;
-        currentRating = ratingService.getRating(userId, exercise.getUuid());
+        if (userId == null || exercise.getId() == null) return;
+        currentRating = ratingService.getRating(userId, exercise.getId());
         renderStars(currentRating);
-        double avg = ratingService.getAverageRating(exercise.getUuid());
+        double avg = ratingService.getAverageRating(exercise.getId());
         if (avg > 0) avgRatingLabel.setText(String.format("avg %.1f ★", avg));
         if (currentRating > 0) ratingLabel.setText("Your rating: " + currentRating + "/5");
     }
@@ -252,12 +252,12 @@ public class ExerciseDetailController {
     private void saveRating(int rating) {
         currentRating = rating;
         UUID userId = AppSession.getCurrentUser() != null ? AppSession.getCurrentUser().getId() : null;
-        if (userId != null && exercise.getUuid() != null) {
-            ratingService.saveRating(userId, exercise.getUuid(), rating);
+        if (userId != null && exercise.getId() != null) {
+            ratingService.saveRating(userId, exercise.getId(), rating);
         }
         renderStars(rating);
         ratingLabel.setText("Your rating: " + rating + "/5");
-        double avg = ratingService.getAverageRating(exercise.getUuid());
+        double avg = ratingService.getAverageRating(exercise.getId());
         if (avg > 0) avgRatingLabel.setText(String.format("avg %.1f ★", avg));
     }
 
@@ -458,8 +458,8 @@ public class ExerciseDetailController {
 
         // Persist to DB
         UUID userId = AppSession.getCurrentUser() != null ? AppSession.getCurrentUser().getId() : null;
-        if (userId != null && exercise.getUuid() != null) {
-            progressService.markExerciseDone(userId, exercise.getUuid(), elapsedSeconds);
+        if (userId != null && exercise.getId() != null) {
+            progressService.markExerciseDone(userId, exercise.getId(), elapsedSeconds);
         }
 
         ActivityTracker.track(ActivityTracker.EventType.COMPLETE_EXERCISE,
@@ -597,9 +597,6 @@ public class ExerciseDetailController {
             if (workout != null) {
                 WorkoutDetailController ctrl = loader.getController();
                 ctrl.setWorkout(workout);
-                if (completed && exercise != null) {
-                    ctrl.markExerciseDoneUuid(exercise.getUuid(), exercise.getId());
-                }
             }
             nameLabel.getScene().setRoot(root);
         } catch (Exception ex) {

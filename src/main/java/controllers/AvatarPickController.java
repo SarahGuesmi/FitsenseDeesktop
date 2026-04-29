@@ -83,7 +83,7 @@ public class AvatarPickController {
 
         try {
             User user = AppSession.getCurrentUser();
-            String sql = "UPDATE `app_user` SET `photo` = ? WHERE `id` = ?";
+            String sql = "UPDATE `fitsense`.`app_user` SET `photo` = ? WHERE `id` = ?";
             try (PreparedStatement stmt = DbConnection.getInstance().getCnx().prepareStatement(sql)) {
                 stmt.setString(1, selectedAvatarUrl);
                 stmt.setBytes(2, UuidUtil.toBytes16(user.getId()));

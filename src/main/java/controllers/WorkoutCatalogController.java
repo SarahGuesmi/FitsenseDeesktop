@@ -112,7 +112,7 @@ public class WorkoutCatalogController {
         exercises.getStyleClass().add("user-email");
 
         // Average rating from users
-        double avgRating = w.getUuid() != null ? ratingService.getWorkoutAverageRating(w.getUuid()) : 0;
+        double avgRating = w.getId() != null ? ratingService.getWorkoutAverageRating(w.getId()) : 0;
         Label ratingLbl = new Label(avgRating > 0
                 ? buildStars(avgRating) + String.format("  %.1f/5", avgRating)
                 : "☆ No ratings yet");

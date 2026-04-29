@@ -41,22 +41,36 @@ public class WorkoutFeedbackController {
     }
 
     private void loadTemplate() {
-        if (currentWorkout == null) return;
+        if (currentWorkout == null) {
+            showNoFeedback("No workout provided.");
+            return;
+        }
         try {
             FeedbackService service = new FeedbackService(DbConnection.getInstance().getCnx());
-            template = currentWorkout.getUuid() != null
-                    ? service.findTemplateByWorkoutUuid(currentWorkout.getUuid())
-                    : service.findTemplateByWorkoutId(currentWorkout.getId());
+            // Try by UUID first
+            template = currentWorkout.getId() != null
+                    ? service.findTemplateByWorkoutUuid(currentWorkout.getId())
+                    : null;
+            // Fallback: any available template
             if (template == null) {
-                submitBtn.setDisable(true);
-                optionsGrid.getChildren().add(new Label("No feedback questionnaire assigned to this workout."));
+                template = service.findTemplateByWorkoutId(0);
+            }
+            if (template == null) {
+                showNoFeedback("No feedback questionnaire assigned to this workout.");
                 return;
             }
             buildOptions(parseOptions(template.getOptions()));
         } catch (SQLException e) {
-            submitBtn.setDisable(true);
-            optionsGrid.getChildren().add(new Label("Could not load feedback: " + e.getMessage()));
+            showNoFeedback("Could not load feedback: " + e.getMessage());
         }
+    }
+
+    private void showNoFeedback(String msg) {
+        submitBtn.setDisable(true);
+        optionsGrid.getChildren().clear();
+        Label lbl = new Label(msg);
+        lbl.setStyle("-fx-text-fill: #9CA3AF; -fx-font-size: 13px;");
+        optionsGrid.getChildren().add(lbl);
     }
 
     private void buildOptions(List<String> options) {

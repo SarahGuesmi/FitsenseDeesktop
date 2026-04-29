@@ -87,6 +87,10 @@ public class WorkoutDetailController {
         row.getStyleClass().add("exercise-row");
         row.setPadding(new Insets(14));
         row.setAlignment(Pos.CENTER_LEFT);
+        row.setStyle("-fx-cursor: hand;");
+
+        // Click on row → open exercise detail
+        row.setOnMouseClicked(ev -> openExerciseDetail(e));
 
         // Icon
         Label icon = new Label("🏋");
@@ -171,8 +175,42 @@ public class WorkoutDetailController {
         });
 
         right.getChildren().addAll(dur, perf, markBtn);
+
+        // "View details" hint
+        Label viewHint = new Label("View details →");
+        viewHint.setStyle("-fx-text-fill: #6B7280; -fx-font-size: 11px; -fx-cursor: hand;");
+        right.getChildren().add(viewHint);
+
         row.getChildren().addAll(icon, info, right);
         return row;
+    }
+
+    private void openExerciseDetail(Exercise e) {
+        try {
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                    Objects.requireNonNull(getClass().getResource("/fxml/ExerciseDetailView.fxml")));
+            javafx.scene.Parent root = loader.load();
+            ExerciseDetailController ctrl = loader.getController();
+            ctrl.setExercise(e, workout, done -> {
+                // Mark exercise as done when returning
+                if (done != null && done.getId() != null) {
+                    doneExerciseIds.add(done.getId());
+                    javafx.application.Platform.runLater(this::refreshAfterReturn);
+                }
+            });
+            workoutNameLabel.getScene().setRoot(root);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void refreshAfterReturn() {
+        updateProgress();
+        // Rebuild exercise rows to show done badges
+        exercisesListBox.getChildren().clear();
+        for (Exercise e : workout.getExercises()) {
+            exercisesListBox.getChildren().add(buildExerciseRow(e));
+        }
     }
 
     private void updateProgress() {
@@ -207,6 +245,43 @@ public class WorkoutDetailController {
         startBtn.setStyle("-fx-background-color: rgba(34,197,94,0.2); -fx-border-color: rgba(34,197,94,0.3); " +
                 "-fx-text-fill: #4ADE80; -fx-font-weight: 800; -fx-font-size: 14px; " +
                 "-fx-background-radius: 12; -fx-padding: 14 0; -fx-max-width: Infinity;");
+
+        // Show feedback form after a short delay
+        javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(
+                javafx.util.Duration.millis(600));
+        pause.setOnFinished(e -> javafx.application.Platform.runLater(this::showFeedbackDialog));
+        pause.play();
+    }
+
+    private void showFeedbackDialog() {
+        try {
+            // Debug: check workout id
+            System.out.println("DEBUG showFeedbackDialog: workout=" + (workout != null ? workout.getNom() : "NULL")
+                    + " id=" + (workout != null ? workout.getId() : "NULL"));
+
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                    getClass().getResource("/fxml/WorkoutFeedbackView.fxml"));
+            javafx.scene.Parent root = loader.load();
+
+            WorkoutFeedbackController ctrl = loader.getController();
+            ctrl.setWorkout(workout);
+
+            javafx.stage.Stage stage = new javafx.stage.Stage();
+            stage.setTitle("Workout Feedback");
+            stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+            stage.setScene(new javafx.scene.Scene(root));
+            stage.setResizable(false);
+            stage.showAndWait();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            // Write to log file
+            try {
+                java.io.FileWriter fw = new java.io.FileWriter("feedback_error.log", false);
+                fw.write(ex.toString() + "\n");
+                for (StackTraceElement el : ex.getStackTrace()) fw.write("  at " + el + "\n");
+                fw.close();
+            } catch (Exception ignored) {}
+        }
     }
 
     @FXML

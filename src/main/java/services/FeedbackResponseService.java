@@ -25,7 +25,8 @@ public class FeedbackResponseService implements CRUD<FeedbackResponse> {
 
     private static FeedbackResponse mapRow(ResultSet rs) throws SQLException {
         FeedbackResponse f = new FeedbackResponse();
-        f.setId(Math.abs(UuidUtil.fromResultSet(rs, "id").hashCode()));
+        UUID uuid = UuidUtil.fromResultSet(rs, "id");
+        f.setId(uuid);
         f.setRating(rs.getString("rating"));
         f.setComment(rs.getString("comment"));
         f.setSentiment(rs.getString("sentiment"));
@@ -60,7 +61,7 @@ public class FeedbackResponseService implements CRUD<FeedbackResponse> {
     public List<FeedbackResponse> readWithDetails() throws SQLException {
         String sql = "SELECT fr.*, u.name_firstname as firstname, u.name_lastname as lastname, w.nom " +
                 "FROM feedback_response fr " +
-                "LEFT JOIN app_user u ON u.id = fr.user_id " +
+                "LEFT JOIN fitsense.app_user u ON u.id = fr.user_id " +
                 "LEFT JOIN workout w ON w.id = fr.workout_id " +
                 "ORDER BY fr.created_at DESC";
         List<FeedbackResponse> list = new ArrayList<>();
@@ -81,8 +82,8 @@ public class FeedbackResponseService implements CRUD<FeedbackResponse> {
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setBytes(1, UuidUtil.toBytes16(id));
             ps.setBytes(2, f.getUser() != null ? UuidUtil.toBytes16(f.getUser().getId()) : null);
-            ps.setBytes(3, f.getWorkout() != null && f.getWorkout().getUuid() != null
-                    ? UuidUtil.toBytes16(f.getWorkout().getUuid()) : null);
+            ps.setBytes(3, f.getWorkout() != null && f.getWorkout().getId() != null
+                    ? UuidUtil.toBytes16(f.getWorkout().getId()) : null);
             ps.setBytes(4, f.getCoach() != null ? UuidUtil.toBytes16(f.getCoach().getId()) : null);
             ps.setString(5, f.getRating());
             ps.setString(6, f.getComment());

@@ -29,7 +29,7 @@ public class ObjectifSportifService implements CRUD<ObjectifSportif> {
         if (email == null || email.isBlank()) return "";
         String sql = "SELECT o.* FROM `objectif_sportif` o "
                 + "INNER JOIN `profile_physique` p ON p.`id` = o.`profile_physique_id` "
-                + "INNER JOIN `app_user` u ON u.`id` = p.`user_id` "
+                + "INNER JOIN `fitsense`.`app_user` u ON u.`id` = p.`user_id` "
                 + "WHERE u.`email_email` = ?";
         try (PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setString(1, email.trim());

@@ -285,7 +285,7 @@ public class TwoFactorSetupController {
 
     private void saveSecret(User user, String secret) throws Exception {
         Connection cnx = DbConnection.getInstance().getCnx();
-        String sql = "UPDATE `app_user` SET `google_authenticator_secret` = ? WHERE `id` = ?";
+        String sql = "UPDATE `fitsense`.`app_user` SET `google_authenticator_secret` = ? WHERE `id` = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
             stmt.setString(1, secret);
             stmt.setBytes(2, UuidUtil.toBytes16(user.getId()));

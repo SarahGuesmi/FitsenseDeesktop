@@ -117,7 +117,7 @@ public class UserService implements CRUD<User> {
      * Retourne null si aucun utilisateur trouvé.
      */
     public User findByEmail(String email) throws SQLException {
-        String sql = "SELECT * FROM `app_user` WHERE `email_email` = ?";
+        String sql = "SELECT * FROM `fitsense`.`app_user` WHERE `email_email` = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
             stmt.setString(1, email); // remplace le "?" par l'email
             try (ResultSet rs = stmt.executeQuery()) {
@@ -134,7 +134,7 @@ public class UserService implements CRUD<User> {
      * qu'un username généré n'est pas déjà pris avant de l'assigner.
      */
     public User findByUsername(String username) throws SQLException {
-        String sql = "SELECT * FROM `app_user` WHERE `username` = ?";
+        String sql = "SELECT * FROM `fitsense`.`app_user` WHERE `username` = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
             stmt.setString(1, username);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -159,11 +159,11 @@ public class UserService implements CRUD<User> {
      * Appelé dans AdminDashboardController.refreshData() pour afficher
      * la liste des utilisateurs dans le TableView.
      *
-     * Retourne : SELECT * FROM app_user → List<User>
+     * Retourne : SELECT * FROM fitsense.app_user → List<User>
      */
     @Override
     public List<User> read() throws SQLException {
-        String sql = "SELECT * FROM `app_user`";
+        String sql = "SELECT * FROM `fitsense`.`app_user`";
         // try-with-resources : ferme automatiquement stmt et rs après utilisation
         try (Statement stmt = cnx.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
             List<User> list = new ArrayList<>();
@@ -183,7 +183,7 @@ public class UserService implements CRUD<User> {
      */
     @Override
     public void update(User user) throws SQLException {
-        String sql = "UPDATE `app_user` SET `email_email` = ?, `password` = ?, `roles` = ?, "
+        String sql = "UPDATE `fitsense`.`app_user` SET `email_email` = ?, `password` = ?, `roles` = ?, "
                 + "`name_firstname` = ?, `name_lastname` = ?, `account_status` = ? "
                 + "WHERE `id` = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
@@ -207,7 +207,7 @@ public class UserService implements CRUD<User> {
      */
     @Override
     public void delete(User user) throws SQLException {
-        String sql = "DELETE FROM `app_user` WHERE `id` = ?";
+        String sql = "DELETE FROM `fitsense`.`app_user` WHERE `id` = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
             stmt.setBytes(1, UuidUtil.toBytes16(user.getId()));
             stmt.executeUpdate(); // exécute le DELETE
@@ -222,7 +222,7 @@ public class UserService implements CRUD<User> {
      */
     public void deleteByIds(List<UUID> ids) throws SQLException {
         if (ids == null || ids.isEmpty()) return;
-        String sql = "DELETE FROM `app_user` WHERE `id` = ?";
+        String sql = "DELETE FROM `fitsense`.`app_user` WHERE `id` = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
             for (UUID id : ids) {
                 stmt.setBytes(1, UuidUtil.toBytes16(id));
@@ -261,7 +261,7 @@ public class UserService implements CRUD<User> {
         // Génère un identifiant unique pour ce nouvel utilisateur
         UUID newId = UUID.randomUUID();
 
-        String sql = "INSERT INTO `app_user` "
+        String sql = "INSERT INTO `fitsense`.`app_user` "
                 + "(`id`, `email_email`, `password`, `roles`, `name_firstname`, `name_lastname`, "
                 + "`account_status`, `date_creation`, `username`, `phone_number`, `photo`, "
                 + "`google_authenticator_secret`) "

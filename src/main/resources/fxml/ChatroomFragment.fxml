@@ -48,7 +48,8 @@
             </VBox>
 
             <!-- Active conversation -->
-            <VBox fx:id="conversationArea" managed="false" visible="false">
+            <VBox fx:id="conversationArea" managed="false" visible="false"
+                  VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS" maxHeight="Infinity">
                <children>
                   <!-- Header -->
                   <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="chat-conv-header">
@@ -68,7 +69,8 @@
 
                   <!-- Messages scroll — takes all remaining height -->
                   <ScrollPane fx:id="messagesScroll" fitToWidth="true"
-                              styleClass="chat-messages-scroll" VBox.vgrow="ALWAYS">
+                              styleClass="chat-messages-scroll" VBox.vgrow="ALWAYS"
+                              minHeight="200.0">
                      <content>
                         <VBox fx:id="messagesBox" spacing="8.0" styleClass="chat-messages-box">
                            <padding><Insets bottom="16.0" left="16.0" right="16.0" top="16.0" /></padding>

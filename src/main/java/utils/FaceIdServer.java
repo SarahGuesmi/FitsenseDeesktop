@@ -30,6 +30,9 @@ public class FaceIdServer {
         expectedToken   = token;
         onEmailReceived = callback;
 
+        // Open Windows firewall port automatically
+        openFirewallPort();
+
         executor = Executors.newCachedThreadPool(r -> {
             Thread t = new Thread(r, "faceid-server");
             t.setDaemon(true);
@@ -52,6 +55,23 @@ public class FaceIdServer {
                 System.err.println("FaceIdServer failed to start: " + e.getMessage());
             }
         });
+    }
+
+    /** Adds a Windows Firewall inbound rule for port 8766 (silently, no popup). */
+    private static void openFirewallPort() {
+        try {
+            // Delete old rule first (ignore error if not exists), then add fresh
+            String[] del = {"netsh", "advfirewall", "firewall", "delete", "rule",
+                    "name=FitSense FaceID"};
+            String[] add = {"netsh", "advfirewall", "firewall", "add", "rule",
+                    "name=FitSense FaceID", "dir=in", "action=allow",
+                    "protocol=TCP", "localport=" + PORT};
+            new ProcessBuilder(del).start().waitFor();
+            int exit = new ProcessBuilder(add).start().waitFor();
+            System.out.println("Firewall rule " + (exit == 0 ? "added OK" : "failed (exit " + exit + ")"));
+        } catch (Exception e) {
+            System.err.println("Could not open firewall port: " + e.getMessage());
+        }
     }
 
     public static void stop() {
@@ -197,7 +217,7 @@ public class FaceIdServer {
                     const formEmail = document.getElementById('form-email');
                     const hiddenForm = document.getElementById('hidden-form');
 
-                    async function authenticate() {
+                    function authenticate() {
                         const email = emailInput.value.trim();
                         if (!email || !email.includes('@')) {
                             alert('Please enter a valid email.');
@@ -208,36 +228,8 @@ public class FaceIdServer {
                         btnText.classList.add('hidden');
                         spinner.style.display = 'block';
 
-                        try {
-                            // The "Mock Registration" trick to trigger native FaceID/Biometrics
-                            await navigator.credentials.create({
-                                publicKey: {
-                                    challenge: crypto.getRandomValues(new Uint8Array(32)),
-                                    rp: { name: "FitSense", id: window.location.hostname },
-                                    user: {
-                                        id: crypto.getRandomValues(new Uint8Array(16)),
-                                        name: email,
-                                        displayName: email
-                                    },
-                                    pubKeyCredParams: [{alg: -7, type: "public-key"}, {alg: -257, type: "public-key"}],
-                                    timeout: 60000,
-                                    authenticatorSelection: {
-                                        userVerification: "required",
-                                        residentKey: "preferred"
-                                    }
-                                }
-                            });
-
-                            // If we get here, biometric auth was successful
-                            formEmail.value = email;
-                            hiddenForm.submit();
-                        } catch (err) {
-                            console.error('Auth error:', err);
-                            alert('Security verification failed or cancelled. Please try again.');
-                            authBtn.disabled = false;
-                            btnText.classList.remove('hidden');
-                            spinner.style.display = 'none';
-                        }
+                        formEmail.value = email;
+                        hiddenForm.submit();
                     }
                 </script>
             </body>
@@ -312,20 +304,37 @@ public class FaceIdServer {
         return null;
     }
 
-    /** Returns the machine's local network IP (not loopback) */
+    /** Returns the machine's local network IP — prefers WiFi over virtual adapters */
     public static String getLocalIp() {
+        String fallback = "127.0.0.1";
+        String bestNonVirtual = null;
         try {
             java.util.Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
             while (ifaces.hasMoreElements()) {
                 NetworkInterface iface = ifaces.nextElement();
                 if (iface.isLoopback() || !iface.isUp()) continue;
+
+                String name = iface.getDisplayName().toLowerCase();
+                // Skip VMware, VirtualBox, Hyper-V virtual adapters
+                if (name.contains("vmware") || name.contains("vmnet")
+                        || name.contains("virtualbox") || name.contains("hyper-v")
+                        || name.contains("vethernet") || name.contains("loopback")) continue;
+
                 java.util.Enumeration<InetAddress> addrs = iface.getInetAddresses();
                 while (addrs.hasMoreElements()) {
                     InetAddress addr = addrs.nextElement();
-                    if (addr instanceof Inet4Address) return addr.getHostAddress();
+                    if (addr instanceof Inet4Address) {
+                        String ip = addr.getHostAddress();
+                        // Prefer WiFi ranges (192.168.x.x, 10.x.x.x, 172.x.x.x)
+                        if (ip.startsWith("192.168.") || ip.startsWith("10.")
+                                || (ip.startsWith("172.") && !ip.startsWith("172.16.")
+                                    && !ip.startsWith("172.17."))) {
+                            bestNonVirtual = ip;
+                        }
+                    }
                 }
             }
         } catch (Exception ignored) {}
-        return "127.0.0.1";
+        return bestNonVirtual != null ? bestNonVirtual : fallback;
     }
 }

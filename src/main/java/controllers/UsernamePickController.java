@@ -91,7 +91,7 @@ public class UsernamePickController {
         // Save to DB
         try {
             User user = AppSession.getCurrentUser();
-            String sql = "UPDATE `app_user` SET `username` = ? WHERE `id` = ?";
+            String sql = "UPDATE `fitsense`.`app_user` SET `username` = ? WHERE `id` = ?";
             try (PreparedStatement stmt = DbConnection.getInstance().getCnx().prepareStatement(sql)) {
                 stmt.setString(1, chosen);
                 stmt.setBytes(2, UuidUtil.toBytes16(user.getId()));

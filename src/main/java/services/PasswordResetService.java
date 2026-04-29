@@ -36,7 +36,7 @@ import java.util.UUID;
 public class PasswordResetService {
 
     private static final String SENDGRID_API_KEY = loadApiKey();
-    private static final String FROM_EMAIL       = "sarahguesmi223@gmail.com";
+    private static final String FROM_EMAIL       = "nourammarr23@icloud.com";
     private static final String FROM_NAME        = "FitSense";
     private static final int    EXPIRY_MINUTES   = 30;
     private static final String RESET_BASE_URL   = "http://localhost:8765/reset";
@@ -94,7 +94,7 @@ public class PasswordResetService {
     public String validateToken(String selector, String rawToken) throws SQLException {
         String sql = "SELECT r.hashed_token, r.expires_at, u.email_email "
                    + "FROM `reset_password_request` r "
-                   + "JOIN `app_user` u ON u.id = r.user_id "
+                   + "JOIN `fitsense`.`app_user` u ON u.id = r.user_id "
                    + "WHERE r.selector = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
             stmt.setString(1, selector);
@@ -125,7 +125,7 @@ public class PasswordResetService {
         org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder encoder =
                 new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder();
 
-        String sql = "UPDATE `app_user` SET `password` = ? WHERE `email_email` = ?";
+        String sql = "UPDATE `fitsense`.`app_user` SET `password` = ? WHERE `email_email` = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(sql)) {
             stmt.setString(1, encoder.encode(newPassword));
             stmt.setString(2, email);

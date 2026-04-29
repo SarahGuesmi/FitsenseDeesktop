@@ -30,20 +30,20 @@ public interface CRUD<X> {
     /**
      * READ — récupère tous les enregistrements de la table.
      * Retourne une List<X> avec tous les objets mappés depuis la base.
-     * Exemple : userService.read() → SELECT * FROM app_user
+     * Exemple : userService.read() → SELECT * FROM fitsense.app_user
      */
     List<X> read() throws SQLException;
 
     /**
      * UPDATE — met à jour un enregistrement existant en base.
      * L'objet X doit avoir un identifiant (id) pour cibler la bonne ligne.
-     * Exemple : userService.update(user) → UPDATE app_user SET ... WHERE id = ?
+     * Exemple : userService.update(user) → UPDATE fitsense.app_user SET ... WHERE id = ?
      */
     void update(X x) throws SQLException;
 
     /**
      * DELETE — supprime un enregistrement de la base.
-     * Exemple : userService.delete(user) → DELETE FROM app_user WHERE id = ?
+     * Exemple : userService.delete(user) → DELETE FROM fitsense.app_user WHERE id = ?
      */
     void delete(X x) throws SQLException;
 

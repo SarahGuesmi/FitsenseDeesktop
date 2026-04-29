@@ -19,6 +19,11 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 public class DashboardController {
+
+    private static DashboardController instance;
+
+    public static DashboardController getInstance() { return instance; }
+
     @FXML
     private StackPane root;
     @FXML
@@ -63,6 +68,7 @@ public class DashboardController {
 
     @FXML
     private void initialize() {
+        instance = this;
         if (navbarBellBtn != null) {
             navbarBellBtn.setText("\uD83D\uDD14");
         }
@@ -255,6 +261,40 @@ public class DashboardController {
         if (logoutOverlay != null) {
             logoutOverlay.setManaged(false);
             logoutOverlay.setVisible(false);
+        }
+    }
+
+    public void showLibraryView(javafx.scene.Node view) {
+        hideAllDashPanes();
+        if (dashWorkoutsPane != null) {
+            dashWorkoutsPane.setManaged(true);
+            dashWorkoutsPane.setVisible(true);
+            if (view != null) {
+                VBox container = new VBox(view);
+                VBox.setVgrow(view, javafx.scene.layout.Priority.ALWAYS);
+                dashWorkoutsPane.getChildren().setAll(container);
+            }
+        }
+        setDashNavActive(dashWorkoutsBtn);
+    }
+
+    public void showWorkoutsList() {
+        onShowWorkouts();
+    }
+
+    public void onShowActivityLog() {
+        try {
+            Parent root = FXMLLoader.load(
+                    Objects.requireNonNull(getClass().getResource("/fxml/ActivityLogView.fxml")));
+            hideAllDashPanes();
+            if (dashWorkoutsPane != null) {
+                dashWorkoutsPane.setManaged(true);
+                dashWorkoutsPane.setVisible(true);
+                dashWorkoutsPane.getChildren().setAll(root);
+            }
+            setDashNavActive(dashWorkoutsBtn);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

@@ -136,22 +136,8 @@ public class ObjectiveController {
     }
 
     private List<String> loadObjectiveNames() {
-        Set<String> unique = new LinkedHashSet<>();
-        try {
-            for (ObjectifSportif o : objectifService.read()) {
-                if (o.getName() != null && !o.getName().isBlank()) {
-                    unique.add(o.getName().trim());
-                }
-            }
-        } catch (SQLException ignored) {
-        }
-        if (unique.isEmpty()) {
-            unique.add("Weight Loss");
-            unique.add("Muscle Gain");
-            unique.add("Endurance");
-            unique.add("Well-being");
-        }
-        return new ArrayList<>(unique);
+        // Always show these 4 standard objectives
+        return List.of("Weight Loss", "Muscle Gain", "Endurance", "Well-being");
     }
 
     private void switchScene(String fxmlPath, String cssPath) {

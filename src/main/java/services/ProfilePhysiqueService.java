@@ -45,7 +45,7 @@ public class ProfilePhysiqueService implements CRUD<ProfilePhysique> {
     public String findGenderByUserEmail(String email) throws SQLException {
         if (email == null || email.isBlank()) return null;
         String sql = "SELECT p.* FROM `profile_physique` p "
-                + "INNER JOIN `app_user` u ON u.`id` = p.`user_id` "
+                + "INNER JOIN `fitsense`.`app_user` u ON u.`id` = p.`user_id` "
                 + "WHERE u.`email_email` = ?";
         try (PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setString(1, email.trim());

@@ -9,6 +9,8 @@ module org.example.fitsense {
     requires commons.logging;
     requires com.google.gson;
     requires java.net.http;
+    requires jdk.httpserver;
+    requires org.json;
 
     opens app to javafx.graphics;
     opens controllers to javafx.fxml;

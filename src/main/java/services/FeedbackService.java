@@ -19,7 +19,7 @@ public class FeedbackService implements CRUD<Questionnaire> {
     private static Questionnaire mapRow(ResultSet rs) throws SQLException {
         Questionnaire q = new Questionnaire();
         UUID uuid = UuidUtil.fromResultSet(rs, "id");
-        q.setId(uuid != null ? Math.abs(uuid.hashCode()) : 0);
+        q.setId(uuid);
         q.setTitre(rs.getString("titre"));
         q.setType(rs.getString("type"));
         q.setOptions(rs.getString("options"));
@@ -35,11 +35,11 @@ public class FeedbackService implements CRUD<Questionnaire> {
 
     @Override
     public void createPrepared(Questionnaire q) throws SQLException {
-        UUID id = UUID.randomUUID();
+        q.setId(UUID.randomUUID());
         String sql = "INSERT INTO questionnaire (id, user_id, coach_id, titre, type, options, exercices_compris, date_soumission) " +
                 "VALUES (?,?,?,?,?,?,?,?)";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setBytes(1, UuidUtil.toBytes16(id));
+            ps.setBytes(1, UuidUtil.toBytes16(q.getId()));
             ps.setBytes(2, q.getUser() != null ? UuidUtil.toBytes16(q.getUser().getId()) : null);
             ps.setBytes(3, q.getCoach() != null ? UuidUtil.toBytes16(q.getCoach().getId()) : null);
             ps.setString(4, q.getTitre());
@@ -51,16 +51,16 @@ public class FeedbackService implements CRUD<Questionnaire> {
         }
         // Link workouts
         for (models.Workout w : q.getWorkouts()) {
-            if (w.getUuid() != null) {
+            if (w.getId() != null) {
                 try (PreparedStatement ps2 = connection.prepareStatement(
                         "INSERT IGNORE INTO questionnaire_workout (questionnaire_id, workout_id) VALUES (?,?)")) {
-                    ps2.setBytes(1, UuidUtil.toBytes16(id));
-                    ps2.setBytes(2, UuidUtil.toBytes16(w.getUuid()));
+                    ps2.setBytes(1, UuidUtil.toBytes16(q.getId()));
+                    ps2.setBytes(2, UuidUtil.toBytes16(w.getId()));
                     ps2.executeUpdate();
                 }
             }
         }
-        q.setId(Math.abs(id.hashCode()));
+        // id already set via q.setId(UUID.randomUUID()) above
     }
 
     @Override

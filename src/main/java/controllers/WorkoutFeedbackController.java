@@ -1,20 +1,34 @@
 package controllers;
 
 import app.AppSession;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import models.Questionnaire;
 import models.Workout;
 import services.FeedbackService;
+import services.GroqAiService;
+import services.WorkoutService;
+import services.YouTubeService;
 import utils.DbConnection;
 
+import java.awt.Desktop;
+import java.net.URI;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class WorkoutFeedbackController {
 
@@ -26,7 +40,8 @@ public class WorkoutFeedbackController {
     private Workout currentWorkout;
     private Questionnaire template;
     private Runnable onDoneCallback;
-    private ToggleGroup ratingGroup;
+    private int selectedStars = 0;
+    private final Label[] starLabels = new Label[5];
 
     public void setWorkout(Workout workout) {
         this.currentWorkout = workout;
@@ -75,61 +90,78 @@ public class WorkoutFeedbackController {
 
     private void buildOptions(List<String> options) {
         optionsGrid.getChildren().clear();
-        ratingGroup = new ToggleGroup();
+        selectedStars = 0;
 
-        // 2-column grid
-        GridPane grid = new GridPane();
-        grid.setHgap(12);
-        grid.setVgap(10);
+        // Star rating row
+        HBox starsRow = new HBox(8);
+        starsRow.setAlignment(Pos.CENTER_LEFT);
 
-        int col = 0, row = 0;
-        for (String opt : options) {
-            HBox cell = buildOptionCell(opt, ratingGroup);
-            grid.add(cell, col, row);
-            col++;
-            if (col == 2) { col = 0; row++; }
+        String[] labels = {"Very poor", "Poor", "Average", "Good", "Excellent"};
+
+        for (int i = 0; i < 5; i++) {
+            final int starIndex = i + 1;
+            Label star = new Label("☆");
+            star.getStyleClass().add("fb-star");
+            star.setUserData(labels[i]);
+
+            // Hover: fill up to hovered star
+            star.setOnMouseEntered(e -> highlightStars(starIndex));
+            star.setOnMouseExited(e -> highlightStars(selectedStars));
+            star.setOnMouseClicked(e -> {
+                selectedStars = starIndex;
+                highlightStars(selectedStars);
+            });
+
+            starLabels[i] = star;
+            starsRow.getChildren().add(star);
         }
-        optionsGrid.getChildren().add(grid);
+
+        // Label showing current selection text
+        Label selectionLabel = new Label("Select a rating");
+        selectionLabel.getStyleClass().add("fb-star-label");
+        selectionLabel.setId("starSelectionLabel");
+
+        // Update label on click
+        for (int i = 0; i < 5; i++) {
+            final int idx = i;
+            starLabels[i].setOnMouseClicked(e -> {
+                selectedStars = idx + 1;
+                highlightStars(selectedStars);
+                selectionLabel.setText(selectedStars + " – " + (String) starLabels[idx].getUserData());
+            });
+        }
+
+        optionsGrid.getChildren().addAll(starsRow, selectionLabel);
     }
 
-    private HBox buildOptionCell(String text, ToggleGroup group) {
-        RadioButton rb = new RadioButton(text);
-        rb.setToggleGroup(group);
-        rb.setMaxWidth(Double.MAX_VALUE);
-        rb.getStyleClass().add("fb-radio");
-
-        HBox cell = new HBox(rb);
-        cell.setAlignment(Pos.CENTER_LEFT);
-        cell.getStyleClass().add("fb-option-cell");
-        cell.setPrefWidth(240);
-        cell.setMaxWidth(Double.MAX_VALUE);
-
-        // Highlight on select
-        rb.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
-            if (isSelected) {
-                if (!cell.getStyleClass().contains("fb-option-selected"))
-                    cell.getStyleClass().add("fb-option-selected");
+    private void highlightStars(int count) {
+        for (int i = 0; i < 5; i++) {
+            if (starLabels[i] == null) continue;
+            if (i < count) {
+                starLabels[i].setText("★");
+                starLabels[i].getStyleClass().remove("fb-star");
+                if (!starLabels[i].getStyleClass().contains("fb-star-filled"))
+                    starLabels[i].getStyleClass().add("fb-star-filled");
             } else {
-                cell.getStyleClass().remove("fb-option-selected");
+                starLabels[i].setText("☆");
+                starLabels[i].getStyleClass().remove("fb-star-filled");
+                if (!starLabels[i].getStyleClass().contains("fb-star"))
+                    starLabels[i].getStyleClass().add("fb-star");
             }
-        });
-
-        // Click anywhere on cell selects the radio
-        cell.setOnMouseClicked(e -> rb.setSelected(true));
-        return cell;
+        }
     }
 
     @FXML
     private void onSubmit() {
         if (template == null) return;
 
-        Toggle selected = ratingGroup != null ? ratingGroup.getSelectedToggle() : null;
-        if (selected == null) {
-            showAlert(Alert.AlertType.WARNING, "Selection required", "Please select a rating.");
+        if (selectedStars == 0) {
+            showAlert(Alert.AlertType.WARNING, "Selection required", "Please select a star rating.");
             return;
         }
 
-        String rating = ((RadioButton) selected).getText();
+        String[] ratingLabels = {"Very poor", "Poor", "Average", "Good", "Excellent"};
+        String rating = selectedStars + " " + ratingLabels[selectedStars - 1];
 
         models.FeedbackResponse response = new models.FeedbackResponse();
         response.setUser(AppSession.getCurrentUser());
@@ -139,12 +171,11 @@ public class WorkoutFeedbackController {
         response.setComment(commentArea.getText());
         response.setCreatedAt(java.time.Instant.now());
 
-        // Analyze sentiment + keywords via OpenAI
+        // Analyze sentiment + keywords via Groq
         String comment = commentArea.getText();
         if (comment != null && !comment.isBlank()) {
             utils.SentimentAnalyzer.AnalysisResult result = utils.SentimentAnalyzer.analyze(comment);
             response.setSentiment(result.sentiment());
-            // Convert keywords to valid JSON array: "like, good" -> ["like","good"]
             String kw = result.keywords();
             if (kw != null && !kw.isBlank()) {
                 StringBuilder json = new StringBuilder("[");
@@ -160,11 +191,154 @@ public class WorkoutFeedbackController {
 
         try {
             new services.FeedbackResponseService().createPrepared(response);
-            showAlert(Alert.AlertType.INFORMATION, "Thank you!", "Your feedback has been submitted.");
-            done();
         } catch (java.sql.SQLException e) {
             showAlert(Alert.AlertType.ERROR, "Error", "Could not save: " + e.getMessage());
+            return;
         }
+
+        // Disable submit to prevent double-submit, show loading state
+        submitBtn.setDisable(true);
+        submitBtn.setText("⏳  Getting AI suggestions...");
+
+        // Fetch all workout names for the AI to suggest from (include all, even current)
+        List<String> workoutNames = new ArrayList<>();
+        try {
+            workoutNames = new WorkoutService().read().stream()
+                    .map(Workout::getNom)
+                    .filter(n -> n != null && !n.isBlank())
+                    .collect(Collectors.toList());
+        } catch (SQLException ignored) {}
+
+        final List<String> finalWorkoutNames = workoutNames;
+        final int stars = selectedStars;
+        final String ratingLabel = ratingLabels[selectedStars - 1];
+        final String workoutName = currentWorkout != null ? currentWorkout.getNom() : "your workout";
+        final String userComment = commentArea.getText();
+
+        GroqAiService.getInstance()
+                .generateWorkoutFeedbackAdvice(workoutName, stars, ratingLabel, userComment, finalWorkoutNames)
+                .thenCombine(
+                    YouTubeService.getInstance().searchWorkoutVideos(workoutName, stars <= 3, 3),
+                    (aiJson, videos) -> new Object[]{aiJson, videos}
+                )
+                .thenAccept(results -> Platform.runLater(() -> {
+                    JsonObject aiJson = (JsonObject) results[0];
+                    @SuppressWarnings("unchecked")
+                    List<YouTubeService.VideoResult> videos =
+                            (List<YouTubeService.VideoResult>) results[1];
+                    System.out.println("[AI Feedback] Response: " + aiJson);
+                    System.out.println("[YouTube] Videos found: " + videos.size());
+                    showAiAdviceDialog(aiJson, stars, videos);
+                    done();
+                }))
+                .exceptionally(ex -> {
+                    System.err.println("[AI Feedback] Error: " + ex.getMessage());
+                    Platform.runLater(() -> {
+                        showAlert(Alert.AlertType.INFORMATION, "Thank you!", "Your feedback has been submitted.");
+                        done();
+                    });
+                    return null;
+                });
+    }
+
+    /**
+     * Shows the AI advice dialog after feedback submission.
+     * - Negative (1-3 stars): empathetic message + follow-up question + YouTube alternatives
+     * - Positive (4-5 stars): congratulatory message + YouTube similar videos
+     */
+    private void showAiAdviceDialog(JsonObject json, int stars,
+                                    List<YouTubeService.VideoResult> videos) {
+        boolean negative = stars <= 3;
+
+        String message = getJsonString(json, "message");
+        String followupQuestion = getJsonString(json, "followup_question");
+
+        Stage dialog = new Stage(StageStyle.UNDECORATED);
+        dialog.initModality(Modality.APPLICATION_MODAL);
+
+        VBox root = new VBox(16);
+        root.getStyleClass().add("ai-dialog-root");
+        root.setPadding(new Insets(28));
+        root.setPrefWidth(480);
+        root.setMaxWidth(480);
+
+        // Header
+        Label icon = new Label(negative ? "🤖  AI Coach Feedback" : "🤖  AI Coach");
+        icon.getStyleClass().add("ai-dialog-title");
+
+        // Main message
+        Label msgLabel = new Label(message.isBlank() ? "Thank you for your feedback!" : message);
+        msgLabel.getStyleClass().add("ai-dialog-message");
+        msgLabel.setWrapText(true);
+        msgLabel.setMaxWidth(420);
+
+        root.getChildren().addAll(icon, msgLabel);
+
+        // Follow-up question (only for negative ratings)
+        if (negative && followupQuestion != null && !followupQuestion.isBlank()) {
+            Label qLabel = new Label("💬  " + followupQuestion);
+            qLabel.getStyleClass().add("ai-dialog-question");
+            qLabel.setWrapText(true);
+            qLabel.setMaxWidth(420);
+            root.getChildren().add(qLabel);
+        }
+
+        // YouTube video suggestions
+        if (!videos.isEmpty()) {
+            Label ytTitle = new Label(negative
+                    ? "▶  Recommended videos for you:"
+                    : "▶  Keep going with these:");
+            ytTitle.getStyleClass().add("ai-dialog-section");
+            root.getChildren().add(ytTitle);
+
+            for (YouTubeService.VideoResult video : videos) {
+                VBox videoCard = new VBox(4);
+                videoCard.getStyleClass().add("yt-video-card");
+                videoCard.setCursor(Cursor.HAND);
+
+                Label titleLbl = new Label("🎬  " + video.title());
+                titleLbl.getStyleClass().add("yt-video-title");
+                titleLbl.setWrapText(true);
+                titleLbl.setMaxWidth(400);
+
+                Label urlLbl = new Label(video.watchUrl());
+                urlLbl.getStyleClass().add("yt-video-url");
+
+                videoCard.getChildren().addAll(titleLbl, urlLbl);
+
+                // Click → open in system browser
+                videoCard.setOnMouseClicked(e -> {
+                    try {
+                        if (Desktop.isDesktopSupported()) {
+                            Desktop.getDesktop().browse(new URI(video.watchUrl()));
+                        }
+                    } catch (Exception ex) {
+                        System.err.println("Could not open browser: " + ex.getMessage());
+                    }
+                });
+
+                root.getChildren().add(videoCard);
+            }
+        }
+
+        // Close button
+        Button closeBtn = new Button("Got it  ✓");
+        closeBtn.getStyleClass().add("ai-dialog-close-btn");
+        closeBtn.setMaxWidth(Double.MAX_VALUE);
+        closeBtn.setOnAction(e -> dialog.close());
+        root.getChildren().add(closeBtn);
+
+        Scene scene = new Scene(root);
+        scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
+        scene.getStylesheets().add(
+                getClass().getResource("/css/feedback.css").toExternalForm());
+        dialog.setScene(scene);
+        dialog.showAndWait();
+    }
+
+    private String getJsonString(JsonObject json, String key) {
+        if (json == null || !json.has(key) || json.get(key).isJsonNull()) return "";
+        return json.get(key).getAsString();
     }
 
     private void done() {

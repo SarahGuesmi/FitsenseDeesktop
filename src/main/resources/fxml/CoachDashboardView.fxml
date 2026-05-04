@@ -363,16 +363,20 @@
                            </children>
                         </VBox>
 
-                        <!-- Response Options -->
+                        <!-- Response Options — fixed 5-star scale -->
                         <VBox spacing="8.0">
                            <children>
-                              <HBox alignment="CENTER_LEFT">
+                              <Label styleClass="field-label-blue" text="Rating Scale (1–5 stars)" />
+                              <HBox fx:id="optionsList" spacing="6.0" alignment="CENTER_LEFT">
                                  <children>
-                                    <Label styleClass="field-label-blue" text="Response Options" HBox.hgrow="ALWAYS" />
-                                    <Button mnemonicParsing="false" onAction="#onAddOption" styleClass="side-link" text="+ Add Option" />
+                                    <Label styleClass="coach-star-preview" text="★" />
+                                    <Label styleClass="coach-star-preview" text="★" />
+                                    <Label styleClass="coach-star-preview" text="★" />
+                                    <Label styleClass="coach-star-preview" text="★" />
+                                    <Label styleClass="coach-star-preview" text="★" />
                                  </children>
                               </HBox>
-                              <VBox fx:id="optionsList" spacing="8.0" />
+                              <Label styleClass="users-subtitle" text="Athletes will rate their workout from 1 to 5 stars." />
                            </children>
                         </VBox>
 

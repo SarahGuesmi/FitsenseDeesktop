@@ -139,7 +139,7 @@ public class CoachDashboardController {
     @FXML private StackPane deleteConfirmOverlay;
     @FXML private TextField modalTitreField;
     @FXML private VBox workoutsCheckboxList;
-    @FXML private VBox optionsList;
+    @FXML private HBox optionsList;  // now a star preview HBox, not editable
     @FXML private Label modalTitreErrorLabel;
     @FXML private Label workoutsErrorLabel;
 
@@ -253,7 +253,6 @@ public class CoachDashboardController {
     private void onAddFeedback() {
         clearFeedbackValidation();
         workoutsCheckboxList.getChildren().clear();
-        optionsList.getChildren().clear();
         modalTitreField.clear();
         // Load workouts from DB
         try {
@@ -267,12 +266,7 @@ public class CoachDashboardController {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        // Default options
-        addOptionRow("1 Very poor");
-        addOptionRow("2 Poor");
-        addOptionRow("3 Average");
-        addOptionRow("4 Good");
-        addOptionRow("5 Excellent");
+        // Options are now fixed 5-star scale (no manual entry needed)
         feedbackModalOverlay.setManaged(true);
         feedbackModalOverlay.setVisible(true);
     }
@@ -321,25 +315,6 @@ public class CoachDashboardController {
     }
 
     @FXML
-    private void onAddOption() {
-        addOptionRow("");
-    }
-
-    private void addOptionRow(String value) {
-        HBox row = new HBox(8);
-        row.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
-        TextField tf = new TextField(value);
-        tf.setPromptText("Option text...");
-        tf.getStyleClass().add("modal-field");
-        HBox.setHgrow(tf, javafx.scene.layout.Priority.ALWAYS);
-        Button removeBtn = new Button("✕");
-        removeBtn.getStyleClass().add("modal-close-btn");
-        removeBtn.setOnAction(e -> optionsList.getChildren().remove(row));
-        row.getChildren().addAll(tf, removeBtn);
-        optionsList.getChildren().add(row);
-    }
-
-    @FXML
     private void onSaveFeedbackModal() {
         clearFeedbackValidation();
         String titre = modalTitreField.getText() == null ? "" : modalTitreField.getText().trim();
@@ -368,24 +343,8 @@ public class CoachDashboardController {
         if (hasValidationError) {
             return;
         }
-        // Collect options as valid JSON array
-        List<String> options = new ArrayList<>();
-        for (javafx.scene.Node node : optionsList.getChildren()) {
-            if (node instanceof HBox row) {
-                row.getChildren().stream()
-                        .filter(n -> n instanceof TextField)
-                        .map(n -> ((TextField) n).getText().trim())
-                        .filter(s -> !s.isEmpty())
-                        .forEach(options::add);
-            }
-        }
-        // Build valid JSON array string
-        StringBuilder jsonOptions = new StringBuilder("[");
-        for (int i = 0; i < options.size(); i++) {
-            jsonOptions.append("\"").append(options.get(i).replace("\"", "\\\"")).append("\"");
-            if (i < options.size() - 1) jsonOptions.append(",");
-        }
-        jsonOptions.append("]");
+        // Options are always the fixed 5-star scale
+        String jsonOptions = "[\"1 Very poor\",\"2 Poor\",\"3 Average\",\"4 Good\",\"5 Excellent\"]";
         Questionnaire q = new Questionnaire();
         // Check if editing existing
         Object userData = modalTitreField.getUserData();
@@ -394,7 +353,7 @@ public class CoachDashboardController {
         }
         q.setTitre(titre);
         q.setType("template");
-        q.setOptions(jsonOptions.toString());
+        q.setOptions(jsonOptions);
         q.setDateSoumission(Instant.now());
         selectedWorkouts.forEach(q::addWorkout);
         String selectedWorkoutTitles = selectedWorkouts.stream()
@@ -546,13 +505,7 @@ public class CoachDashboardController {
                 workoutsCheckboxList.getChildren().add(cb);
             }
         } catch (SQLException e) { e.printStackTrace(); }
-        // Load options
-        if (q.getOptions() != null && !q.getOptions().isBlank()) {
-            String raw = q.getOptions().replaceAll("[\\[\\]\"]", "");
-            for (String opt : raw.split(",")) {
-                if (!opt.isBlank()) addOptionRow(opt.trim());
-            }
-        }
+        // Options are now fixed 5-star scale — no need to load them into the modal
         // Store id for update
         modalTitreField.setUserData(q.getId());
         clearFeedbackValidation();

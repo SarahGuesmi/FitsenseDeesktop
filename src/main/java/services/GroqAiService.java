@@ -10,6 +10,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class GroqAiService {
@@ -95,6 +96,89 @@ public class GroqAiService {
         
         sb.append("\nReturn JSON with 'general_note' and an array of 2-3 specific 'exercises' (name, duration, description). Focus on stress relief and recovery.");
         return sb.toString();
+    }
+
+    /**
+     * Generates post-feedback advice based on the star rating.
+     *
+     * For ratings 1-3 (Very poor / Poor / Average):
+     *   - Asks what specifically was bad
+     *   - Suggests alternative workouts
+     *
+     * For ratings 4-5 (Good / Excellent):
+     *   - Acknowledges the positive experience
+     *   - Suggests similar workouts to keep the momentum
+     *
+     * Returns JSON: { "message": "...", "followup_question": "...", "suggestions": ["w1","w2","w3"] }
+     */
+    public CompletableFuture<JsonObject> generateWorkoutFeedbackAdvice(
+            String workoutName, int stars, String ratingLabel,
+            String userComment, List<String> availableWorkouts) {
+
+        boolean negative = stars <= 3;
+
+        String workoutList = availableWorkouts.isEmpty() ? "none available"
+                : String.join(", ", availableWorkouts);
+
+        String prompt;
+        if (negative) {
+            prompt = "A user just rated the workout \"" + workoutName + "\" with " + stars + " star(s) (" + ratingLabel + ").\n"
+                    + (userComment != null && !userComment.isBlank()
+                        ? "Their comment: \"" + userComment + "\"\n" : "")
+                    + "Available workouts in the app: " + workoutList + "\n\n"
+                    + "Your task:\n"
+                    + "1. Write a short empathetic message acknowledging the poor experience (1-2 sentences).\n"
+                    + "2. Ask one specific follow-up question to understand what was bad (intensity? duration? exercises? instructions?).\n"
+                    + "3. You MUST suggest workouts. Pick 1-3 from the available list above. If the list is short, suggest all of them. Never return an empty suggestions array.\n"
+                    + "Return JSON with keys: \"message\" (string), \"followup_question\" (string), \"suggestions\" (array of workout name strings — MUST NOT be empty).";
+        } else {
+            prompt = "A user just rated the workout \"" + workoutName + "\" with " + stars + " star(s) (" + ratingLabel + ").\n"
+                    + (userComment != null && !userComment.isBlank()
+                        ? "Their comment: \"" + userComment + "\"\n" : "")
+                    + "Available workouts in the app: " + workoutList + "\n\n"
+                    + "Your task:\n"
+                    + "1. Write a short enthusiastic congratulatory message (1-2 sentences).\n"
+                    + "2. You MUST suggest workouts. Pick 1-3 from the available list above. If the list is short, suggest all of them. Never return an empty suggestions array.\n"
+                    + "Return JSON with keys: \"message\" (string), \"followup_question\" (empty string), \"suggestions\" (array of workout name strings — MUST NOT be empty).";
+        }
+
+        JsonObject body = new JsonObject();
+        body.addProperty("model", MODEL);
+
+        JsonArray messages = new JsonArray();
+        JsonObject system = new JsonObject();
+        system.addProperty("role", "system");
+        system.addProperty("content", "You are a fitness coach assistant. Always respond in JSON format only.");
+        messages.add(system);
+
+        JsonObject user = new JsonObject();
+        user.addProperty("role", "user");
+        user.addProperty("content", prompt);
+        messages.add(user);
+
+        body.add("messages", messages);
+        body.addProperty("temperature", 0.7);
+        body.add("response_format", gson.fromJson("{\"type\": \"json_object\"}", JsonObject.class));
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(API_URL))
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + apiKey)
+                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(body)))
+                .build();
+
+        return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenApply(response -> {
+                    if (response.statusCode() != 200) {
+                        throw new RuntimeException("Groq API error: " + response.body());
+                    }
+                    JsonObject jsonResponse = gson.fromJson(response.body(), JsonObject.class);
+                    String content = jsonResponse.getAsJsonArray("choices")
+                            .get(0).getAsJsonObject()
+                            .getAsJsonObject("message")
+                            .get("content").getAsString();
+                    return gson.fromJson(content, JsonObject.class);
+                });
     }
 
     /**

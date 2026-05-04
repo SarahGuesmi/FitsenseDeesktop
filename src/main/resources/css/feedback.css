@@ -99,3 +99,129 @@
 .fb-submit-btn:hover {
     -fx-background-color: linear-gradient(to right, #4338ca, #6d28d9);
 }
+
+/* ── Star rating ─────────────────────────────────────────────────────────── */
+
+.fb-star {
+    -fx-font-size: 36px;
+    -fx-text-fill: #4a4f7a;
+    -fx-cursor: hand;
+    -fx-padding: 0 4 0 4;
+}
+
+.fb-star-filled {
+    -fx-font-size: 36px;
+    -fx-text-fill: #f5c518;
+    -fx-cursor: hand;
+    -fx-padding: 0 4 0 4;
+    -fx-effect: dropshadow(gaussian, rgba(245,197,24,0.5), 6, 0.4, 0, 0);
+}
+
+.fb-star-label {
+    -fx-text-fill: #9ca3af;
+    -fx-font-size: 13px;
+    -fx-padding: 4 0 0 2;
+}
+
+/* ── Coach modal star preview ────────────────────────────────────────────── */
+
+.coach-star-preview {
+    -fx-font-size: 28px;
+    -fx-text-fill: #f5c518;
+    -fx-padding: 0 3 0 3;
+}
+
+/* ── AI Advice Dialog ────────────────────────────────────────────────────── */
+
+.ai-dialog-root {
+    -fx-background-color: #1a1d2e;
+    -fx-background-radius: 16;
+    -fx-border-radius: 16;
+    -fx-border-color: #2e3250;
+    -fx-border-width: 1.5;
+}
+
+.ai-dialog-title {
+    -fx-text-fill: #a78bfa;
+    -fx-font-size: 17px;
+    -fx-font-weight: bold;
+}
+
+.ai-dialog-message {
+    -fx-text-fill: #e2e8f0;
+    -fx-font-size: 14px;
+    -fx-line-spacing: 3;
+}
+
+.ai-dialog-question {
+    -fx-text-fill: #93c5fd;
+    -fx-font-size: 14px;
+    -fx-background-color: rgba(59,130,246,0.1);
+    -fx-background-radius: 8;
+    -fx-border-color: rgba(59,130,246,0.3);
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-padding: 10 14 10 14;
+    -fx-line-spacing: 2;
+}
+
+.ai-dialog-section {
+    -fx-text-fill: #94a3b8;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+.ai-suggestion-chip {
+    -fx-text-fill: #c4b5fd;
+    -fx-background-color: rgba(124,58,237,0.15);
+    -fx-background-radius: 8;
+    -fx-border-color: rgba(124,58,237,0.35);
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-padding: 8 14 8 14;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+}
+
+.ai-dialog-close-btn {
+    -fx-background-color: linear-gradient(to right, #4f46e5, #7c3aed);
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10;
+    -fx-padding: 12 0 12 0;
+    -fx-cursor: hand;
+}
+
+.ai-dialog-close-btn:hover {
+    -fx-background-color: linear-gradient(to right, #4338ca, #6d28d9);
+}
+
+/* ── YouTube Video Cards ─────────────────────────────────────────────────── */
+
+.yt-video-card {
+    -fx-background-color: rgba(255, 0, 0, 0.08);
+    -fx-background-radius: 10;
+    -fx-border-color: rgba(255, 80, 80, 0.3);
+    -fx-border-radius: 10;
+    -fx-border-width: 1;
+    -fx-padding: 10 14 10 14;
+    -fx-cursor: hand;
+}
+
+.yt-video-card:hover {
+    -fx-background-color: rgba(255, 0, 0, 0.15);
+    -fx-border-color: rgba(255, 80, 80, 0.6);
+}
+
+.yt-video-title {
+    -fx-text-fill: #f1f5f9;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+.yt-video-url {
+    -fx-text-fill: #ff6b6b;
+    -fx-font-size: 11px;
+    -fx-underline: true;
+}

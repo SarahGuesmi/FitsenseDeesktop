@@ -60,7 +60,9 @@ public class DashboardController {
     private Button dashMentalHealthBtn;
     @FXML private Button dashChatroomBtn;
     @FXML private Button dashSecurityBtn;
+    @FXML private Button dashNutritionBtn;
     @FXML private ScrollPane dashSecurityPane;
+    @FXML private ScrollPane dashNutritionPane;
     @FXML private ImageView sidebarAvatarView;
     @FXML private Label     sidebarAvatarInitials;
     @FXML
@@ -167,6 +169,14 @@ public class DashboardController {
     }
 
     @FXML
+    private void onShowNutrition() {
+        if (navbarPageTitle != null) navbarPageTitle.setText("Nutrition");
+        if (navbarPageSubtitle != null) navbarPageSubtitle.setText("Meals and macros");
+        hideAllDashPanes();
+        if (dashNutritionPane != null) { dashNutritionPane.setManaged(true); dashNutritionPane.setVisible(true); }
+        setDashNavActive(dashNutritionBtn);
+    }
+    @FXML
     private void onShowChatroom() {
         if (navbarPageTitle != null) navbarPageTitle.setText("Chatroom");
         if (navbarPageSubtitle != null) navbarPageSubtitle.setText("Message your coaches and teammates");
@@ -179,7 +189,8 @@ public class DashboardController {
         for (VBox p : new VBox[]{dashHomePane, dashProfilePane, dashMentalHealthPane, dashWorkoutsPane, dashChatroomPane}) {
             if (p != null) { p.setManaged(false); p.setVisible(false); }
         }
-        if (dashSecurityPane != null) { dashSecurityPane.setManaged(false); dashSecurityPane.setVisible(false); }
+        if (dashSecurityPane != null)   { dashSecurityPane.setManaged(false);   dashSecurityPane.setVisible(false); }
+        if (dashNutritionPane != null)  { dashNutritionPane.setManaged(false);  dashNutritionPane.setVisible(false); }
     }
 
     @FXML
@@ -230,7 +241,7 @@ public class DashboardController {
     }
 
     private void setDashNavActive(Button selected) {
-        Stream.of(dashHomeBtn, dashProfileBtn, dashWorkoutsBtn, dashMentalHealthBtn, dashChatroomBtn, dashSecurityBtn)
+        Stream.of(dashHomeBtn, dashProfileBtn, dashWorkoutsBtn, dashMentalHealthBtn, dashChatroomBtn, dashSecurityBtn, dashNutritionBtn)
                 .filter(Objects::nonNull)
                 .forEach(b -> {
                     b.getStyleClass().setAll("dash-side-link");
@@ -280,6 +291,11 @@ public class DashboardController {
 
     public void showWorkoutsList() {
         onShowWorkouts();
+    }
+
+    /** Called by NotificationPopupController after marking all notifications as read. */
+    public void refreshNotificationBadge() {
+        // Badge refresh — extend this when a notification badge Label is added to DashboardView.fxml
     }
 
     public void onShowActivityLog() {

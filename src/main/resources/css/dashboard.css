@@ -331,3 +331,18 @@
 .main-scroll {
     -fx-background: transparent;
 }
+
+/* ── Sidebar scrollpane (hide scrollbar) ── */
+.dash-sidebar .scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+.dash-sidebar .scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+.dash-sidebar .scroll-pane .scroll-bar:vertical {
+    -fx-opacity: 0;
+    -fx-pref-width: 0;
+}

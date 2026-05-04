@@ -15,8 +15,9 @@
    <children>
       <BorderPane>
          <left>
-            <VBox prefWidth="250.0" spacing="14.0" styleClass="dash-sidebar">
+            <VBox prefWidth="250.0" styleClass="dash-sidebar" maxHeight="Infinity">
                <children>
+                  <!-- Avatar + brand — fixed at top -->
                   <HBox alignment="CENTER">
                      <StackPane alignment="CENTER" styleClass="sidebar-avatar-frame">
                         <children>
@@ -28,18 +29,32 @@
                   </HBox>
                   <Label styleClass="dash-brand" text="FITSENSE" />
                   <Label styleClass="dash-side-sub" text="YOUR SPACE" />
-                  <Button fx:id="dashHomeBtn" mnemonicParsing="false" onAction="#onShowDashboard" styleClass="dash-side-link" text="◈  Dashboard" />
-                  <Button fx:id="dashProfileBtn" mnemonicParsing="false" onAction="#onShowProfile" styleClass="dash-side-link" text="☺  Profile" />
-                  <Button fx:id="dashWorkoutsBtn" mnemonicParsing="false" onAction="#onShowWorkouts" styleClass="dash-side-link" text="▣  My Workouts" />
-                  <Button fx:id="dashMentalHealthBtn" mnemonicParsing="false" onAction="#onShowMentalHealth" styleClass="dash-side-link" text="◉  Mental Health" />
-                  <Button mnemonicParsing="false" styleClass="dash-side-link" text="◇  Nutrition" />
-                  <Button fx:id="dashChatroomBtn" mnemonicParsing="false" onAction="#onShowChatroom" styleClass="dash-side-link" text="💬  Chatroom" />
-                  <Button fx:id="dashSecurityBtn" mnemonicParsing="false" onAction="#onShowSecurity" styleClass="dash-side-link" text="🔐  Security" />
-                  <Region VBox.vgrow="ALWAYS" />
-                  <Button mnemonicParsing="false" onAction="#onLogout" styleClass="dash-side-link" text="⏻  Sign Out" />
+
+                  <!-- Scrollable nav links -->
+                  <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
+                              hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+                              style="-fx-background-color:transparent;-fx-background:transparent;-fx-border-color:transparent;-fx-padding:0;">
+                     <content>
+                        <VBox spacing="4.0" style="-fx-background-color:transparent;">
+                           <children>
+                              <Button fx:id="dashHomeBtn" mnemonicParsing="false" onAction="#onShowDashboard" styleClass="dash-side-link" text="◈  Dashboard" maxWidth="Infinity" />
+                              <Button fx:id="dashProfileBtn" mnemonicParsing="false" onAction="#onShowProfile" styleClass="dash-side-link" text="☺  Profile" maxWidth="Infinity" />
+                              <Button fx:id="dashWorkoutsBtn" mnemonicParsing="false" onAction="#onShowWorkouts" styleClass="dash-side-link" text="▣  My Workouts" maxWidth="Infinity" />
+                              <Button fx:id="dashMentalHealthBtn" mnemonicParsing="false" onAction="#onShowMentalHealth" styleClass="dash-side-link" text="◉  Mental Health" maxWidth="Infinity" />
+                              <Button fx:id="dashNutritionBtn" mnemonicParsing="false" onAction="#onShowNutrition" styleClass="dash-side-link" text="◇  Nutrition" maxWidth="Infinity" />
+                              <Button fx:id="dashChatroomBtn" mnemonicParsing="false" onAction="#onShowChatroom" styleClass="dash-side-link" text="💬  Chatroom" maxWidth="Infinity" />
+                              <Button fx:id="dashSecurityBtn" mnemonicParsing="false" onAction="#onShowSecurity" styleClass="dash-side-link" text="🔐  Security" maxWidth="Infinity" />
+                           </children>
+                           <padding><Insets bottom="8.0" left="0.0" right="0.0" top="4.0" /></padding>
+                        </VBox>
+                     </content>
+                  </ScrollPane>
+
+                  <!-- Sign Out always visible at bottom -->
+                  <Button mnemonicParsing="false" onAction="#onLogout" styleClass="dash-side-link" text="⏻  Sign Out" maxWidth="Infinity" />
                </children>
                <padding>
-                  <Insets bottom="22.0" left="18.0" right="18.0" top="22.0" />
+                  <Insets bottom="18.0" left="18.0" right="18.0" top="22.0" />
                </padding>
             </VBox>
          </left>
@@ -132,6 +147,16 @@
                               <fx:include fx:id="dashActivity" source="ActivityLogView.fxml" VBox.vgrow="ALWAYS" />
                            </children>
                         </VBox>
+                        <!-- Nutrition pane -->
+                        <ScrollPane fx:id="dashNutritionPane" managed="false" visible="false"
+                                    fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+                                    styleClass="dash-content" VBox.vgrow="ALWAYS"
+                                    style="-fx-background-color:transparent;-fx-background:#070b16;">
+                           <content>
+                              <fx:include source="NutritionFragment.fxml" />
+                           </content>
+                        </ScrollPane>
+
                         <VBox fx:id="dashChatroomPane" managed="false" visible="false"
                               styleClass="dash-content" VBox.vgrow="ALWAYS">
                            <children>

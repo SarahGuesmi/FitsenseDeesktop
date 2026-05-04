@@ -9,7 +9,6 @@ import javafx.scene.control.ProgressIndicator;
 import models.User;
 import services.NutritionService;
 import java.util.List;
-;
 import java.util.Map;
 
 public class NutritionFragmentController {

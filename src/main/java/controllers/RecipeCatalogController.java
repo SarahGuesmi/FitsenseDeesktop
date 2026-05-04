@@ -90,6 +90,12 @@ public class RecipeCatalogController {
                 new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg", "*.webp")
         );
 
+        // Open directly in the pidevassets folder
+        File assetsDir = new File("C:/xampp/htdocs/pidevassets");
+        if (assetsDir.exists() && assetsDir.isDirectory()) {
+            fileChooser.setInitialDirectory(assetsDir);
+        }
+
         Window window = formPane != null && formPane.getScene() != null
                 ? formPane.getScene().getWindow()
                 : null;
@@ -548,6 +554,11 @@ public class RecipeCatalogController {
             fileChooser.getExtensionFilters().add(
                     new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg", "*.webp")
             );
+            // Open directly in the pidevassets folder
+            File assetsDir = new File("C:/xampp/htdocs/pidevassets");
+            if (assetsDir.exists() && assetsDir.isDirectory()) {
+                fileChooser.setInitialDirectory(assetsDir);
+            }
             File file = fileChooser.showOpenDialog(modal);
             if (file != null) {
                 editImageFile[0] = file;

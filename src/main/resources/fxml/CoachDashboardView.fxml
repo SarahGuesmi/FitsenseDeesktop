@@ -21,8 +21,9 @@
    <children>
       <BorderPane>
          <left>
-            <VBox prefWidth="250.0" spacing="10.0" styleClass="admin-sidebar">
+            <VBox prefWidth="250.0" styleClass="admin-sidebar" maxHeight="Infinity">
                <children>
+                  <!-- Avatar + brand — fixed at top -->
                   <HBox alignment="CENTER">
                      <StackPane alignment="CENTER" styleClass="sidebar-avatar-frame">
                         <children>
@@ -34,21 +35,36 @@
                   </HBox>
                   <Label styleClass="admin-brand" text="FITSENSE" />
                   <Label styleClass="admin-side-sub" text="COACH PANEL" />
-                  <Button fx:id="coachHomeBtn" mnemonicParsing="false" onAction="#onShowDashboard" styleClass="side-link" text="◈  Dashboard" />
-                  <Button fx:id="athletesBtn" mnemonicParsing="false" onAction="#onShowAthletes" styleClass="side-link" text="◎  Athletes" />
-                  <Button fx:id="chatroomBtn" mnemonicParsing="false" onAction="#onShowChatroom" styleClass="side-link" text="💬  Chatroom" />
-                  <Button fx:id="workoutCatalogBtn" mnemonicParsing="false" onAction="#onShowWorkoutCatalog" styleClass="side-link" text="🏋  Workout catalog" />
-                  <Button fx:id="feedbackBtn" mnemonicParsing="false" onAction="#onShowFeedback" styleClass="side-link" text="✉  Feedback management" />
-                  <Label styleClass="coach-side-section" text="MENTAL WELLNESS" />
-                  <Button fx:id="mentalTestsBtn" mnemonicParsing="false" onAction="#onShowMentalTests" styleClass="side-sub-link" text="◇  Tests &amp; questionnaires" />
-                  <Button fx:id="mentalAssessmentsBtn" mnemonicParsing="false" onAction="#onShowMentalAssessments" styleClass="side-sub-link" text="◇  Latest assessments" />
-                  <Button fx:id="nutritionBtn" mnemonicParsing="false" onAction="#onShowNutrition" styleClass="side-link" text="🥗  Nutrition plan" />
-                  <Button fx:id="profileBtn" mnemonicParsing="false" onAction="#onShowProfile" styleClass="side-link" text="☺  Profile" />
-                  <Button fx:id="securityBtn" mnemonicParsing="false" onAction="#onShowSecurity" styleClass="side-link" text="🔐  Security" />
-                  <Button mnemonicParsing="false" onAction="#onLogout" styleClass="side-link" text="⏻  Sign Out" />
+
+                  <!-- Scrollable nav links -->
+                  <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
+                              hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+                              style="-fx-background-color:transparent;-fx-background:transparent;-fx-border-color:transparent;-fx-padding:0;">
+                     <content>
+                        <VBox spacing="4.0" style="-fx-background-color:transparent;">
+                           <children>
+                              <Button fx:id="coachHomeBtn" mnemonicParsing="false" onAction="#onShowDashboard" styleClass="side-link" text="◈  Dashboard" maxWidth="Infinity" />
+                              <Button fx:id="athletesBtn" mnemonicParsing="false" onAction="#onShowAthletes" styleClass="side-link" text="◎  Athletes" maxWidth="Infinity" />
+                              <Button fx:id="chatroomBtn" mnemonicParsing="false" onAction="#onShowChatroom" styleClass="side-link" text="💬  Chatroom" maxWidth="Infinity" />
+                              <Button fx:id="workoutCatalogBtn" mnemonicParsing="false" onAction="#onShowWorkoutCatalog" styleClass="side-link" text="🏋  Workout catalog" maxWidth="Infinity" />
+                              <Button fx:id="feedbackBtn" mnemonicParsing="false" onAction="#onShowFeedback" styleClass="side-link" text="✉  Feedback management" maxWidth="Infinity" />
+                              <Label styleClass="coach-side-section" text="MENTAL WELLNESS" />
+                              <Button fx:id="mentalTestsBtn" mnemonicParsing="false" onAction="#onShowMentalTests" styleClass="side-sub-link" text="◇  Tests &amp; questionnaires" maxWidth="Infinity" />
+                              <Button fx:id="mentalAssessmentsBtn" mnemonicParsing="false" onAction="#onShowMentalAssessments" styleClass="side-sub-link" text="◇  Latest assessments" maxWidth="Infinity" />
+                              <Button fx:id="nutritionBtn" mnemonicParsing="false" onAction="#onShowNutrition" styleClass="side-link" text="🥗  Nutrition plan" maxWidth="Infinity" />
+                              <Button fx:id="profileBtn" mnemonicParsing="false" onAction="#onShowProfile" styleClass="side-link" text="☺  Profile" maxWidth="Infinity" />
+                              <Button fx:id="securityBtn" mnemonicParsing="false" onAction="#onShowSecurity" styleClass="side-link" text="🔐  Security" maxWidth="Infinity" />
+                           </children>
+                           <padding><Insets bottom="8.0" left="0.0" right="0.0" top="4.0" /></padding>
+                        </VBox>
+                     </content>
+                  </ScrollPane>
+
+                  <!-- Sign Out always visible at bottom -->
+                  <Button mnemonicParsing="false" onAction="#onLogout" styleClass="side-link" text="⏻  Sign Out" maxWidth="Infinity" />
                </children>
                <padding>
-                  <Insets bottom="22.0" left="18.0" right="18.0" top="22.0" />
+                  <Insets bottom="18.0" left="18.0" right="18.0" top="22.0" />
                </padding>
             </VBox>
          </left>

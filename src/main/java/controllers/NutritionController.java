@@ -75,25 +75,25 @@ public class NutritionController {
     }
     private void loadDefaultYoutubeVideos() {
         youtubeVideosBox.getChildren().clear();
-
-        List<FoodApiService.YoutubeVideo> videos =
-                foodApiService.searchYoutubeVideos("high protein breakfast healthy recipes");
-
-        showYoutubeVideos(videos);
+        new Thread(() -> {
+            List<FoodApiService.YoutubeVideo> videos =
+                    foodApiService.searchYoutubeVideos("high protein breakfast healthy recipes");
+            javafx.application.Platform.runLater(() -> showYoutubeVideos(videos));
+        }, "youtube-default-load").start();
     }
 
     @FXML
     private void onSearchYoutubeVideos() {
         String query = youtubeSearchField.getText();
-
         if (query == null || query.isBlank()) {
             query = "high protein breakfast healthy recipes";
         }
-
-        List<FoodApiService.YoutubeVideo> videos =
-                foodApiService.searchYoutubeVideos(query);
-
-        showYoutubeVideos(videos);
+        final String finalQuery = query;
+        new Thread(() -> {
+            List<FoodApiService.YoutubeVideo> videos =
+                    foodApiService.searchYoutubeVideos(finalQuery);
+            javafx.application.Platform.runLater(() -> showYoutubeVideos(videos));
+        }, "youtube-search").start();
     }
 
     private void showYoutubeVideos(List<FoodApiService.YoutubeVideo> videos) {
@@ -129,18 +129,37 @@ public class NutritionController {
     @FXML
     private void onSearchApiRecipes() {
         String ingredient = ingredientInput.getText();
-
         if (ingredient == null || ingredient.isBlank()) return;
+
+        // Show scroll and clear previous results
         apiRecipesScroll.setVisible(true);
         apiRecipesScroll.setManaged(true);
         apiRecipesBox.getChildren().clear();
 
-        List<FoodApiService.ApiRecipe> recipes =
-                foodApiService.searchRecipesByIngredients(ingredient);
+        // Loading indicator
+        javafx.scene.control.Label loading = new javafx.scene.control.Label("⏳ Searching recipes...");
+        loading.setStyle("-fx-text-fill:#9CA3AF;-fx-font-size:13px;-fx-padding:12;");
+        apiRecipesBox.getChildren().add(loading);
 
-        for (FoodApiService.ApiRecipe r : recipes) {
-            apiRecipesBox.getChildren().add(createApiRecipeCard(r));
-        }
+        // Run API call in background — never block the UI thread
+        new Thread(() -> {
+            List<FoodApiService.ApiRecipe> recipes =
+                    foodApiService.searchRecipesByIngredients(ingredient);
+
+            javafx.application.Platform.runLater(() -> {
+                apiRecipesBox.getChildren().clear();
+                if (recipes.isEmpty()) {
+                    javafx.scene.control.Label empty = new javafx.scene.control.Label(
+                            "No recipes found for \"" + ingredient + "\". Try: chicken, egg, tomato");
+                    empty.setStyle("-fx-text-fill:#9CA3AF;-fx-font-size:13px;-fx-padding:12;");
+                    apiRecipesBox.getChildren().add(empty);
+                } else {
+                    for (FoodApiService.ApiRecipe r : recipes) {
+                        apiRecipesBox.getChildren().add(createApiRecipeCard(r));
+                    }
+                }
+            });
+        }, "recipe-search").start();
     }
     private HBox createApiRecipeCard(FoodApiService.ApiRecipe recipe) {
         HBox card = new HBox(14);
@@ -560,22 +579,27 @@ public class NutritionController {
     @FXML
     private void onCheckCalories() {
         String food = foodInput.getText();
-
         if (food == null || food.isBlank()) {
             foodCaloriesLabel.setText("Please type a food first.");
             previewCalories = 0;
             return;
         }
+        foodCaloriesLabel.setText("⏳ Checking...");
+        addCaloriesBtn.setDisable(true);
 
-        previewCalories = foodApiService.getCaloriesFromFood(food);
-
-        if (previewCalories <= 0) {
-            foodCaloriesLabel.setText("No calories found.");
-            addCaloriesBtn.setDisable(true);
-        } else {
-            foodCaloriesLabel.setText(previewCalories + " kcal");
-            addCaloriesBtn.setDisable(false);
-        }
+        new Thread(() -> {
+            int cal = foodApiService.getCaloriesFromFood(food);
+            javafx.application.Platform.runLater(() -> {
+                previewCalories = cal;
+                if (cal <= 0) {
+                    foodCaloriesLabel.setText("No calories found.");
+                    addCaloriesBtn.setDisable(true);
+                } else {
+                    foodCaloriesLabel.setText(cal + " kcal");
+                    addCaloriesBtn.setDisable(false);
+                }
+            });
+        }, "calorie-check").start();
     }
     @FXML
     private void onAddCalories() {

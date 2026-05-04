@@ -11,6 +11,7 @@ module org.example.fitsense {
     requires com.google.gson;
     requires jdk.httpserver;
     requires org.json;
+    requires java.desktop;
 
     opens app to javafx.graphics;
     opens controllers to javafx.fxml;

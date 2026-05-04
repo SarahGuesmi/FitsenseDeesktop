@@ -11,7 +11,7 @@ import java.io.File;
  */
 public final class WebAssets {
 
-    private static final String ASSETS_DIR = "C:/xampp2/htdocs/pidevassets/";
+    private static final String ASSETS_DIR = "C:/xampp/htdocs/pidevassets/";
 
     private WebAssets() {}
 

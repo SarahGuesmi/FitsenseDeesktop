@@ -15,18 +15,12 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class ImagePickerController {
 
@@ -58,21 +52,35 @@ public class ImagePickerController {
 
         new Thread(() -> {
             try {
-                // Fetch directory listing from Apache
-                HttpClient client = HttpClient.newHttpClient();
-                HttpRequest req = HttpRequest.newBuilder()
-                        .uri(URI.create(PIDEVASSETS_URL))
-                        .GET().build();
-                HttpResponse<String> resp = client.send(req, HttpResponse.BodyHandlers.ofString());
+                // Read directory directly from filesystem instead of HTTP
+                File dir = new File(PIDEVASSETS_PATH);
+                List<String> files = new ArrayList<>();
 
-                // Parse Apache directory listing HTML for image files
-                List<String> files = parseApacheListing(resp.body());
+                if (dir.exists() && dir.isDirectory()) {
+                    File[] fileArray = dir.listFiles((d, name) -> {
+                        String lower = name.toLowerCase();
+                        return lower.endsWith(".png") || lower.endsWith(".jpg")
+                                || lower.endsWith(".jpeg") || lower.endsWith(".gif")
+                                || lower.endsWith(".webp");
+                    });
+                    if (fileArray != null) {
+                        for (File f : fileArray) {
+                            files.add(f.getName());
+                        }
+                    }
+                }
 
                 Platform.runLater(() -> {
                     allFiles = files;
                     loadingLabel.setVisible(false);
                     loadingLabel.setManaged(false);
-                    renderGrid(files);
+                    if (files.isEmpty()) {
+                        loadingLabel.setText("⚠ No images found in " + PIDEVASSETS_PATH);
+                        loadingLabel.setVisible(true);
+                        loadingLabel.setManaged(true);
+                    } else {
+                        renderGrid(files);
+                    }
                 });
             } catch (Exception e) {
                 Platform.runLater(() -> {
@@ -80,21 +88,6 @@ public class ImagePickerController {
                 });
             }
         }).start();
-    }
-
-    private List<String> parseApacheListing(String html) {
-        List<String> files = new ArrayList<>();
-        // Match href="filename.ext" for image files
-        Pattern p = Pattern.compile("href=\"([^\"]+\\.(png|jpg|jpeg|gif|webp))\"",
-                Pattern.CASE_INSENSITIVE);
-        Matcher m = p.matcher(html);
-        while (m.find()) {
-            String name = m.group(1);
-            if (!name.startsWith("?") && !name.startsWith("/")) {
-                files.add(name);
-            }
-        }
-        return files;
     }
 
     private void renderGrid(List<String> files) {
@@ -111,7 +104,8 @@ public class ImagePickerController {
         for (String filename : files) {
             if (!filter.isEmpty() && !filename.toLowerCase().contains(filter)) continue;
 
-            String url = PIDEVASSETS_URL + filename;
+            // Use file:// URL directly from filesystem — no Apache needed
+            String url = new File(PIDEVASSETS_PATH + "/" + filename).toURI().toString();
 
             StackPane card = new StackPane();
             card.setStyle("-fx-background-color:#1F2937;-fx-border-color:#374151;-fx-border-radius:10;-fx-background-radius:10;-fx-cursor:hand;");

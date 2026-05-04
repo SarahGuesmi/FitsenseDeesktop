@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
 
 <VBox spacing="24"
       styleClass="nutrition-root"
@@ -9,7 +10,9 @@
       xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="controllers.NutritionController">
-
+    <padding>
+        <Insets bottom="24.0" left="22.0" right="22.0" top="22.0" />
+    </padding>
     <children>
 
         <VBox spacing="22" styleClass="discover-card">

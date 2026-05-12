@@ -1,4 +1,4 @@
-# FitSense - Smart Fitness, Nutrition & Mental Health Platform (Java Version)
+# FitSense - Smart Fitness, Nutrition & Mental Health Platform 
 <img width="500" height="500" alt="sport-hero" src="https://github.com/user-attachments/assets/e242ee5d-6c5c-4664-87a9-34c1e6eee43b" />
 
 ---

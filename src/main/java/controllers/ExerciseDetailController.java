@@ -7,6 +7,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -17,6 +18,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.web.WebView;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import models.Exercise;
 import models.Workout;
@@ -66,6 +68,8 @@ public class ExerciseDetailController {
     @FXML private Label star1, star2, star3, star4, star5;
     @FXML private Label ratingLabel;
     @FXML private Label avgRatingLabel;
+
+    // Rating Modal - removed overlay, now using separate modal window
 
     // Music player
     @FXML private Button moodWorkout, moodHiit, moodRelax, moodEnergy;
@@ -162,7 +166,7 @@ public class ExerciseDetailController {
 
         updateTimerDisplay(elapsedSeconds);
 
-        // Load existing rating
+        // Load existing rating (for internal tracking only)
         loadRating();
     }
 
@@ -170,10 +174,7 @@ public class ExerciseDetailController {
         UUID userId = AppSession.getCurrentUser() != null ? AppSession.getCurrentUser().getId() : null;
         if (userId == null || exercise.getId() == null) return;
         currentRating = ratingService.getRating(userId, exercise.getId());
-        renderStars(currentRating);
-        double avg = ratingService.getAverageRating(exercise.getId());
-        if (avg > 0) avgRatingLabel.setText(String.format("avg %.1f ★", avg));
-        if (currentRating > 0) ratingLabel.setText("Your rating: " + currentRating + "/5");
+        // Rating UI removed from exercise view - only load for internal tracking
     }
 
     // ── VIDEO CONTROLS ─────────────────────────────────────
@@ -235,42 +236,39 @@ public class ExerciseDetailController {
         videoStatusLabel.setText("Paused — click Play to resume");
     }
 
-    // ── STAR RATING ────────────────────────────────────────
-    @FXML private void onStar1() { saveRating(1); }
-    @FXML private void onStar2() { saveRating(2); }
-    @FXML private void onStar3() { saveRating(3); }
-    @FXML private void onStar4() { saveRating(4); }
-    @FXML private void onStar5() { saveRating(5); }
-
-    @FXML private void onStarHover1() { renderStars(1); }
-    @FXML private void onStarHover2() { renderStars(2); }
-    @FXML private void onStarHover3() { renderStars(3); }
-    @FXML private void onStarHover4() { renderStars(4); }
-    @FXML private void onStarHover5() { renderStars(5); }
-    @FXML private void onStarExit()   { renderStars(currentRating); }
-
-    private void saveRating(int rating) {
-        currentRating = rating;
-        UUID userId = AppSession.getCurrentUser() != null ? AppSession.getCurrentUser().getId() : null;
-        if (userId != null && exercise.getId() != null) {
-            ratingService.saveRating(userId, exercise.getId(), rating);
-        }
-        renderStars(rating);
-        ratingLabel.setText("Your rating: " + rating + "/5");
-        double avg = ratingService.getAverageRating(exercise.getId());
-        if (avg > 0) avgRatingLabel.setText(String.format("avg %.1f ★", avg));
-    }
-
-    private void renderStars(int count) {
-        Label[] stars = {star1, star2, star3, star4, star5};
-        for (int i = 0; i < 5; i++) {
-            if (i < count) {
-                stars[i].setText("★");
-                stars[i].setStyle("-fx-font-size:26px;-fx-cursor:hand;-fx-text-fill:#F59E0B;");
-            } else {
-                stars[i].setText("☆");
-                stars[i].setStyle("-fx-font-size:26px;-fx-cursor:hand;-fx-text-fill:#6B7280;");
+    // ── RATING MODAL ───────────────────────────────────────
+    private void showRatingModal() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ExerciseRatingModal.fxml"));
+            Parent root = loader.load();
+            
+            ExerciseRatingModalController controller = loader.getController();
+            controller.setExercise(exercise, onDoneCallback);
+            
+            Stage modal = new Stage();
+            utils.AppIconLoader.setIcon(modal);
+            modal.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+            modal.setTitle("Rate Exercise");
+            modal.setResizable(false);
+            modal.initStyle(javafx.stage.StageStyle.DECORATED);
+            
+            Scene scene = new Scene(root, 500, 400);
+            
+            // Apply CSS if available
+            try {
+                String css = getClass().getResource("/css/exercise-rating.css").toExternalForm();
+                scene.getStylesheets().add(css);
+            } catch (Exception e) {
+                // CSS not found, continue without it
             }
+            
+            modal.setScene(scene);
+            modal.showAndWait();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Fallback: if modal fails, just call the callback
+            if (onDoneCallback != null) onDoneCallback.accept(exercise);
         }
     }
 
@@ -467,7 +465,9 @@ public class ExerciseDetailController {
                 "Time: " + elapsedSeconds + "s" + (exercise.getDuree() != null ? " / target " + exercise.getDuree() + "s" : ""));
 
         showCompletion(elapsedSeconds);
-        if (onDoneCallback != null) onDoneCallback.accept(exercise);
+        
+        // Show rating popup instead of calling onDoneCallback immediately
+        showRatingModal();
     }
 
     @FXML

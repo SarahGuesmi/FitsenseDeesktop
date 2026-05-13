@@ -16,16 +16,30 @@
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="controllers.ChatroomController"
       VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS"
-      minHeight="400.0">
+      prefHeight="600.0" minHeight="500.0">
    <children>
 
       <!-- LEFT: contacts list -->
-      <VBox prefWidth="260.0" minWidth="220.0" maxWidth="260.0" styleClass="chat-contacts-panel">
+      <VBox prefWidth="280.0" minWidth="250.0" maxWidth="300.0" styleClass="chat-contacts-panel" VBox.vgrow="ALWAYS">
          <children>
             <Label styleClass="chat-contacts-title" text="CONVERSATIONS" />
-            <ScrollPane fitToWidth="true" styleClass="chat-contacts-scroll" VBox.vgrow="ALWAYS">
+            
+            <!-- Search bar -->
+            <HBox spacing="8.0" alignment="CENTER_LEFT" styleClass="chat-search-bar">
+               <children>
+                  <TextField fx:id="searchField" promptText="Search users..." 
+                             styleClass="chat-search-field" HBox.hgrow="ALWAYS"
+                             onKeyReleased="#onSearchUsers" />
+                  <Button fx:id="clearSearchBtn" mnemonicParsing="false" onAction="#onClearSearch"
+                          styleClass="chat-clear-search-btn" text="✕" visible="false" managed="false" />
+               </children>
+               <padding><Insets bottom="8.0" left="8.0" right="8.0" top="4.0" /></padding>
+            </HBox>
+            
+            <ScrollPane fitToWidth="true" styleClass="chat-contacts-scroll" VBox.vgrow="ALWAYS" 
+                        hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" prefHeight="400.0">
                <content>
-                  <VBox fx:id="contactsListBox" spacing="4.0" styleClass="chat-contacts-list">
+                  <VBox fx:id="contactsListBox" spacing="6.0" styleClass="chat-contacts-list" fillWidth="true">
                      <padding><Insets bottom="8.0" left="8.0" right="8.0" top="8.0" /></padding>
                   </VBox>
                </content>
@@ -35,7 +49,8 @@
       </VBox>
 
       <!-- RIGHT: message area — StackPane so empty/active overlay each other -->
-      <StackPane HBox.hgrow="ALWAYS" styleClass="chat-messages-panel" minHeight="400.0">
+      <StackPane HBox.hgrow="ALWAYS" styleClass="chat-messages-panel" 
+                 prefHeight="600.0" minHeight="500.0" VBox.vgrow="ALWAYS">
          <children>
 
             <!-- Empty state -->
@@ -49,8 +64,8 @@
 
             <!-- Active conversation -->
             <VBox fx:id="conversationArea" managed="false" visible="false"
-                  VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS"
-                  maxHeight="1.7976931348623157E308" StackPane.alignment="TOP_LEFT">
+                  VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS" fillWidth="true"
+                  prefHeight="600.0" minHeight="500.0" StackPane.alignment="TOP_LEFT">
                <children>
                   <!-- Header -->
                   <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="chat-conv-header" VBox.vgrow="NEVER">
@@ -71,9 +86,10 @@
                   <!-- Messages scroll — takes all remaining height -->
                   <ScrollPane fx:id="messagesScroll" fitToWidth="true"
                               styleClass="chat-messages-scroll" VBox.vgrow="ALWAYS"
-                              minHeight="100.0">
+                              hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+                              prefHeight="400.0" minHeight="300.0">
                      <content>
-                        <VBox fx:id="messagesBox" spacing="8.0" styleClass="chat-messages-box">
+                        <VBox fx:id="messagesBox" spacing="8.0" styleClass="chat-messages-box" fillWidth="true">
                            <padding><Insets bottom="16.0" left="16.0" right="16.0" top="16.0" /></padding>
                         </VBox>
                      </content>

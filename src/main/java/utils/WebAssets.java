@@ -7,11 +7,11 @@ import java.io.File;
 
 /**
  * Loads local assets from the XAMPP htdocs/pidevassets folder.
- * Base path: C:/xampp/htdocs/pidevassets/
+ * Base path: C:/xampp2/htdocs/pidevassets/
  */
 public final class WebAssets {
 
-    private static final String ASSETS_DIR = "C:/xampp/htdocs/pidevassets/";
+    private static final String ASSETS_DIR = "C:/xampp2/htdocs/pidevassets/";
 
     private WebAssets() {}
 

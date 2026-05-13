@@ -9,6 +9,7 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.GridPane?>
@@ -73,12 +74,22 @@
                <children>
                   <HBox alignment="CENTER_LEFT" styleClass="admin-navbar" VBox.vgrow="NEVER">
                      <children>
-                        <VBox HBox.hgrow="ALWAYS" spacing="4.0">
+                        <!-- Logo and Title Section -->
+                        <HBox alignment="CENTER_LEFT" spacing="12" HBox.hgrow="ALWAYS">
                            <children>
-                              <Label fx:id="navbarPageTitle" styleClass="navbar-page-title" text="Coach dashboard" />
-                              <Label fx:id="navbarPageSubtitle" styleClass="navbar-page-subtitle" text="Train and support your athletes" />
+                              <ImageView fx:id="navbarLogoImage" fitHeight="32.0" fitWidth="32.0" preserveRatio="true" smooth="true">
+                                 <image>
+                                    <javafx.scene.image.Image url="file:C:/xampp2/htdocs/pidevassets/sport-hero.png" />
+                                 </image>
+                              </ImageView>
+                              <VBox spacing="4.0">
+                                 <children>
+                                    <Label fx:id="navbarPageTitle" styleClass="navbar-page-title" text="Coach dashboard" />
+                                    <Label fx:id="navbarPageSubtitle" styleClass="navbar-page-subtitle" text="Train and support your athletes" />
+                                 </children>
+                              </VBox>
                            </children>
-                        </VBox>
+                        </HBox>
                         <Button fx:id="navbarBellBtn" focusTraversable="false" mnemonicParsing="false" styleClass="navbar-bell-btn" text="" />
                         <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="navbar-profile">
                            <children>
@@ -153,6 +164,40 @@
                                        <children>
                                           <Label styleClass="stat-title" text="INTENSITÉ DES FEEDBACKS" />
                                           <VBox fx:id="sentimentChartContainer" prefHeight="200.0" />
+                                       </children>
+                                       <padding><Insets bottom="12.0" left="14.0" right="14.0" top="12.0" /></padding>
+                                    </VBox>
+                                    <VBox styleClass="stat-card" HBox.hgrow="ALWAYS" spacing="8.0">
+                                       <children>
+                                          <Label styleClass="stat-title" text="AVG DURATION" />
+                                          <VBox fx:id="avgDurationContainer" prefHeight="200.0" alignment="CENTER" />
+                                       </children>
+                                       <padding><Insets bottom="12.0" left="14.0" right="14.0" top="12.0" /></padding>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+
+                              <!-- Second Charts row -->
+                              <HBox spacing="14.0">
+                                 <children>
+                                    <VBox styleClass="stat-card" HBox.hgrow="ALWAYS" spacing="8.0">
+                                       <children>
+                                          <Label styleClass="stat-title" text="MOST USED EXERCISES" />
+                                          <VBox fx:id="mostUsedExercisesContainer" prefHeight="200.0" />
+                                       </children>
+                                       <padding><Insets bottom="12.0" left="14.0" right="14.0" top="12.0" /></padding>
+                                    </VBox>
+                                    <VBox styleClass="stat-card" HBox.hgrow="ALWAYS" spacing="8.0">
+                                       <children>
+                                          <Label styleClass="stat-title" text="WORKOUTS BY GOAL" />
+                                          <VBox fx:id="workoutsByGoalContainer" prefHeight="200.0" />
+                                       </children>
+                                       <padding><Insets bottom="12.0" left="14.0" right="14.0" top="12.0" /></padding>
+                                    </VBox>
+                                    <VBox styleClass="stat-card" HBox.hgrow="ALWAYS" spacing="8.0">
+                                       <children>
+                                          <Label styleClass="stat-title" text="WORKOUTS BY LEVEL" />
+                                          <VBox fx:id="workoutsByLevelContainer" prefHeight="200.0" />
                                        </children>
                                        <padding><Insets bottom="12.0" left="14.0" right="14.0" top="12.0" /></padding>
                                     </VBox>

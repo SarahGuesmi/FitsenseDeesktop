@@ -25,10 +25,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class ChatroomController {
 
     @FXML private VBox contactsListBox;
+    @FXML private TextField searchField;
+    @FXML private Button clearSearchBtn;
     @FXML private VBox emptyState;
     @FXML private VBox conversationArea;
     @FXML private Label convAvatar;
@@ -46,6 +49,8 @@ public class ChatroomController {
     private LocalDateTime lastPollTime;
     private Timeline pollTimeline;
     private final Set<UUID> renderedMessageIds = new HashSet<>();
+    private List<User> allContacts = new ArrayList<>(); // Store all contacts for filtering
+    private String currentSearchText = "";
 
     @FXML
     private void initialize() {
@@ -109,6 +114,9 @@ public class ChatroomController {
                 });
             }
 
+            // Store all contacts for filtering
+            allContacts = new ArrayList<>(users);
+
             Map<UUID, LocalDateTime> lastMsgTimes = new HashMap<>();
             for (User u : users) {
                 LocalDateTime t = chatService.getLastMessageTime(me.getId(), u.getId());
@@ -116,25 +124,83 @@ public class ChatroomController {
             }
             users.sort((u1, u2) -> lastMsgTimes.get(u2.getId()).compareTo(lastMsgTimes.get(u1.getId())));
 
-            contactsListBox.getChildren().clear();
-            if (users.isEmpty()) {
-                Label empty = new Label("No contacts available.");
-                empty.setStyle("-fx-text-fill: #6B7280; -fx-font-size: 13px; -fx-padding: 20;");
-                contactsListBox.getChildren().add(empty);
-                return;
-            }
-            for (User u : users) {
-                contactsListBox.getChildren().add(buildContactRow(u));
-            }
+            displayContacts(users);
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    private void displayContacts(List<User> users) {
+        contactsListBox.getChildren().clear();
+        
+        if (users.isEmpty()) {
+            Label empty = new Label("No contacts available.");
+            empty.setStyle("-fx-text-fill: #6B7280; -fx-font-size: 13px; -fx-padding: 20;");
+            contactsListBox.getChildren().add(empty);
+            return;
+        }
+
+        // Separate users by role
+        List<User> admins = new ArrayList<>();
+        List<User> coaches = new ArrayList<>();
+        List<User> regularUsers = new ArrayList<>();
+
+        for (User u : users) {
+            String role = u.getRolesJson() == null ? "" : u.getRolesJson();
+            if (role.contains("ROLE_ADMIN")) {
+                admins.add(u);
+            } else if (role.contains("ROLE_COACH")) {
+                coaches.add(u);
+            } else {
+                regularUsers.add(u);
+            }
+        }
+
+        // Add section headers and users
+        if (!admins.isEmpty()) {
+            addSectionHeader("ADMINISTRATORS");
+            for (User u : admins) {
+                contactsListBox.getChildren().add(buildContactRow(u));
+            }
+        }
+
+        if (!coaches.isEmpty()) {
+            addSectionHeader("COACHES");
+            for (User u : coaches) {
+                contactsListBox.getChildren().add(buildContactRow(u));
+            }
+        }
+
+        if (!regularUsers.isEmpty()) {
+            addSectionHeader("USERS");
+            for (User u : regularUsers) {
+                contactsListBox.getChildren().add(buildContactRow(u));
+            }
+        }
+    }
+
+    private void addSectionHeader(String title) {
+        Label header = new Label(title);
+        header.getStyleClass().add("chat-section-header");
+        header.setPadding(new Insets(8, 12, 4, 12));
+        contactsListBox.getChildren().add(header);
     }
 
     private HBox buildContactRow(User u) {
         HBox row = new HBox(12);
         row.setAlignment(Pos.CENTER_LEFT);
         row.getStyleClass().add("chat-contact-row");
+        
+        // Add role-specific styling
+        String role = u.getRolesJson() == null ? "" : u.getRolesJson();
+        if (role.contains("ROLE_ADMIN")) {
+            row.getStyleClass().add("chat-contact-admin");
+        } else if (role.contains("ROLE_COACH")) {
+            row.getStyleClass().add("chat-contact-coach");
+        } else {
+            row.getStyleClass().add("chat-contact-user");
+        }
+        
         row.setPadding(new Insets(10, 12, 10, 12));
 
         Label avatar = new Label(initials(u));
@@ -164,9 +230,9 @@ public class ChatroomController {
             info.getChildren().add(name);
         }
 
-        Label role = new Label(roleLabel(u.getRolesJson()));
-        role.getStyleClass().add("chat-contact-role");
-        info.getChildren().add(role);
+        Label roleLabel = new Label(roleLabel(u.getRolesJson()));
+        roleLabel.getStyleClass().add("chat-contact-role");
+        info.getChildren().add(roleLabel);
 
         row.getChildren().addAll(avatar, info);
         row.setOnMouseClicked(e -> openConversation(u));
@@ -407,6 +473,47 @@ public class ChatroomController {
 
     public void stopPolling() {
         if (pollTimeline != null) pollTimeline.stop();
+    }
+
+    // ── Search functionality ─────────────────────────────────────────────────
+
+    @FXML
+    private void onSearchUsers() {
+        String searchText = searchField.getText() == null ? "" : searchField.getText().trim().toLowerCase();
+        currentSearchText = searchText;
+        
+        // Show/hide clear button
+        boolean hasText = !searchText.isEmpty();
+        clearSearchBtn.setVisible(hasText);
+        clearSearchBtn.setManaged(hasText);
+        
+        if (searchText.isEmpty()) {
+            // Show all contacts
+            displayContacts(allContacts);
+        } else {
+            // Filter contacts by name
+            List<User> filteredContacts = allContacts.stream()
+                .filter(u -> {
+                    String fullName = fullName(u).toLowerCase();
+                    String firstName = (u.getFirstname() == null ? "" : u.getFirstname().toLowerCase());
+                    String lastName = (u.getLastname() == null ? "" : u.getLastname().toLowerCase());
+                    return fullName.contains(searchText) || 
+                           firstName.contains(searchText) || 
+                           lastName.contains(searchText);
+                })
+                .collect(Collectors.toList());
+            
+            displayContacts(filteredContacts);
+        }
+    }
+
+    @FXML
+    private void onClearSearch() {
+        searchField.clear();
+        currentSearchText = "";
+        clearSearchBtn.setVisible(false);
+        clearSearchBtn.setManaged(false);
+        displayContacts(allContacts);
     }
 
     // ── Utils ─────────────────────────────────────────────────────────────────

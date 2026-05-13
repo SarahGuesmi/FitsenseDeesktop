@@ -25,7 +25,7 @@ import java.util.function.Consumer;
 public class ImagePickerController {
 
     private static final String PIDEVASSETS_URL  = "http://localhost/pidevassets/";
-    private static final String PIDEVASSETS_PATH = "C:/xampp/htdocs/pidevassets";
+    private static final String PIDEVASSETS_PATH = "C:/xampp2/htdocs/pidevassets";
 
     @FXML private TextField searchField;
     @FXML private Label loadingLabel;

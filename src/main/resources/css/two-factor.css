@@ -210,29 +210,45 @@
     -fx-font-weight: 600;
 }
 
-/* Verify screen */
+/* Verify screen - Modern gradient icon */
+.tfa-verify-icon-container {
+    -fx-background-color: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -fx-background-radius: 20px;
+    -fx-min-width: 64px;
+    -fx-min-height: 64px;
+    -fx-max-width: 64px;
+    -fx-max-height: 64px;
+    -fx-alignment: center;
+    -fx-effect: dropshadow(gaussian, rgba(102, 126, 234, 0.5), 24, 0, 0, 8);
+}
+
 .tfa-verify-icon {
-    -fx-font-size: 52px;
+    -fx-font-size: 36px;
     -fx-alignment: CENTER;
 }
 
 .tfa-verify-input {
-    -fx-background-color: #13131b;
-    -fx-text-fill: white;
-    -fx-prompt-text-fill: #6f7285;
-    -fx-font-size: 28px;
-    -fx-font-weight: 800;
+    -fx-background-color: rgba(20, 20, 30, 0.8);
+    -fx-text-fill: #6b7280;
+    -fx-prompt-text-fill: rgba(107, 114, 128, 0.6);
+    -fx-font-size: 20px;
+    -fx-font-weight: 500;
     -fx-alignment: CENTER;
-    -fx-padding: 16px;
+    -fx-padding: 16px 28px;
     -fx-background-radius: 12px;
     -fx-border-radius: 12px;
-    -fx-border-color: rgba(255,255,255,0.1);
+    -fx-border-color: rgba(99, 102, 241, 0.5);
+    -fx-border-width: 1.5;
     -fx-background-insets: 0;
-    -fx-letter-spacing: 8px;
+    -fx-letter-spacing: 0.6em;
+    -fx-max-width: 280px;
 }
 
 .tfa-verify-input:focused {
-    -fx-border-color: #9f7cff;
+    -fx-border-color: rgba(102, 126, 234, 0.8);
+    -fx-effect: dropshadow(gaussian, rgba(102, 126, 234, 0.2), 10, 0, 0, 2);
+    -fx-background-color: rgba(25, 25, 35, 0.9);
+    -fx-text-fill: #9ca3af;
 }
 
 /* Make the ScrollPane wrapper dark to match the app theme */

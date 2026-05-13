@@ -7,22 +7,20 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import models.User;
-import utils.SidebarAvatarLoader;
-
+import models.Workout;
+import utils.FeedbackLauncher;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import javafx.scene.control.Alert;
+import services.NotificationService;
+import java.util.List;
 import java.io.IOException;
 import java.util.Objects;
-import java.util.stream.Stream;
-
 public class DashboardController {
-
-    private static DashboardController instance;
-
-    public static DashboardController getInstance() { return instance; }
 
     @FXML
     private StackPane root;
@@ -38,39 +36,43 @@ public class DashboardController {
     private Label navbarUserName;
     @FXML
     private Label navbarUserRole;
+    private Stage notificationStage;
     @FXML
     private Label navbarAvatar;
-    @FXML
-    private VBox dashHomePane;
-    @FXML
-    private VBox dashProfilePane;
-    @FXML
-    private VBox dashMentalHealthPane;
-    @FXML
-    private VBox dashWorkoutsPane;
-    @FXML
-    private VBox dashChatroomPane;
-    @FXML
-    private Button dashHomeBtn;
-    @FXML
-    private Button dashProfileBtn;
-    @FXML
-    private Button dashWorkoutsBtn;
-    @FXML
-    private Button dashMentalHealthBtn;
+    @FXML 
+    private ImageView navbarLogoImage;
+    @FXML private VBox dashHomePane;
+    @FXML private VBox dashProfilePane;
+    @FXML private VBox dashWorkoutsPane;
+    @FXML private VBox dashActivityPane;
+    @FXML private VBox dashMentalHealthPane;
+    @FXML private VBox dashChatroomPane;
+    @FXML private VBox workoutsFragmentPane;
+    @FXML private VBox libraryPane;
+    @FXML private VBox dashNutritionPane;
+    @FXML private Button dashHomeBtn;
+    @FXML private Button dashProfileBtn;
+    @FXML private Button dashWorkoutsBtn;
+    @FXML private Button dashMentalHealthBtn;
     @FXML private Button dashChatroomBtn;
-    @FXML private Button dashSecurityBtn;
     @FXML private Button dashNutritionBtn;
-    @FXML private ScrollPane dashSecurityPane;
-    @FXML private ScrollPane dashNutritionPane;
-    @FXML private ImageView sidebarAvatarView;
-    @FXML private Label     sidebarAvatarInitials;
-    @FXML
-    private ProfileFragmentController dashProfileController;
+    @FXML private Label notificationBadge;
+    @FXML private ProfileFragmentController dashProfileController;
+    @FXML private ActivityLogController dashActivityController;
+    @FXML private MentalHealthUserFragmentController dashMentalHealthController;
+    @FXML private ChatroomController dashChatroomController;
+    @FXML private NutritionFragmentController dashNutritionStatsController;
 
+    // Singleton reference so child controllers can call back
+    private static DashboardController instance;
+    public static DashboardController getInstance() { return instance; }
     @FXML
     private void initialize() {
         instance = this;
+        
+        // Load navbar logo
+        loadNavbarLogo();
+        
         if (navbarBellBtn != null) {
             navbarBellBtn.setText("\uD83D\uDD14");
         }
@@ -80,7 +82,96 @@ public class DashboardController {
         refreshNavbar();
         setDashboardNavbarTitles();
         showDashboardHome();
-        SidebarAvatarLoader.load(AppSession.getCurrentUser(), sidebarAvatarView, sidebarAvatarInitials);
+        refreshNotificationBadge();
+    }
+    
+    private void loadNavbarLogo() {
+        if (navbarLogoImage != null) {
+            try {
+                java.io.File logoFile = new java.io.File("C:/xampp2/htdocs/pidevassets/sport-hero.png");
+                if (logoFile.exists()) {
+                    javafx.scene.image.Image logo = new javafx.scene.image.Image(logoFile.toURI().toString(), true);
+                    navbarLogoImage.setImage(logo);
+                }
+            } catch (Exception e) {
+                System.err.println("Could not load navbar logo: " + e.getMessage());
+            }
+        }
+    }
+    @FXML
+    private void onShowNutrition() {
+        showOnly(dashNutritionPane); // ou le bon pane
+        setDashNavActive(dashNutritionBtn);
+    }
+
+    @FXML
+    private void onShowMentalHealth() {
+        if (navbarPageTitle != null) navbarPageTitle.setText("Mental Health");
+        if (navbarPageSubtitle != null) navbarPageSubtitle.setText("Mental wellness and assessments");
+        showOnly(dashMentalHealthPane);
+        setDashNavActive(dashMentalHealthBtn);
+    }
+
+    @FXML
+    private void onShowChatroom() {
+        if (navbarPageTitle != null) navbarPageTitle.setText("Chatroom");
+        if (navbarPageSubtitle != null) navbarPageSubtitle.setText("Connect with your coach and community");
+        showOnly(dashChatroomPane);
+        setDashNavActive(dashChatroomBtn);
+        // Refresh chatroom when showing
+        if (dashChatroomController != null) {
+            dashChatroomController.refresh();
+        }
+    }
+    @FXML
+    private void onShowNotifications() {
+        try {
+            if (notificationStage != null && notificationStage.isShowing()) {
+                notificationStage.close();
+                notificationStage = null;
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/NotificationPopup.fxml"));
+            Parent root = loader.load();
+
+            NotificationPopupController controller = loader.getController();
+            String userId = AppSession.getCurrentUser().getId().toString();
+            controller.loadNotifications(userId, this);
+
+            notificationStage = new Stage();
+            notificationStage.setScene(new Scene(root));
+            notificationStage.initStyle(StageStyle.TRANSPARENT);
+            notificationStage.show();
+
+            notificationStage.setOnHidden(e -> notificationStage = null);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void refreshNotificationBadge() {
+        if (notificationBadge == null) return;
+        int unreadCount = 1;
+        notificationBadge.setText(String.valueOf(unreadCount));
+        notificationBadge.setVisible(unreadCount > 0);
+        notificationBadge.setManaged(unreadCount > 0);
+    }
+
+    private void showOnly(VBox paneToShow) {
+        VBox[] allPanes = {dashHomePane, dashProfilePane, dashWorkoutsPane,
+                dashActivityPane, dashMentalHealthPane, dashChatroomPane, dashNutritionPane};
+        for (VBox p : allPanes) {
+            if (p != null) {
+                p.setVisible(false);
+                p.setManaged(false);
+            }
+        }
+        if (paneToShow != null) {
+            paneToShow.setVisible(true);
+            paneToShow.setManaged(true);
+        }
     }
 
     private void setDashboardNavbarTitles() {
@@ -98,15 +189,6 @@ public class DashboardController {
         }
         if (navbarPageSubtitle != null) {
             navbarPageSubtitle.setText("Manage your personal information");
-        }
-    }
-
-    private void setMentalHealthNavbarTitles() {
-        if (navbarPageTitle != null) {
-            navbarPageTitle.setText("Dashboard");
-        }
-        if (navbarPageSubtitle != null) {
-            navbarPageSubtitle.setText("Welcome back to FitSense.");
         }
     }
 
@@ -169,45 +251,39 @@ public class DashboardController {
     }
 
     @FXML
-    private void onShowNutrition() {
-        if (navbarPageTitle != null) navbarPageTitle.setText("Nutrition");
-        if (navbarPageSubtitle != null) navbarPageSubtitle.setText("Meals and macros");
-        hideAllDashPanes();
-        if (dashNutritionPane != null) { dashNutritionPane.setManaged(true); dashNutritionPane.setVisible(true); }
-        setDashNavActive(dashNutritionBtn);
-    }
-    @FXML
-    private void onShowChatroom() {
-        if (navbarPageTitle != null) navbarPageTitle.setText("Chatroom");
-        if (navbarPageSubtitle != null) navbarPageSubtitle.setText("Message your coaches and teammates");
-        hideAllDashPanes();
-        if (dashChatroomPane != null) { dashChatroomPane.setManaged(true); dashChatroomPane.setVisible(true); }
-        setDashNavActive(dashChatroomBtn);
-    }
-
-    private void hideAllDashPanes() {
-        for (VBox p : new VBox[]{dashHomePane, dashProfilePane, dashMentalHealthPane, dashWorkoutsPane, dashChatroomPane}) {
-            if (p != null) { p.setManaged(false); p.setVisible(false); }
-        }
-        if (dashSecurityPane != null)   { dashSecurityPane.setManaged(false);   dashSecurityPane.setVisible(false); }
-        if (dashNutritionPane != null)  { dashNutritionPane.setManaged(false);  dashNutritionPane.setVisible(false); }
-    }
-
-    @FXML
-    private void onShowSecurity() {
-        if (navbarPageTitle != null) navbarPageTitle.setText("Security");
-        if (navbarPageSubtitle != null) navbarPageSubtitle.setText("Manage two-factor authentication");
-        hideAllDashPanes();
-        if (dashSecurityPane != null) { dashSecurityPane.setManaged(true); dashSecurityPane.setVisible(true); }
-        setDashNavActive(dashSecurityBtn);
+    public void onShowActivityLog() {
+        if (navbarPageTitle != null) navbarPageTitle.setText("Activity Log");
+        if (navbarPageSubtitle != null) navbarPageSubtitle.setText("Your session activity today");
+        showOnly(dashActivityPane);
+        if (dashActivityController != null) dashActivityController.refresh();
+        setDashNavActive(null);
     }
 
     @FXML
     private void onShowWorkouts() {
         if (navbarPageTitle != null) navbarPageTitle.setText("My Workouts");
         if (navbarPageSubtitle != null) navbarPageSubtitle.setText("Personalized sessions matching your goals");
-        hideAllDashPanes();
-        if (dashWorkoutsPane != null) { dashWorkoutsPane.setManaged(true); dashWorkoutsPane.setVisible(true); }
+        showOnly(dashWorkoutsPane);
+        showWorkoutsList();
+        setDashNavActive(dashWorkoutsBtn);
+    }
+
+    public void showWorkoutsList() {
+        if (workoutsFragmentPane != null) { workoutsFragmentPane.setVisible(true); workoutsFragmentPane.setManaged(true); }
+        if (libraryPane != null) { libraryPane.setVisible(false); libraryPane.setManaged(false); libraryPane.getChildren().clear(); }
+    }
+
+    public void showLibraryView(javafx.scene.Node view) {
+        if (navbarPageTitle != null) navbarPageTitle.setText("Exercise Library");
+        if (navbarPageSubtitle != null) navbarPageSubtitle.setText("Browse and discover exercises");
+        showOnly(dashWorkoutsPane);
+        if (workoutsFragmentPane != null) { workoutsFragmentPane.setVisible(false); workoutsFragmentPane.setManaged(false); }
+        if (libraryPane != null) {
+            libraryPane.getChildren().setAll(view);
+            javafx.scene.layout.VBox.setVgrow(view, javafx.scene.layout.Priority.ALWAYS);
+            libraryPane.setVisible(true);
+            libraryPane.setManaged(true);
+        }
         setDashNavActive(dashWorkoutsBtn);
     }
 
@@ -216,102 +292,56 @@ public class DashboardController {
         setDashboardNavbarTitles();
         showDashboardHome();
     }
-
     @FXML
     private void onShowProfile() {
         setProfileNavbarTitles();
-        hideAllDashPanes();
-        if (dashProfilePane != null) { dashProfilePane.setManaged(true); dashProfilePane.setVisible(true); }
+        showOnly(dashProfilePane);
         setDashNavActive(dashProfileBtn);
-        if (dashProfileController != null) dashProfileController.reloadFromSession();
-    }
 
-    @FXML
-    private void onShowMentalHealth() {
-        setMentalHealthNavbarTitles();
-        hideAllDashPanes();
-        if (dashMentalHealthPane != null) { dashMentalHealthPane.setManaged(true); dashMentalHealthPane.setVisible(true); }
-        setDashNavActive(dashMentalHealthBtn);
+        if (dashProfileController != null) {
+            dashProfileController.reloadFromSession();
+        }
     }
 
     private void showDashboardHome() {
-        hideAllDashPanes();
         if (dashHomePane != null) { dashHomePane.setManaged(true); dashHomePane.setVisible(true); }
+        if (dashProfilePane != null) { dashProfilePane.setManaged(false); dashProfilePane.setVisible(false); }
+        if (dashWorkoutsPane != null) { dashWorkoutsPane.setManaged(false); dashWorkoutsPane.setVisible(false); }
+        if (dashActivityPane != null) { dashActivityPane.setManaged(false); dashActivityPane.setVisible(false); }
+        if (dashMentalHealthPane != null) { dashMentalHealthPane.setManaged(false); dashMentalHealthPane.setVisible(false); }
+        if (dashChatroomPane != null) { dashChatroomPane.setManaged(false); dashChatroomPane.setVisible(false); }
+        if (dashNutritionPane != null) { dashNutritionPane.setManaged(false); dashNutritionPane.setVisible(false); }
         setDashNavActive(dashHomeBtn);
+
+        if (dashNutritionStatsController != null) {
+            dashNutritionStatsController.reloadNutrition();
+        }
     }
 
     private void setDashNavActive(Button selected) {
-        Stream.of(dashHomeBtn, dashProfileBtn, dashWorkoutsBtn, dashMentalHealthBtn, dashChatroomBtn, dashSecurityBtn, dashNutritionBtn)
-                .filter(Objects::nonNull)
-                .forEach(b -> {
-                    b.getStyleClass().setAll("dash-side-link");
-                    if (b == selected) b.getStyleClass().add("dash-side-link-active");
-                });
+        for (Button b : new Button[]{dashHomeBtn, dashProfileBtn, dashWorkoutsBtn, dashMentalHealthBtn, dashChatroomBtn, dashNutritionBtn}) {
+            if (b != null) {
+                b.getStyleClass().setAll("dash-side-link");
+                if (b == selected) b.getStyleClass().add("dash-side-link-active");
+            }
+        }
     }
-
     @FXML
-    private StackPane logoutOverlay;
+    private void onTestFeedback() {
+        Workout testWorkout = new Workout();
+        testWorkout.setNom("Test Workout");
+        testWorkout.setNiveau("Medium");
+        testWorkout.setDuree(45);
+        testWorkout.setDescription("Test");
+        testWorkout.setStatus("active");
+        FeedbackLauncher.show(testWorkout, () -> System.out.println("Feedback done"));
+    }
 
     @FXML
     private void onLogout() {
-        if (logoutOverlay != null) {
-            logoutOverlay.setManaged(true);
-            logoutOverlay.setVisible(true);
-        }
-    }
-
-    @FXML
-    private void onConfirmLogout() {
         AppSession.setCurrentUser(null);
         AppSession.resetOnboarding();
         switchScene("/fxml/SignInView.fxml", "/css/signin.css");
-    }
-
-    @FXML
-    private void onCancelLogout() {
-        if (logoutOverlay != null) {
-            logoutOverlay.setManaged(false);
-            logoutOverlay.setVisible(false);
-        }
-    }
-
-    public void showLibraryView(javafx.scene.Node view) {
-        hideAllDashPanes();
-        if (dashWorkoutsPane != null) {
-            dashWorkoutsPane.setManaged(true);
-            dashWorkoutsPane.setVisible(true);
-            if (view != null) {
-                VBox container = new VBox(view);
-                VBox.setVgrow(view, javafx.scene.layout.Priority.ALWAYS);
-                dashWorkoutsPane.getChildren().setAll(container);
-            }
-        }
-        setDashNavActive(dashWorkoutsBtn);
-    }
-
-    public void showWorkoutsList() {
-        onShowWorkouts();
-    }
-
-    /** Called by NotificationPopupController after marking all notifications as read. */
-    public void refreshNotificationBadge() {
-        // Badge refresh — extend this when a notification badge Label is added to DashboardView.fxml
-    }
-
-    public void onShowActivityLog() {
-        try {
-            Parent root = FXMLLoader.load(
-                    Objects.requireNonNull(getClass().getResource("/fxml/ActivityLogView.fxml")));
-            hideAllDashPanes();
-            if (dashWorkoutsPane != null) {
-                dashWorkoutsPane.setManaged(true);
-                dashWorkoutsPane.setVisible(true);
-                dashWorkoutsPane.getChildren().setAll(root);
-            }
-            setDashNavActive(dashWorkoutsBtn);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     private void switchScene(String fxmlPath, String cssPath) {

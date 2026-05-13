@@ -32,6 +32,7 @@ public final class FeedbackLauncher {
             });
 
             Stage stage = new Stage();
+            utils.AppIconLoader.setIcon(stage);
             stage.setTitle("Post-Workout Feedback");
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(new Scene(root, 660, 600));

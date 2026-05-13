@@ -10,13 +10,13 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * GroqService — calls the Groq API (llama3-8b-8192) for text generation.
+ * GroqService — calls the Groq API (llama-3.1-8b-instant) for text generation.
  * API key is read from config.properties: groq.api.key=YOUR_KEY
  */
 public class GroqService {
 
     private static final String API_URL  = "https://api.groq.com/openai/v1/chat/completions";
-    private static final String MODEL    = "llama3-8b-8192";
+    private static final String MODEL    = "llama-3.1-8b-instant";
     private static final String API_KEY  = loadKey();
 
     /**
@@ -96,11 +96,19 @@ public class GroqService {
 
     private static String loadKey() {
         try (InputStream in = GroqService.class.getResourceAsStream("/config.properties")) {
-            if (in == null) return "";
+            if (in == null) {
+                System.err.println("[GroqService] Error: /config.properties not found in classpath.");
+                return "";
+            }
             Properties p = new Properties();
             p.load(in);
-            return p.getProperty("groq.api.key", "");
+            String key = p.getProperty("groq.api.key", "");
+            if (key.isEmpty()) {
+                System.err.println("[GroqService] Warning: groq.api.key is missing or empty in config.properties.");
+            }
+            return key;
         } catch (Exception e) {
+            System.err.println("[GroqService] Error loading config.properties: " + e.getMessage());
             return "";
         }
     }

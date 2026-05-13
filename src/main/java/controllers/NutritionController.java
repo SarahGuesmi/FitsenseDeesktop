@@ -1,4 +1,5 @@
 package controllers;
+import java.io.File;
 import javafx.scene.layout.GridPane;
 import javafx.scene.control.*;
 import javafx.fxml.FXML;
@@ -198,24 +199,48 @@ public class NutritionController {
         modal.initModality(Modality.APPLICATION_MODAL);
         modal.setTitle(recipe.title);
 
-        VBox root = new VBox(15);
-        root.setPadding(new Insets(20));
+        VBox root = new VBox(18);
+        root.setPadding(new Insets(28));
         root.setStyle("-fx-background-color:#111827;");
 
+        // Header: logo + title
+        HBox headerRow = new HBox(12);
+        headerRow.setAlignment(Pos.CENTER_LEFT);
+
+        ImageView logoView = new ImageView();
+        try {
+            File logoFile = new File("C:/xampp2/htdocs/pidevassets/sport-hero.png");
+            if (logoFile.exists()) {
+                logoView.setImage(new Image(logoFile.toURI().toString(), true));
+            }
+        } catch (Exception ignored) {}
+        logoView.setFitWidth(42);
+        logoView.setFitHeight(42);
+        logoView.setPreserveRatio(true);
+        logoView.setSmooth(true);
+
         Label title = new Label(recipe.title);
-        title.setStyle("-fx-text-fill:white; -fx-font-size:20px; -fx-font-weight:bold;");
+        title.setStyle("-fx-text-fill:white; -fx-font-size:22px; -fx-font-weight:bold;");
+        title.setWrapText(true);
+
+        headerRow.getChildren().addAll(logoView, title);
 
         ImageView image = new ImageView(new Image(recipe.image, true));
-        image.setFitWidth(400);
-        image.setFitHeight(250);
+        image.setFitWidth(740);
+        image.setFitHeight(320);
+        image.setPreserveRatio(false);
+        image.setSmooth(true);
 
         Label instructions = new Label(recipe.instructions);
         instructions.setWrapText(true);
-        instructions.setStyle("-fx-text-fill:#d1d5db;");
+        instructions.setStyle("-fx-text-fill:#d1d5db; -fx-font-size:14px; -fx-line-spacing:4;");
 
-        root.getChildren().addAll(title, image, instructions);
+        root.getChildren().addAll(headerRow, image, instructions);
 
-        Scene scene = new Scene(new ScrollPane(root), 450, 500);
+        ScrollPane scroll = new ScrollPane(root);
+        scroll.setFitToWidth(true);
+        scroll.setStyle("-fx-background: #111827; -fx-background-color: #111827;");
+        Scene scene = new Scene(scroll, 800, 700);
         modal.setScene(scene);
         modal.showAndWait();
     }
@@ -322,8 +347,14 @@ public class NutritionController {
                 ? DEFAULT_IMAGE_URL
                 : recipe.getImage();
 
-        Image img = new Image(imageUrl, false);
-        if (img.isError()) {
+        Image img;
+        try {
+            img = new Image(imageUrl, false);
+            if (img.isError()) {
+                img = new Image(DEFAULT_IMAGE_URL, false);
+            }
+        } catch (Exception e) {
+            // If image URL is invalid, use default image
             img = new Image(DEFAULT_IMAGE_URL, false);
         }
 
@@ -436,9 +467,27 @@ public class NutritionController {
         root.setPadding(new Insets(24));
         root.getStyleClass().add("recipe-modal-card");
 
+        HBox headerRow = new HBox(15);
+        headerRow.setAlignment(Pos.CENTER_LEFT);
+
+        ImageView logoView = new ImageView();
+        try {
+            File logoFile = new File("C:/xampp2/htdocs/pidevassets/sport-hero.png");
+            if (logoFile.exists()) {
+                logoView.setImage(new Image(logoFile.toURI().toString(), true));
+            }
+        } catch (Exception ignored) {}
+        logoView.setFitWidth(50);
+        logoView.setFitHeight(50);
+        logoView.setPreserveRatio(true);
+        logoView.setSmooth(true);
+
         Label title = new Label(safe(recipe.getTitle()));
         title.getStyleClass().add("recipe-modal-title");
         title.setWrapText(true);
+        HBox.setHgrow(title, Priority.ALWAYS);
+
+        headerRow.getChildren().addAll(logoView, title);
 
         HBox badges = new HBox(10);
         badges.getChildren().addAll(
@@ -460,8 +509,8 @@ public class NutritionController {
         }
 
         imageView.setImage(img);
-        imageView.setFitWidth(680);
-        imageView.setFitHeight(300);
+        imageView.setFitWidth(820);
+        imageView.setFitHeight(380);
         imageView.setPreserveRatio(false);
         imageView.setSmooth(true);
         imageView.getStyleClass().add("recipe-detail-image");
@@ -532,7 +581,7 @@ public class NutritionController {
         });
 
         root.getChildren().addAll(
-                title,
+                headerRow,
                 badges,
                 imageView,
                 allergyBox,
@@ -551,7 +600,7 @@ public class NutritionController {
         scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scroll.getStyleClass().add("nutrition-detail-scroll");
 
-        Scene scene = new Scene(scroll, 760, 780);
+        Scene scene = new Scene(scroll, 900, 850);
         scene.getStylesheets().add(
                 getClass().getResource("/css/nutrition.css").toExternalForm()
         );

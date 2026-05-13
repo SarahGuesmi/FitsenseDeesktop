@@ -49,16 +49,7 @@
                 </HBox>
 
                 <!-- Star rating -->
-                <HBox spacing="6.0" alignment="CENTER_LEFT" style="-fx-padding:14 0 0 0;">
-                    <Label style="-fx-text-fill:#6B7280;-fx-font-size:11px;-fx-font-weight:800;" text="YOUR RATING" />
-                    <Label fx:id="star1" text="☆" style="-fx-font-size:26px;-fx-cursor:hand;-fx-text-fill:#6B7280;" onMouseClicked="#onStar1" onMouseEntered="#onStarHover1" onMouseExited="#onStarExit" />
-                    <Label fx:id="star2" text="☆" style="-fx-font-size:26px;-fx-cursor:hand;-fx-text-fill:#6B7280;" onMouseClicked="#onStar2" onMouseEntered="#onStarHover2" onMouseExited="#onStarExit" />
-                    <Label fx:id="star3" text="☆" style="-fx-font-size:26px;-fx-cursor:hand;-fx-text-fill:#6B7280;" onMouseClicked="#onStar3" onMouseEntered="#onStarHover3" onMouseExited="#onStarExit" />
-                    <Label fx:id="star4" text="☆" style="-fx-font-size:26px;-fx-cursor:hand;-fx-text-fill:#6B7280;" onMouseClicked="#onStar4" onMouseEntered="#onStarHover4" onMouseExited="#onStarExit" />
-                    <Label fx:id="star5" text="☆" style="-fx-font-size:26px;-fx-cursor:hand;-fx-text-fill:#6B7280;" onMouseClicked="#onStar5" onMouseEntered="#onStarHover5" onMouseExited="#onStarExit" />
-                    <Label fx:id="ratingLabel" style="-fx-text-fill:#6B7280;-fx-font-size:12px;-fx-padding:0 0 0 4;" text="" />
-                    <Label fx:id="avgRatingLabel" style="-fx-text-fill:#F59E0B;-fx-font-size:12px;-fx-font-weight:700;" text="" />
-                </HBox>
+                <!-- Rating stars removed - will show in popup after marking exercise as done -->
             </VBox>
 
             <!-- Instructions card -->

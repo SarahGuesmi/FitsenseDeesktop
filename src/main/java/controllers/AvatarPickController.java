@@ -95,6 +95,30 @@ public class AvatarPickController {
             return;
         }
 
+        navigateToDashboard();
+    }
+
+    /**
+     * Navigate to the appropriate dashboard based on user role.
+     * Matches the routing logic in SignInController, TwoFactorVerifyController, and FaceIdQrController.
+     */
+    private void navigateToDashboard() {
+        User user = AppSession.getCurrentUser();
+        String roles = user.getRolesJson() == null ? "" : user.getRolesJson();
+        
+        // Admin dashboard
+        if (roles.contains("ROLE_ADMIN")) {
+            switchScene("/fxml/AdminDashboardView.fxml", "/css/admin.css");
+            return;
+        }
+        
+        // Coach dashboard
+        if (roles.contains("ROLE_COACH")) {
+            switchScene("/fxml/CoachDashboardView.fxml", "/css/admin.css");
+            return;
+        }
+        
+        // Regular user dashboard
         switchScene("/fxml/DashboardView.fxml", "/css/dashboard.css");
     }
 

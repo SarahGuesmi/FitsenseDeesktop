@@ -121,89 +121,42 @@ public final class RecommendationEditorDialog {
             aiBtn.setDisable(true);
             aiBtn.setText("Generating...");
             generalNote.setPromptText("AI is thinking...");
-            
+
             GroqAiService.getInstance().generateRecommendation(submission)
                 .thenAccept(result -> Platform.runLater(() -> {
-                    // 1. Set general note
                     if (result.has("general_note")) {
                         generalNote.setText(result.get("general_note").getAsString());
                     }
-
-                    // 2. Clear existing empty or existing rows if AI provides them
                     if (result.has("exercises")) {
                         JsonArray exercisesArr = result.getAsJsonArray("exercises");
                         if (exercisesArr.size() > 0) {
-                            // Clear current UI rows
                             exercisesBox.getChildren().clear();
                             rows.clear();
-
-                            // Add new AI suggested rows
                             for (JsonElement el : exercisesArr) {
                                 JsonObject obj = el.getAsJsonObject();
                                 String exName = obj.has("name") ? obj.get("name").getAsString() : "";
-                                String exDur = obj.has("duration") ? obj.get("duration").getAsString() : "";
+                                String exDur  = obj.has("duration") ? obj.get("duration").getAsString() : "";
                                 String exDesc = obj.has("description") ? obj.get("description").getAsString() : "";
-
                                 ExerciseRow newRow = new ExerciseRow(
                                         new RecommendedExercise(exName, exDur, exDesc),
-                                        exercisesBox,
-                                        rows
-                                );
+                                        exercisesBox, rows);
                                 rows.add(newRow);
                                 exercisesBox.getChildren().add(newRow.root);
                             }
                         }
                     }
-
                     aiBtn.setDisable(false);
                     aiBtn.setText("✨ Recommend with AI");
                     generalNote.setPromptText("Special overall advice…");
                 }))
                 .exceptionally(ex -> {
                     Platform.runLater(() -> {
-                        // Groq failed — retry once more, then show an error.
-                        // No hardcoded exercises: everything comes from the AI.
-                        aiBtn.setDisable(true);
-                        aiBtn.setText("Retrying...");
-                        generalNote.setPromptText("Contacting AI...");
-
-                        GroqAiService.getInstance().generateRecommendation(submission)
-                            .thenAccept(result -> Platform.runLater(() -> {
-                                if (result.has("general_note")) {
-                                    generalNote.setText(result.get("general_note").getAsString());
-                                }
-                                if (result.has("exercises")) {
-                                    com.google.gson.JsonArray exercisesArr = result.getAsJsonArray("exercises");
-                                    if (exercisesArr.size() > 0) {
-                                        exercisesBox.getChildren().clear();
-                                        rows.clear();
-                                        for (com.google.gson.JsonElement el : exercisesArr) {
-                                            com.google.gson.JsonObject obj = el.getAsJsonObject();
-                                            String exName = obj.has("name") ? obj.get("name").getAsString() : "";
-                                            String exDur  = obj.has("duration") ? obj.get("duration").getAsString() : "";
-                                            String exDesc = obj.has("description") ? obj.get("description").getAsString() : "";
-                                            ExerciseRow newRow = new ExerciseRow(
-                                                    new RecommendedExercise(exName, exDur, exDesc),
-                                                    exercisesBox, rows);
-                                            rows.add(newRow);
-                                            exercisesBox.getChildren().add(newRow.root);
-                                        }
-                                    }
-                                }
-                                aiBtn.setDisable(false);
-                                aiBtn.setText("✨ Recommend with AI");
-                                generalNote.setPromptText("Special overall advice…");
-                            }))
-                            .exceptionally(ex2 -> {
-                                Platform.runLater(() -> {
-                                    aiBtn.setDisable(false);
-                                    aiBtn.setText("✨ Recommend with AI");
-                                    generalNote.setPromptText("Special overall advice…");
-                                    warn("AI Unavailable",
-                                            "Could not reach Groq AI. Please check your API key in config.properties (groq.api.key) and try again.");
-                                });
-                                return null;
-                            });
+                        aiBtn.setDisable(false);
+                        aiBtn.setText("✨ Recommend with AI");
+                        generalNote.setPromptText("Special overall advice…");
+                        // Show the actual real error message
+                        String msg = ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage();
+                        warn("AI Error", "Request failed:\n\n" + msg);
                     });
                     return null;
                 });

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+
+<VBox style="-fx-background-color:#111827;-fx-border-color:#1F2937;-fx-border-radius:20;-fx-background-radius:20;"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controllers.ExerciseRatingModalController"
+      spacing="24.0" alignment="CENTER">
+    
+    <padding><Insets top="32.0" bottom="32.0" left="40.0" right="40.0"/></padding>
+
+    <!-- Header with logo and exercise name -->
+    <HBox spacing="16.0" alignment="CENTER_LEFT">
+        <ImageView fx:id="logoImage" fitWidth="50" fitHeight="50" preserveRatio="true" smooth="true" />
+        <VBox spacing="4.0">
+            <Label fx:id="exerciseNameLabel" 
+                   style="-fx-text-fill:white;-fx-font-size:24px;-fx-font-weight:900;" 
+                   text="Exercise Name" />
+            <Label style="-fx-text-fill:#6B7280;-fx-font-size:14px;" 
+                   text="How was your workout experience?" />
+        </VBox>
+    </HBox>
+
+    <!-- Rating Stars -->
+    <VBox spacing="16.0" alignment="CENTER">
+        <Label style="-fx-text-fill:#9CA3AF;-fx-font-size:16px;-fx-font-weight:600;" 
+               text="Rate this exercise" />
+        
+        <HBox spacing="8.0" alignment="CENTER">
+            <Label fx:id="star1" 
+                   style="-fx-font-size:48px;-fx-cursor:hand;-fx-text-fill:#374151;" 
+                   text="☆"
+                   onMouseClicked="#onStar1Clicked"
+                   onMouseEntered="#onStar1Hover"
+                   onMouseExited="#onStarExit" />
+            <Label fx:id="star2" 
+                   style="-fx-font-size:48px;-fx-cursor:hand;-fx-text-fill:#374151;" 
+                   text="☆"
+                   onMouseClicked="#onStar2Clicked"
+                   onMouseEntered="#onStar2Hover"
+                   onMouseExited="#onStarExit" />
+            <Label fx:id="star3" 
+                   style="-fx-font-size:48px;-fx-cursor:hand;-fx-text-fill:#374151;" 
+                   text="☆"
+                   onMouseClicked="#onStar3Clicked"
+                   onMouseEntered="#onStar3Hover"
+                   onMouseExited="#onStarExit" />
+            <Label fx:id="star4" 
+                   style="-fx-font-size:48px;-fx-cursor:hand;-fx-text-fill:#374151;" 
+                   text="☆"
+                   onMouseClicked="#onStar4Clicked"
+                   onMouseEntered="#onStar4Hover"
+                   onMouseExited="#onStarExit" />
+            <Label fx:id="star5" 
+                   style="-fx-font-size:48px;-fx-cursor:hand;-fx-text-fill:#374151;" 
+                   text="☆"
+                   onMouseClicked="#onStar5Clicked"
+                   onMouseEntered="#onStar5Hover"
+                   onMouseExited="#onStarExit" />
+        </HBox>
+
+        <Label fx:id="ratingTextLabel" 
+               style="-fx-text-fill:#D1D5DB;-fx-font-size:16px;-fx-font-weight:600;" 
+               text="Tap a star to rate" />
+    </VBox>
+
+    <!-- Action Buttons -->
+    <HBox spacing="16.0" alignment="CENTER" style="-fx-padding:16 0 0 0;">
+        <Button fx:id="skipButton" 
+                mnemonicParsing="false" 
+                onAction="#onSkipRating"
+                style="-fx-background-color:#374151;-fx-text-fill:#9CA3AF;-fx-font-weight:700;-fx-font-size:14px;-fx-background-radius:12;-fx-padding:12 24;-fx-cursor:hand;"
+                text="Skip Rating" />
+        
+        <Button fx:id="submitButton" 
+                mnemonicParsing="false" 
+                onAction="#onSubmitRating"
+                style="-fx-background-color:#1F2937;-fx-text-fill:#4B5563;-fx-font-weight:700;-fx-font-size:14px;-fx-background-radius:12;-fx-padding:12 24;"
+                text="Submit Rating" 
+                disable="true" />
+    </HBox>
+
+</VBox>

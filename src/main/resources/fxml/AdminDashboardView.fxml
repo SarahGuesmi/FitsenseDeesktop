@@ -8,6 +8,7 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -53,12 +54,22 @@
                <children>
                   <HBox alignment="CENTER_LEFT" styleClass="admin-navbar" VBox.vgrow="NEVER">
                      <children>
-                        <VBox HBox.hgrow="ALWAYS" spacing="4.0">
+                        <!-- Logo and Title Section -->
+                        <HBox alignment="CENTER_LEFT" spacing="12" HBox.hgrow="ALWAYS">
                            <children>
-                              <Label styleClass="navbar-page-title" text="Admin Panel" />
-                              <Label styleClass="navbar-page-subtitle" text="Manage your application" />
+                              <ImageView fx:id="navbarLogoImage" fitHeight="32.0" fitWidth="32.0" preserveRatio="true" smooth="true">
+                                 <image>
+                                    <javafx.scene.image.Image url="file:C:/xampp2/htdocs/pidevassets/sport-hero.png" />
+                                 </image>
+                              </ImageView>
+                              <VBox spacing="4.0">
+                                 <children>
+                                    <Label styleClass="navbar-page-title" text="Admin Panel" />
+                                    <Label styleClass="navbar-page-subtitle" text="Manage your application" />
+                                 </children>
+                              </VBox>
                            </children>
-                        </VBox>
+                        </HBox>
                         <Button fx:id="navbarBellBtn" focusTraversable="false" mnemonicParsing="false" styleClass="navbar-bell-btn" text="" />
                         <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="navbar-profile">
                            <children>

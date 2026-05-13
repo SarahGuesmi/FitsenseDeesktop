@@ -14,16 +14,24 @@ public class SentimentAnalyzer {
 
     private static final String OPENAI_API_KEY = loadKey("groq.api.key");
     private static final String API_URL = "https://api.groq.com/openai/v1/chat/completions";
-    private static final String MODEL = "llama-3.3-70b-versatile";
+    private static final String MODEL = "llama-3.1-8b-instant";
 
     private static String loadKey(String property) {
         try (java.io.InputStream is = SentimentAnalyzer.class.getResourceAsStream("/config.properties")) {
-            if (is != null) {
-                java.util.Properties props = new java.util.Properties();
-                props.load(is);
-                return props.getProperty(property, "");
+            if (is == null) {
+                System.err.println("[SentimentAnalyzer] Error: /config.properties not found in classpath.");
+                return "";
             }
-        } catch (Exception ignored) {}
+            java.util.Properties props = new java.util.Properties();
+            props.load(is);
+            String val = props.getProperty(property, "");
+            if (val.isEmpty()) {
+                System.err.println("[SentimentAnalyzer] Warning: " + property + " is missing or empty in config.properties.");
+            }
+            return val;
+        } catch (Exception e) {
+            System.err.println("[SentimentAnalyzer] Error loading config.properties: " + e.getMessage());
+        }
         return "";
     }
 

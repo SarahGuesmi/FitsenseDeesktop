@@ -363,7 +363,7 @@ public class ExerciseFormController {
             java.io.File localFile = new java.io.File("../FitsenseApp/public/uploads/exercises/" + imageName);
             String url = localFile.exists()
                     ? localFile.toURI().toString()
-                    : new java.io.File("C:/xampp/htdocs/pidevassets/uploads/exercises/" + imageName).toURI().toString();
+                    : new java.io.File("C:/xampp2/htdocs/pidevassets/uploads/exercises/" + imageName).toURI().toString();
             Image img = new Image(url, 160, 160, true, true, true);
 
             imagePreview.setImage(img);
@@ -445,7 +445,7 @@ public class ExerciseFormController {
     private String copyImageToUploads(File file) {
         try {
             // Copy to XAMPP htdocs/pidevassets/ — accessible via http://localhost/pidevassets/
-            Path dir = Path.of("C:/xampp/htdocs/pidevassets");
+            Path dir = Path.of("C:/xampp2/htdocs/pidevassets");
 
             if (!Files.exists(dir)) {
                 Files.createDirectories(dir);

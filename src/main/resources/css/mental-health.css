@@ -276,13 +276,14 @@
 }
 
 .mh-table .column-header-background {
-    -fx-background-color: #151b2e;
+    -fx-background-color: #1a1f33;
 }
 
 .mh-table .column-header,
 .mh-table .filler {
-    -fx-size: 40px;
-    -fx-border-color: rgba(255, 255, 255, 0.06);
+    -fx-size: 44px;
+    -fx-background-color: #1a1f33;
+    -fx-border-color: rgba(255, 255, 255, 0.08);
     -fx-border-width: 0 1 1 0;
 }
 
@@ -301,6 +302,10 @@
     -fx-background-color: #0f1424;
 }
 
+.mh-table .table-row-cell:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.03);
+}
+
 .mh-table .table-row-cell:selected {
     -fx-background-color: rgba(74, 130, 255, 0.22);
 }
@@ -309,6 +314,7 @@
     -fx-text-fill: #e8ecfa;
     -fx-font-size: 13px;
     -fx-border-color: transparent;
+    -fx-padding: 10 12;
 }
 
 .mh-table .table-column {
@@ -351,13 +357,15 @@
 }
 
 .mh-rec-table .column-header-background {
-    -fx-background-color: #151b2e;
+    -fx-background-color: #1a1f33;
 }
 
 .mh-rec-table .column-header,
 .mh-rec-table .filler {
-    -fx-size: 38px;
-    -fx-border-color: rgba(255, 255, 255, 0.06);
+    -fx-size: 42px;
+    -fx-background-color: #1a1f33;
+    -fx-border-color: rgba(255, 255, 255, 0.08);
+    -fx-border-width: 0 1 1 0;
 }
 
 .mh-rec-table .label {
@@ -370,14 +378,15 @@
     -fx-background-color: #12182a;
 }
 
-.mh-rec-table .table-row-cell:odd {
-    -fx-background-color: #0f1424;
+.mh-rec-table .table-row-cell:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.03);
 }
 
 .mh-rec-table .table-cell {
     -fx-text-fill: #e8ecfa;
     -fx-font-size: 13px;
     -fx-border-color: transparent;
+    -fx-padding: 10 12;
 }
 
 .mh-rec-cell-text {
@@ -433,4 +442,23 @@
     -fx-text-fill: #c0d0f5;
     -fx-line-spacing: 2px;
     -fx-padding: 8 0 0 0;
+}
+
+/* Remove white background from empty tables and placeholders */
+.mh-table .placeholder {
+    -fx-background-color: transparent;
+    -fx-text-fill: #8b96b0;
+}
+
+.mh-table .table-row-cell:empty {
+    -fx-background-color: #1a1f33;
+}
+
+.mh-rec-table .placeholder {
+    -fx-background-color: transparent;
+    -fx-text-fill: #8b96b0;
+}
+
+.mh-rec-table .table-row-cell:empty {
+    -fx-background-color: #1a1f33;
 }

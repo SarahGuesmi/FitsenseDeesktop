@@ -6,228 +6,210 @@ import com.google.gson.JsonObject;
 import models.MentalHealthAssessmentSubmission;
 import services.WeatherService.WeatherInfo;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Calls the Groq API for AI-powered recommendations and advice.
+ * Uses the same API key and model as GroqService (username generation).
+ */
 public class GroqAiService {
 
     private static final String API_URL = "https://api.groq.com/openai/v1/chat/completions";
-    private static final String MODEL = "llama-3.3-70b-versatile";
+    private static final String MODEL   = "llama-3.1-8b-instant";
+    private static final String API_KEY = loadApiKey();
 
     private static GroqAiService instance;
-    private final HttpClient client = HttpClient.newHttpClient();
     private final Gson gson = new Gson();
-    private final String apiKey;
 
-    private GroqAiService() {
-        this.apiKey = loadApiKey();
-    }
+    private GroqAiService() {}
 
-    private static String loadApiKey() {
-        try (java.io.InputStream in = GroqAiService.class.getResourceAsStream("/config.properties")) {
-            if (in == null) return "";
-            java.util.Properties p = new java.util.Properties();
-            p.load(in);
-            return p.getProperty("groq.api.key", "");
-        } catch (Exception e) { return ""; }
-    }
+    // ── Singleton ─────────────────────────────────────────────────────────────
 
     public static synchronized GroqAiService getInstance() {
         if (instance == null) instance = new GroqAiService();
         return instance;
     }
 
-    public CompletableFuture<JsonObject> generateRecommendation(MentalHealthAssessmentSubmission submission) {
-        String prompt = buildPrompt(submission);
+    // ── Key loading (identical pattern to GroqService) ─────────────────────────
 
-        JsonObject body = new JsonObject();
-        body.addProperty("model", MODEL);
-        
-        JsonArray messages = new JsonArray();
-        JsonObject systemMessage = new JsonObject();
-        systemMessage.addProperty("role", "system");
-        systemMessage.addProperty("content", "You are a professional mental health coach. You must return your response in JSON format. The JSON should have two keys: 'general_note' (a string with empathetic advice) and 'exercises' (an array of objects, each with 'name', 'duration' (string), and 'description' properties).");
-        messages.add(systemMessage);
-
-        JsonObject userMessage = new JsonObject();
-        userMessage.addProperty("role", "user");
-        userMessage.addProperty("content", prompt);
-        messages.add(userMessage);
-
-        body.add("messages", messages);
-        body.addProperty("temperature", 0.7);
-        body.add("response_format", gson.fromJson("{\"type\": \"json_object\"}", JsonObject.class));
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(API_URL))
-                .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + apiKey)
-                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(body)))
-                .build();
-
-        return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .thenApply(response -> {
-                    if (response.statusCode() != 200) {
-                        throw new RuntimeException("Groq API error: " + response.body());
-                    }
-                    JsonObject jsonResponse = gson.fromJson(response.body(), JsonObject.class);
-                    String content = jsonResponse.getAsJsonArray("choices")
-                            .get(0).getAsJsonObject()
-                            .getAsJsonObject("message")
-                            .get("content").getAsString();
-                    return gson.fromJson(content, JsonObject.class);
-                });
+    private static String loadApiKey() {
+        try (InputStream in = GroqAiService.class.getResourceAsStream("/config.properties")) {
+            if (in == null) {
+                System.err.println("[GroqAiService] config.properties not found in classpath.");
+                return "";
+            }
+            Properties p = new Properties();
+            p.load(in);
+            String key = p.getProperty("groq.api.key", "").trim();
+            if (key.isEmpty()) {
+                System.err.println("[GroqAiService] groq.api.key is empty.");
+            } else {
+                System.out.println("[GroqAiService] Key loaded OK (" + key.substring(0, Math.min(6, key.length())) + "...)");
+            }
+            return key;
+        } catch (Exception e) {
+            System.err.println("[GroqAiService] Failed to load key: " + e.getMessage());
+            return "";
+        }
     }
 
-    private String buildPrompt(MentalHealthAssessmentSubmission s) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Provide a mental health recommendation for an athlete with these metrics:\n");
-        sb.append("- Stress: ").append(s.getStress()).append("/5, Sleep: ").append(s.getSleep())
-          .append("/5, Mood: ").append(s.getMood()).append("/5, Motivation: ").append(s.getMotivation())
-          .append("/5, Tiredness: ").append(s.getMentalTired()).append("/5.\n");
-        
-        if (s.getMemberNotes() != null && !s.getMemberNotes().isBlank()) {
-            sb.append("Athlete's comment: \"").append(s.getMemberNotes()).append("\"\n");
+    // ── Shared HTTP helper (same approach as GroqService) ──────────────────────
+
+    private String chat(String systemPrompt, String userPrompt) {
+        try {
+            String bodyJson = buildBody(systemPrompt, userPrompt);
+
+            HttpRequest req = HttpRequest.newBuilder()
+                    .uri(URI.create(API_URL))
+                    .header("Authorization", "Bearer " + API_KEY)
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(bodyJson))
+                    .build();
+
+            System.out.println("[GroqAiService] Sending request, model=" + MODEL);
+
+            HttpResponse<String> resp = HttpClient.newHttpClient()
+                    .send(req, HttpResponse.BodyHandlers.ofString());
+
+            if (resp.statusCode() != 200) {
+                System.err.println("[GroqAiService] HTTP " + resp.statusCode() + ": " + resp.body());
+                throw new RuntimeException("Groq API returned " + resp.statusCode() + ": " + resp.body());
+            }
+
+            return extractContent(resp.body());
+
+        } catch (Exception e) {
+            System.err.println("[GroqAiService] chat() failed: " + e.getMessage());
+            throw new RuntimeException(e);
         }
-        
-        sb.append("\nReturn JSON with 'general_note' and an array of 2-3 specific 'exercises' (name, duration, description). Focus on stress relief and recovery.");
-        return sb.toString();
+    }
+
+    private String buildBody(String systemPrompt, String userPrompt) {
+        JsonObject body = new JsonObject();
+        body.addProperty("model", MODEL);
+        body.addProperty("temperature", 0.7);
+
+        JsonArray messages = new JsonArray();
+
+        JsonObject sys = new JsonObject();
+        sys.addProperty("role", "system");
+        sys.addProperty("content", systemPrompt);
+        messages.add(sys);
+
+        JsonObject usr = new JsonObject();
+        usr.addProperty("role", "user");
+        usr.addProperty("content", userPrompt);
+        messages.add(usr);
+
+        body.add("messages", messages);
+        return gson.toJson(body);
+    }
+
+    private String extractContent(String json) {
+        JsonObject root = gson.fromJson(json, JsonObject.class);
+        return root.getAsJsonArray("choices")
+                .get(0).getAsJsonObject()
+                .getAsJsonObject("message")
+                .get("content").getAsString().trim();
+    }
+
+    /** Strip optional ```json ... ``` markdown fences from the response. */
+    private String stripCodeFence(String raw) {
+        if (raw == null) return "{}";
+        String s = raw.trim();
+        if (s.startsWith("```json")) s = s.substring(7);
+        else if (s.startsWith("```")) s = s.substring(3);
+        if (s.endsWith("```")) s = s.substring(0, s.length() - 3);
+        return s.trim();
+    }
+
+    // ── Public API ─────────────────────────────────────────────────────────────
+
+    /**
+     * Generate a mental health recommendation for the given assessment.
+     */
+    public CompletableFuture<JsonObject> generateRecommendation(MentalHealthAssessmentSubmission submission) {
+        return CompletableFuture.supplyAsync(() -> {
+            String systemPrompt =
+                "You are a professional mental health coach. " +
+                "Return ONLY a raw JSON object (no markdown) with exactly two keys: " +
+                "'general_note' (a string with empathetic advice) and " +
+                "'exercises' (an array of 2-3 objects each with 'name', 'duration', 'description').";
+
+            String userPrompt = buildPrompt(submission);
+
+            String raw = chat(systemPrompt, userPrompt);
+            return gson.fromJson(stripCodeFence(raw), JsonObject.class);
+        });
     }
 
     /**
-     * Generates post-feedback advice based on the star rating.
-     *
-     * For ratings 1-3 (Very poor / Poor / Average):
-     *   - Asks what specifically was bad
-     *   - Suggests alternative workouts
-     *
-     * For ratings 4-5 (Good / Excellent):
-     *   - Acknowledges the positive experience
-     *   - Suggests similar workouts to keep the momentum
-     *
-     * Returns JSON: { "message": "...", "followup_question": "...", "suggestions": ["w1","w2","w3"] }
+     * Generate post-workout feedback advice.
      */
     public CompletableFuture<JsonObject> generateWorkoutFeedbackAdvice(
             String workoutName, int stars, String ratingLabel,
             String userComment, List<String> availableWorkouts) {
 
-        boolean negative = stars <= 3;
+        return CompletableFuture.supplyAsync(() -> {
+            boolean negative = stars <= 3;
+            String workoutList = availableWorkouts.isEmpty() ? "none available" : String.join(", ", availableWorkouts);
+            String commentPart = (userComment != null && !userComment.isBlank()) ? "User comment: \"" + userComment + "\". " : "";
 
-        String workoutList = availableWorkouts.isEmpty() ? "none available"
-                : String.join(", ", availableWorkouts);
+            String userPrompt;
+            if (negative) {
+                userPrompt = "User rated \"" + workoutName + "\" " + stars + " stars. " + commentPart +
+                        "Available workouts: " + workoutList + ". " +
+                        "Return ONLY raw JSON with 'message', 'followup_question', 'suggestions' (array, never empty).";
+            } else {
+                userPrompt = "User rated \"" + workoutName + "\" " + stars + " stars. " + commentPart +
+                        "Available workouts: " + workoutList + ". " +
+                        "Return ONLY raw JSON with 'message', 'followup_question' (empty string), 'suggestions' (array, never empty).";
+            }
 
-        String prompt;
-        if (negative) {
-            prompt = "A user just rated the workout \"" + workoutName + "\" with " + stars + " star(s) (" + ratingLabel + ").\n"
-                    + (userComment != null && !userComment.isBlank()
-                        ? "Their comment: \"" + userComment + "\"\n" : "")
-                    + "Available workouts in the app: " + workoutList + "\n\n"
-                    + "Your task:\n"
-                    + "1. Write a short empathetic message acknowledging the poor experience (1-2 sentences).\n"
-                    + "2. Ask one specific follow-up question to understand what was bad (intensity? duration? exercises? instructions?).\n"
-                    + "3. You MUST suggest workouts. Pick 1-3 from the available list above. If the list is short, suggest all of them. Never return an empty suggestions array.\n"
-                    + "Return JSON with keys: \"message\" (string), \"followup_question\" (string), \"suggestions\" (array of workout name strings — MUST NOT be empty).";
-        } else {
-            prompt = "A user just rated the workout \"" + workoutName + "\" with " + stars + " star(s) (" + ratingLabel + ").\n"
-                    + (userComment != null && !userComment.isBlank()
-                        ? "Their comment: \"" + userComment + "\"\n" : "")
-                    + "Available workouts in the app: " + workoutList + "\n\n"
-                    + "Your task:\n"
-                    + "1. Write a short enthusiastic congratulatory message (1-2 sentences).\n"
-                    + "2. You MUST suggest workouts. Pick 1-3 from the available list above. If the list is short, suggest all of them. Never return an empty suggestions array.\n"
-                    + "Return JSON with keys: \"message\" (string), \"followup_question\" (empty string), \"suggestions\" (array of workout name strings — MUST NOT be empty).";
-        }
+            String systemPrompt = negative
+                    ? "You are a fitness coach. Empathize, ask a follow-up, and suggest workouts. JSON only."
+                    : "You are a fitness coach. Congratulate and suggest workouts. JSON only.";
 
-        JsonObject body = new JsonObject();
-        body.addProperty("model", MODEL);
-
-        JsonArray messages = new JsonArray();
-        JsonObject system = new JsonObject();
-        system.addProperty("role", "system");
-        system.addProperty("content", "You are a fitness coach assistant. Always respond in JSON format only.");
-        messages.add(system);
-
-        JsonObject user = new JsonObject();
-        user.addProperty("role", "user");
-        user.addProperty("content", prompt);
-        messages.add(user);
-
-        body.add("messages", messages);
-        body.addProperty("temperature", 0.7);
-        body.add("response_format", gson.fromJson("{\"type\": \"json_object\"}", JsonObject.class));
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(API_URL))
-                .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + apiKey)
-                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(body)))
-                .build();
-
-        return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .thenApply(response -> {
-                    if (response.statusCode() != 200) {
-                        throw new RuntimeException("Groq API error: " + response.body());
-                    }
-                    JsonObject jsonResponse = gson.fromJson(response.body(), JsonObject.class);
-                    String content = jsonResponse.getAsJsonArray("choices")
-                            .get(0).getAsJsonObject()
-                            .getAsJsonObject("message")
-                            .get("content").getAsString();
-                    return gson.fromJson(content, JsonObject.class);
-                });
+            String raw = chat(systemPrompt, userPrompt);
+            return gson.fromJson(stripCodeFence(raw), JsonObject.class);
+        });
     }
 
     /**
-     * Generates a short wellness tip based purely on current weather conditions.
-     * Returns a plain string (the advice text) via CompletableFuture.
+     * Generate a short wellness tip based on weather conditions.
      */
     public CompletableFuture<String> generateWeatherAdvice(WeatherInfo weather) {
-        String prompt = "The current weather is: " + weather.condition
-                + ", " + weather.description
-                + ", temperature " + String.format("%.1f", weather.tempCelsius) + "°C"
-                + ", humidity " + weather.humidity + "%."
-                + " Give a single short (2-3 sentences) mental wellness tip for someone about to do a mental health check-in today."
-                + " Consider how this weather might affect mood, energy, and motivation."
-                + " Be warm, empathetic, and practical. Return only the advice text, no JSON.";
+        return CompletableFuture.supplyAsync(() -> {
+            String systemPrompt = "You are a compassionate mental wellness coach. Give brief, practical advice in 2-3 sentences. No JSON.";
+            String userPrompt = "Weather: " + weather.condition + ", " + weather.description +
+                    ", " + String.format("%.1f", weather.tempCelsius) + "°C, humidity " + weather.humidity + "%. " +
+                    "Give a mental wellness tip for someone about to do a mental health check-in.";
 
-        JsonObject body = new JsonObject();
-        body.addProperty("model", MODEL);
+            return chat(systemPrompt, userPrompt);
+        });
+    }
 
-        JsonArray messages = new JsonArray();
-        JsonObject system = new JsonObject();
-        system.addProperty("role", "system");
-        system.addProperty("content", "You are a compassionate mental wellness coach. Give brief, practical advice.");
-        messages.add(system);
+    // ── Prompt builder ─────────────────────────────────────────────────────────
 
-        JsonObject user = new JsonObject();
-        user.addProperty("role", "user");
-        user.addProperty("content", prompt);
-        messages.add(user);
-
-        body.add("messages", messages);
-        body.addProperty("temperature", 0.7);
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(API_URL))
-                .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + apiKey)
-                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(body)))
-                .build();
-
-        return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .thenApply(response -> {
-                    if (response.statusCode() != 200) {
-                        throw new RuntimeException("Groq API error: " + response.body());
-                    }
-                    JsonObject json = gson.fromJson(response.body(), JsonObject.class);
-                    return json.getAsJsonArray("choices")
-                            .get(0).getAsJsonObject()
-                            .getAsJsonObject("message")
-                            .get("content").getAsString().trim();
-                });
+    private String buildPrompt(MentalHealthAssessmentSubmission s) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Mental health recommendation for athlete. Metrics: ");
+        sb.append("Stress=").append(s.getStress()).append("/5, ");
+        sb.append("Sleep=").append(s.getSleep()).append("/5, ");
+        sb.append("Mood=").append(s.getMood()).append("/5, ");
+        sb.append("Motivation=").append(s.getMotivation()).append("/5, ");
+        sb.append("Tiredness=").append(s.getMentalTired()).append("/5. ");
+        if (s.getMemberNotes() != null && !s.getMemberNotes().isBlank()) {
+            sb.append("Notes: \"").append(s.getMemberNotes()).append("\". ");
+        }
+        sb.append("Return JSON with 'general_note' and 'exercises' array.");
+        return sb.toString();
     }
 }

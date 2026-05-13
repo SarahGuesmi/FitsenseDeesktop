@@ -91,7 +91,7 @@ public class RecipeCatalogController {
         );
 
         // Open directly in the pidevassets folder
-        File assetsDir = new File("C:/xampp/htdocs/pidevassets");
+        File assetsDir = new File("C:/xampp2/htdocs/pidevassets");
         if (assetsDir.exists() && assetsDir.isDirectory()) {
             fileChooser.setInitialDirectory(assetsDir);
         }
@@ -362,8 +362,27 @@ public class RecipeCatalogController {
     private void rebuildDetailsView(VBox root, Stage modal, RecetteNutritionnelle recipe) {
         root.getChildren().clear();
 
-        HBox header = new HBox();
+        HBox header = new HBox(12);
         header.setAlignment(Pos.CENTER_LEFT);
+
+        // Add sport-hero.png image next to title
+        ImageView titleImage = new ImageView();
+        try {
+            File logoFile = new File("C:/xampp2/htdocs/pidevassets/sport-hero.png");
+            if (logoFile.exists()) {
+                titleImage.setImage(new Image(logoFile.toURI().toString(), true));
+            } else {
+                // Fallback to recipe image if logo not found
+                titleImage.setImage(new Image(resolveImage(recipe), true));
+            }
+        } catch (Exception e) {
+            titleImage.setImage(new Image(DEFAULT_IMAGE_URL, true));
+        }
+        titleImage.setFitWidth(50);
+        titleImage.setFitHeight(50);
+        titleImage.setPreserveRatio(true);
+        titleImage.setSmooth(true);
+        titleImage.getStyleClass().add("recipe-title-image");
 
         Label title = new Label(safe(recipe.getTitle()));
         title.getStyleClass().add("recipe-modal-title");
@@ -375,7 +394,7 @@ public class RecipeCatalogController {
         closeBtn.getStyleClass().add("recipe-modal-close-btn");
         closeBtn.setOnAction(e -> modal.close());
 
-        header.getChildren().addAll(title, spacer, closeBtn);
+        header.getChildren().addAll(titleImage, title, spacer, closeBtn);
 
         HBox badges = new HBox(12);
         badges.getChildren().addAll(
@@ -402,8 +421,8 @@ public class RecipeCatalogController {
         } catch (Exception e) {
             imageView.setImage(new Image(DEFAULT_IMAGE_URL, true));
         }
-        imageView.setFitWidth(320);
-        imageView.setFitHeight(240);
+        imageView.setFitWidth(650);
+        imageView.setFitHeight(480);
         imageView.setPreserveRatio(false);
         imageView.setSmooth(true);
         imageView.getStyleClass().add("recipe-modal-image");
@@ -555,7 +574,7 @@ public class RecipeCatalogController {
                     new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg", "*.webp")
             );
             // Open directly in the pidevassets folder
-            File assetsDir = new File("C:/xampp/htdocs/pidevassets");
+            File assetsDir = new File("C:/xampp2/htdocs/pidevassets");
             if (assetsDir.exists() && assetsDir.isDirectory()) {
                 fileChooser.setInitialDirectory(assetsDir);
             }
@@ -707,6 +726,7 @@ public class RecipeCatalogController {
 
     private Stage buildBaseModal() {
         Stage modal = new Stage();
+        utils.AppIconLoader.setIcon(modal);
         modal.initModality(Modality.APPLICATION_MODAL);
         modal.setTitle("Recipe");
         modal.setResizable(false);
@@ -714,26 +734,26 @@ public class RecipeCatalogController {
     }
 
     private void showModal(Stage modal, VBox content) {
-        content.setMaxWidth(820);
-        content.setPrefWidth(820);
-        content.setMaxHeight(600);
+        content.setMaxWidth(1600);
+        content.setPrefWidth(1600);
+        content.setMaxHeight(900);
 
         ScrollPane scroll = new ScrollPane(content);
         scroll.setFitToWidth(true);
         scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scroll.getStyleClass().add("recipe-modal-scroll");
-        scroll.setMaxWidth(980);
-        scroll.setPrefViewportWidth(980);
-        scroll.setPrefViewportHeight(720);
+        scroll.setMaxWidth(1700);
+        scroll.setPrefViewportWidth(1700);
+        scroll.setPrefViewportHeight(950);
 
         StackPane wrapper = new StackPane(scroll);
         wrapper.getStyleClass().add("recipe-modal-overlay");
         wrapper.setAlignment(Pos.CENTER);
         wrapper.setPadding(new Insets(30));
 
-        Scene scene = new Scene(wrapper, 1000, 680);
-        content.setMaxWidth(980);
+        Scene scene = new Scene(wrapper, 1800, 1000);
+        content.setMaxWidth(1700);
         scene.setFill(Color.TRANSPARENT);
 
         String css = getClass().getResource("/css/recette.css").toExternalForm();

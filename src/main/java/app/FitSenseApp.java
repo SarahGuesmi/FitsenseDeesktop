@@ -61,6 +61,10 @@ public class FitSenseApp extends Application {
         primaryStage.setTitle("FitSense");
         primaryStage.setMinWidth(840);   // taille minimale pour eviter les deformations
         primaryStage.setMinHeight(540);
+        
+        // 5. Set application icon
+        utils.AppIconLoader.setIcon(primaryStage);
+        
         primaryStage.setScene(scene);
         primaryStage.show(); // affiche la fenetre
     }

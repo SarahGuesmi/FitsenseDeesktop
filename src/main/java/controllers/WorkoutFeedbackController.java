@@ -28,6 +28,7 @@ import java.net.URI;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class WorkoutFeedbackController {
@@ -198,41 +199,36 @@ public class WorkoutFeedbackController {
 
         // Disable submit to prevent double-submit, show loading state
         submitBtn.setDisable(true);
-        submitBtn.setText("⏳  Getting AI suggestions...");
+        submitBtn.setText("⏳  Getting video suggestions...");
 
-        // Fetch all workout names for the AI to suggest from (include all, even current)
-        List<String> workoutNames = new ArrayList<>();
-        try {
-            workoutNames = new WorkoutService().read().stream()
-                    .map(Workout::getNom)
-                    .filter(n -> n != null && !n.isBlank())
-                    .collect(Collectors.toList());
-        } catch (SQLException ignored) {}
-
-        final List<String> finalWorkoutNames = workoutNames;
         final int stars = selectedStars;
         final String ratingLabel = ratingLabels[selectedStars - 1];
         final String workoutName = currentWorkout != null ? currentWorkout.getNom() : "your workout";
-        final String userComment = commentArea.getText();
 
-        GroqAiService.getInstance()
-                .generateWorkoutFeedbackAdvice(workoutName, stars, ratingLabel, userComment, finalWorkoutNames)
-                .thenCombine(
-                    YouTubeService.getInstance().searchWorkoutVideos(workoutName, stars <= 3, 3),
-                    (aiJson, videos) -> new Object[]{aiJson, videos}
-                )
-                .thenAccept(results -> Platform.runLater(() -> {
-                    JsonObject aiJson = (JsonObject) results[0];
-                    @SuppressWarnings("unchecked")
-                    List<YouTubeService.VideoResult> videos =
-                            (List<YouTubeService.VideoResult>) results[1];
-                    System.out.println("[AI Feedback] Response: " + aiJson);
+        // Use only YouTube service since AI service is currently unavailable
+        System.out.println("[DEBUG] Starting YouTube search for workout: " + workoutName + ", negative rating: " + (stars <= 3));
+        YouTubeService.getInstance()
+                .searchWorkoutVideos(workoutName, stars <= 3, 3)
+                .orTimeout(10, TimeUnit.SECONDS)
+                .thenAccept(videos -> Platform.runLater(() -> {
+                    System.out.println("[DEBUG] YouTube search completed, found " + videos.size() + " videos");
                     System.out.println("[YouTube] Videos found: " + videos.size());
-                    showAiAdviceDialog(aiJson, stars, videos);
+                    // Create a simple JSON object for the dialog (no AI needed)
+                    JsonObject simpleJson = new com.google.gson.JsonObject();
+                    if (stars <= 3) {
+                        simpleJson.addProperty("message", "Thanks for your feedback! Let's find some alternatives that might work better for you.");
+                        simpleJson.addProperty("followup_question", "What specific aspect was challenging? This will help us recommend better workouts.");
+                    } else {
+                        simpleJson.addProperty("message", "Great job completing this workout! Keep up the excellent work.");
+                        simpleJson.addProperty("followup_question", "");
+                    }
+                    System.out.println("[DEBUG] About to show advice dialog");
+                    showAiAdviceDialog(simpleJson, stars, videos);
                     done();
                 }))
                 .exceptionally(ex -> {
-                    System.err.println("[AI Feedback] Error: " + ex.getMessage());
+                    System.err.println("[YouTube] Error: " + ex.getMessage());
+                    ex.printStackTrace();
                     Platform.runLater(() -> {
                         showAlert(Alert.AlertType.INFORMATION, "Thank you!", "Your feedback has been submitted.");
                         done();
@@ -248,11 +244,14 @@ public class WorkoutFeedbackController {
      */
     private void showAiAdviceDialog(JsonObject json, int stars,
                                     List<YouTubeService.VideoResult> videos) {
+        System.out.println("[DEBUG] showAiAdviceDialog called with " + videos.size() + " videos, stars: " + stars);
+        
         boolean negative = stars <= 3;
 
         String message = getJsonString(json, "message");
         String followupQuestion = getJsonString(json, "followup_question");
 
+        System.out.println("[DEBUG] Creating dialog stage");
         Stage dialog = new Stage(StageStyle.UNDECORATED);
         dialog.initModality(Modality.APPLICATION_MODAL);
 
@@ -333,7 +332,10 @@ public class WorkoutFeedbackController {
         scene.getStylesheets().add(
                 getClass().getResource("/css/feedback.css").toExternalForm());
         dialog.setScene(scene);
+        
+        System.out.println("[DEBUG] About to show dialog with showAndWait()");
         dialog.showAndWait();
+        System.out.println("[DEBUG] Dialog closed");
     }
 
     private String getJsonString(JsonObject json, String key) {

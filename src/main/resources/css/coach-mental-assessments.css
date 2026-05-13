@@ -88,42 +88,48 @@
 
 .ca-table {
     -fx-background-color: transparent;
-    -fx-border-color: rgba(176, 196, 246, 0.15);
-    -fx-border-radius: 10px;
-    -fx-background-radius: 10px;
+    -fx-border-color: transparent;
+    -fx-background-radius: 0;
 }
 
 .ca-table .column-header-background {
-    -fx-background-color: #151b2e;
+    -fx-background-color: transparent;
 }
 
 .ca-table .column-header,
 .ca-table .filler {
-    -fx-size: 40px;
-    -fx-border-color: rgba(255, 255, 255, 0.06);
+    -fx-size: 48px;
+    -fx-background-color: transparent;
+    -fx-border-color: rgba(176, 196, 246, 0.12);
+    -fx-border-width: 0 0 2 0;
+    -fx-padding: 0 12 8 12;
 }
 
-.ca-table .label {
-    -fx-text-fill: #8b96b0;
+.ca-table .column-header .label {
+    -fx-text-fill: #6d7a9a;
     -fx-font-size: 11px;
-    -fx-font-weight: 700;
+    -fx-font-weight: 800;
+    -fx-letter-spacing: 0.05em;
 }
 
 .ca-table .table-row-cell {
-    -fx-background-color: #12182a;
+    -fx-background-color: transparent;
+    -fx-border-color: rgba(176, 196, 246, 0.06);
+    -fx-border-width: 0 0 1 0;
 }
 
-.ca-table .table-row-cell:odd {
-    -fx-background-color: #0f1424;
+.ca-table .table-row-cell:hover {
+    -fx-background-color: rgba(74, 130, 255, 0.06);
 }
 
 .ca-table .table-row-cell:selected {
-    -fx-background-color: rgba(74, 130, 255, 0.18);
+    -fx-background-color: rgba(74, 130, 255, 0.12);
 }
 
 .ca-table .table-cell {
     -fx-border-color: transparent;
-    -fx-padding: 10px 8px;
+    -fx-padding: 14px 12px;
+    -fx-text-fill: #e8ecfa;
 }
 
 .ca-user-name {

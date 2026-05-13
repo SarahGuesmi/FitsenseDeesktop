@@ -57,18 +57,21 @@ public class CoachMentalTestsFragmentController {
     private UUID editingTestId;
 
     @FXML
-    private void initialize() {
-        testsTable.setItems(service.getTests());
-        testsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        testsTable.setPlaceholder(new Label("No tests yet. Click “+ Create test”."));
+        private void initialize() {
+            testsTable.setItems(service.getTests());
+            testsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+            Label placeholder = new Label("No tests created yet. Click '+ Create test' to get started.");
+            placeholder.setStyle("-fx-text-fill: #6d7a9a; -fx-font-size: 14px;");
+            testsTable.setPlaceholder(placeholder);
 
-        colTitle.setCellValueFactory(cdf -> new SimpleStringProperty(safe(cdf.getValue().getTitle())));
-        colQuestionCount.setCellValueFactory(cdf -> new SimpleStringProperty(String.valueOf(cdf.getValue().getQuestionCount())));
-        colMaxScore.setCellValueFactory(cdf -> new SimpleStringProperty(String.valueOf(cdf.getValue().getMaxScore())));
-        colAction.setCellFactory(actionColumnFactory());
+            colTitle.setCellValueFactory(cdf -> new SimpleStringProperty(safe(cdf.getValue().getTitle())));
+            colQuestionCount.setCellValueFactory(cdf -> new SimpleStringProperty(String.valueOf(cdf.getValue().getQuestionCount())));
+            colMaxScore.setCellValueFactory(cdf -> new SimpleStringProperty(String.valueOf(cdf.getValue().getMaxScore())));
+            colAction.setCellFactory(actionColumnFactory());
 
-        showListView();
-    }
+            showListView();
+        }
+
 
     /**
      * Called when coach opens Mental wellness; ensures list is visible after returning from other tabs.
@@ -161,7 +164,7 @@ public class CoachMentalTestsFragmentController {
         tf.getStyleClass().add("cm-text-field");
         HBox.setHgrow(tf, Priority.ALWAYS);
 
-        Button removeBtn = new Button("Remove");
+        Button removeBtn = new Button("✕");
         removeBtn.getStyleClass().add("cm-remove-btn");
 
         HBox row = new HBox(10, tf, removeBtn);
@@ -216,14 +219,14 @@ public class CoachMentalTestsFragmentController {
 
     private Callback<TableColumn<CoachMentalTest, Void>, TableCell<CoachMentalTest, Void>> actionColumnFactory() {
         return column -> new TableCell<>() {
-            private final Button editBtn = new Button("Edit");
-            private final Button deleteBtn = new Button("Delete");
-            private final HBox box = new HBox(8, editBtn, deleteBtn);
+            private final Button editBtn = new Button("✎");
+            private final Button deleteBtn = new Button("🗑");
+            private final HBox box = new HBox(10, editBtn, deleteBtn);
 
             {
                 box.setAlignment(Pos.CENTER_LEFT);
-                editBtn.getStyleClass().add("cm-table-action");
-                deleteBtn.getStyleClass().add("cm-table-action");
+                editBtn.getStyleClass().add("cm-icon-btn");
+                deleteBtn.getStyleClass().add("cm-icon-btn-delete");
                 editBtn.setOnAction(e -> {
                     CoachMentalTest row = getTableView().getItems().get(getIndex());
                     if (row != null) {

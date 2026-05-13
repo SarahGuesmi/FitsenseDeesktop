@@ -90,6 +90,8 @@ public class AdminDashboardController {
     private Label navbarUserRole;
     @FXML
     private Label navbarAvatar;
+    @FXML 
+    private ImageView navbarLogoImage;
     @FXML
     private Label totalUsersLabel;
     @FXML
@@ -160,6 +162,9 @@ public class AdminDashboardController {
 
     @FXML
     private void initialize() {
+        // Load navbar logo
+        loadNavbarLogo();
+        
         setupTable();
         setupUserFilters();
         initializeModalControls();
@@ -182,6 +187,20 @@ public class AdminDashboardController {
 
         // Delay showAdminDashboard slightly to ensure UI is ready
         javafx.application.Platform.runLater(this::showAdminDashboard);
+    }
+    
+    private void loadNavbarLogo() {
+        if (navbarLogoImage != null) {
+            try {
+                java.io.File logoFile = new java.io.File("C:/xampp2/htdocs/pidevassets/sport-hero.png");
+                if (logoFile.exists()) {
+                    javafx.scene.image.Image logo = new javafx.scene.image.Image(logoFile.toURI().toString(), true);
+                    navbarLogoImage.setImage(logo);
+                }
+            } catch (Exception e) {
+                System.err.println("Could not load navbar logo: " + e.getMessage());
+            }
+        }
     }
 
     private void refreshNavbar() {
@@ -605,11 +624,6 @@ public class AdminDashboardController {
             {
                 actions.setAlignment(Pos.CENTER_LEFT);
                 actions.getStyleClass().add("actions-box");
-                activateBtn.visibleProperty().bind(Bindings.selectBoolean(tableRowProperty(), "hover"));
-                activateBtn.managedProperty().bind(activateBtn.visibleProperty());
-                deactivateBtn.visibleProperty().bind(Bindings.selectBoolean(tableRowProperty(), "hover"));
-                deactivateBtn.managedProperty().bind(deactivateBtn.visibleProperty());
-
                 activateBtn.setOnAction(event -> updateStatusForRow(getTableRow().getItem(), "active"));
                 deactivateBtn.setOnAction(event -> updateStatusForRow(getTableRow().getItem(), "inactive"));
                 editBtn.setOnAction(event -> openEditModal(getTableRow().getItem()));
@@ -623,6 +637,13 @@ public class AdminDashboardController {
                     setGraphic(null);
                     return;
                 }
+                User user = getTableRow().getItem();
+                boolean isActive = "active".equalsIgnoreCase(safe(user.getAccountStatus()));
+                // active user: show deactivate only; inactive user: show activate only
+                activateBtn.setVisible(!isActive);
+                activateBtn.setManaged(!isActive);
+                deactivateBtn.setVisible(isActive);
+                deactivateBtn.setManaged(isActive);
                 setGraphic(actions);
             }
         });

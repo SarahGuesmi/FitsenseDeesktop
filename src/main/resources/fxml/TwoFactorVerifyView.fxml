@@ -14,37 +14,41 @@
            xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="controllers.TwoFactorVerifyController">
    <children>
-      <VBox alignment="CENTER" maxWidth="460" spacing="0" styleClass="signin-card">
-         <padding><Insets bottom="48" left="48" right="48" top="48"/></padding>
+      <VBox alignment="CENTER" maxWidth="400" spacing="0" styleClass="signin-card">
+         <padding><Insets bottom="48" left="40" right="40" top="48"/></padding>
          <children>
 
-            <!-- Icon + title -->
-            <Label styleClass="tfa-verify-icon" text="🔐" />
-            <Region prefHeight="12" />
-            <Label styleClass="welcome-title" text="Two-Factor Auth" />
-            <Region prefHeight="8" />
-            <Label styleClass="welcome-subtitle" wrapText="true" alignment="CENTER"
-                   text="Open your authenticator app and enter the 6-digit code for FitSense." />
+            <!-- Gradient Icon Container -->
+            <StackPane styleClass="tfa-verify-icon-container">
+               <children>
+                  <Label styleClass="tfa-verify-icon" text="🔐" />
+               </children>
+            </StackPane>
             <Region prefHeight="32" />
+            
+            <!-- Title -->
+            <Label styleClass="welcome-title" text="Secure Access" />
+            <Region prefHeight="12" />
+            <Label styleClass="welcome-subtitle" wrapText="true" alignment="CENTER"
+                   text="Enter the 6-digit verification code from your authenticator app to continue." />
+            <Region prefHeight="40" />
 
             <!-- Code input -->
-            <Label styleClass="field-label" text="AUTHENTICATION CODE" />
-            <Region prefHeight="6" />
-            <TextField fx:id="codeField" promptText="000000" styleClass="tfa-verify-input"
-                       maxWidth="Infinity" />
+            <TextField fx:id="codeField" promptText="0 0 0 0 0 0" styleClass="tfa-verify-input"
+                       maxWidth="320" />
             <Label fx:id="codeError" styleClass="form-error-label" managed="false" visible="false" text="" />
-            <Region prefHeight="20" />
+            <Region prefHeight="32" />
 
             <!-- Verify button -->
             <Button fx:id="verifyBtn" mnemonicParsing="false" onAction="#onVerify"
-                    styleClass="btn-signin-password" text="VERIFY" maxWidth="Infinity" />
-            <Region prefHeight="16" />
+                    styleClass="btn-signin-password" text="VERIFY IDENTITY" maxWidth="320" />
+            <Region prefHeight="24" />
 
             <!-- Back link -->
             <HBox alignment="CENTER">
                <children>
                   <Button mnemonicParsing="false" onAction="#onBackToSignIn"
-                          styleClass="btn-signup-inline" text="← Back to Sign In" />
+                          styleClass="btn-signup-inline" text="⟲ Cancel and Logout" />
                </children>
             </HBox>
 

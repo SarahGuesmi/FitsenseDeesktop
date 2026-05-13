@@ -60,9 +60,9 @@
                            <CheckBox fx:id="rememberMeCheckBox" styleClass="remember-me-checkbox" text="Remember me" HBox.hgrow="ALWAYS" />
                            <Button mnemonicParsing="false" onAction="#onForgotPassword" styleClass="btn-forgot-password" text="Forgot password?" />
                         </HBox>
-                        <Region prefHeight="4.0" />                        <Label styleClass="separator-text" text="or sign in with email" />
-                        <Button fx:id="faceIdButton" mnemonicParsing="false" onAction="#onFaceIdLogin" styleClass="btn-faceid" text="🪪  LOGIN WITH FACE ID" />
-                        <Button fx:id="signInWithPasswordButton" mnemonicParsing="false" onAction="#onSignInWithPassword" styleClass="btn-signin-password" text="SIGN IN WITH PASSWORD" />
+                        <Region prefHeight="4.0" />                        <Button fx:id="signInWithPasswordButton" maxWidth="Infinity" mnemonicParsing="false" onAction="#onSignInWithPassword" styleClass="btn-signin-password" text="Sign In" />
+                        <Label alignment="CENTER" maxWidth="Infinity" styleClass="or-separator" text="OR" />
+                        <Button fx:id="faceIdButton" maxWidth="Infinity" mnemonicParsing="false" onAction="#onFaceIdLogin" styleClass="btn-faceid" text="🪪  Face ID" />
                         <HBox alignment="CENTER" spacing="6.0">
                            <children>
                               <Label styleClass="footer-text" text="You don't have an account?" />

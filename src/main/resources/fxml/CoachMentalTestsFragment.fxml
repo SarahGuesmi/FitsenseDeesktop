@@ -30,7 +30,7 @@
                               <Button mnemonicParsing="false" onAction="#onCreateTest" styleClass="cm-primary-btn" text="+ Create test" />
                            </children>
                         </HBox>
-                        <TableView fx:id="testsTable" minHeight="280.0" styleClass="cm-table" VBox.vgrow="ALWAYS">
+                        <TableView fx:id="testsTable" styleClass="cm-table" VBox.vgrow="ALWAYS">
                            <columns>
                               <TableColumn fx:id="colTitle" prefWidth="280.0" text="Title" />
                               <TableColumn fx:id="colQuestionCount" prefWidth="100.0" text="Questions" />

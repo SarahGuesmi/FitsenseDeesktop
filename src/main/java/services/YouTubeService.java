@@ -39,11 +39,19 @@ public class YouTubeService {
     private static String loadApiKey() {
         try (java.io.InputStream in =
                      YouTubeService.class.getResourceAsStream("/config.properties")) {
-            if (in == null) return "";
+            if (in == null) {
+                System.err.println("[YouTube] config.properties not found");
+                return "";
+            }
             java.util.Properties p = new java.util.Properties();
             p.load(in);
-            return p.getProperty("youtube.api.key", "");
-        } catch (Exception e) { return ""; }
+            String key = p.getProperty("youtube.api.key", "");
+            System.out.println("[YouTube] API key loaded: " + (key.isEmpty() ? "EMPTY" : "OK (" + key.length() + " chars)"));
+            return key;
+        } catch (Exception e) { 
+            System.err.println("[YouTube] Error loading API key: " + e.getMessage());
+            return ""; 
+        }
     }
 
     public static synchronized YouTubeService getInstance() {
@@ -69,6 +77,11 @@ public class YouTubeService {
     public CompletableFuture<List<VideoResult>> searchWorkoutVideos(
             String workoutName, boolean negative, int maxResults) {
 
+        if (apiKey == null || apiKey.isEmpty()) {
+            System.err.println("[YouTube] API key is empty - cannot make requests");
+            return CompletableFuture.completedFuture(new ArrayList<>());
+        }
+
         String query = negative
                 ? "beginner " + workoutName + " tutorial workout"
                 : workoutName + " full workout routine";
@@ -83,6 +96,9 @@ public class YouTubeService {
                 + "&maxResults=" + maxResults
                 + "&key=" + apiKey;
 
+        System.out.println("[YouTube] Searching for: " + query);
+        System.out.println("[YouTube] Request URL: " + url.replace(apiKey, "***API_KEY***"));
+
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .GET()
@@ -90,6 +106,7 @@ public class YouTubeService {
 
         return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(response -> {
+                    System.out.println("[YouTube] Response status: " + response.statusCode());
                     List<VideoResult> results = new ArrayList<>();
                     if (response.statusCode() != 200) {
                         System.err.println("[YouTube] API error " + response.statusCode()
@@ -99,6 +116,8 @@ public class YouTubeService {
                     JsonObject json = gson.fromJson(response.body(), JsonObject.class);
                     JsonArray items = json.has("items")
                             ? json.getAsJsonArray("items") : new JsonArray();
+
+                    System.out.println("[YouTube] Found " + items.size() + " items in response");
 
                     for (int i = 0; i < items.size(); i++) {
                         JsonObject item = items.get(i).getAsJsonObject();
@@ -111,7 +130,9 @@ public class YouTubeService {
                                 ? snippet.get("title").getAsString() : "Workout video";
 
                         results.add(new VideoResult(title, videoId));
+                        System.out.println("[YouTube] Added video: " + title);
                     }
+                    System.out.println("[YouTube] Returning " + results.size() + " videos");
                     return results;
                 });
     }
